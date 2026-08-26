@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SistemaBecas.Api/SistemaBecas.Api.csproj" />
+  <Project Path="SistemaBecas.Client/SistemaBecas.Client.csproj" />
+  <Project Path="SistemaBecas.Library/SistemaBecas.Library.csproj" />
+</Solution>
