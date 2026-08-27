@@ -1,7 +1,139 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Inicio - Plataforma Nacional de Becas</PageTitle>
 
-<h1>Hello, world!</h1>
+<!-- HERO / CARRUSEL -->
+<div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+    </div>
 
-Welcome to your new app.
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="hero-slide hero-bg-1 d-flex align-items-center">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <h1 class="hero-title">Construye tu futuro <span class="fw-normal">con educación.</span></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="hero-slide hero-bg-2 d-flex align-items-center">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <h1 class="hero-title">Tu beca, <span class="fw-normal">en un solo lugar.</span></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="hero-slide hero-bg-3 d-flex align-items-center">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <h1 class="hero-title">Transparencia <span class="fw-normal">en cada proceso.</span></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BANDA DE ESTADÍSTICAS -->
+<section class="stats-band py-5">
+    <div class="container">
+        <div class="row text-center">
+            @foreach (var stat in Stats)
+            {
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <i class="bi @stat.Icon stats-icon"></i>
+                    <div class="stats-number">@stat.Number</div>
+                    <div class="stats-label">@stat.Label</div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- QUÉ SOMOS -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title">PLATAFORMA NACIONAL DE BECAS</h2>
+        <hr class="section-divider" />
+
+        <p class="about-text">
+            De conformidad con el mandato del Ministerio de Educación, esta plataforma centraliza
+            la gestión integral del ciclo de vida de las becas otorgadas a estudiantes guatemaltecos
+            de nivel medio, universitario y de posgrado.
+        </p>
+
+        <p class="about-text">
+            A través de este sistema se administran convocatorias, se registran estudiantes, se
+            gestionan solicitudes y documentación, y se da seguimiento a las evaluaciones realizadas
+            por los comités correspondientes, garantizando trazabilidad y transparencia en cada etapa.
+        </p>
+
+        <p class="about-text">
+            El sistema permite consultar el estado de una beca en tiempo real y genera reportes
+            que facilitan la toma de decisiones institucionales, reemplazando procesos manuales
+            que antes generaban retrasos y duplicidad de información.
+        </p>
+    </div>
+</section>
+
+
+
+<!-- FOOTER -->
+<footer class="footer-band py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h6 class="fw-bold">INFORMACIÓN DE CONTACTO</h6>
+                <p class="mb-1"><i class="bi bi-envelope-fill me-2"></i>becas@mineduc.gob.gt</p>
+                <p class="mb-1">Becas Nacionales</p>
+                <p class="mb-1">+(502) 2411-9595 Ext. 1000</p>
+                <p class="mb-1 mt-2">Becas Internacionales</p>
+                <p class="mb-1">+(502) 2411-9595 Ext. 1001</p>
+                <p class="mb-0"><i class="bi bi-geo-alt-fill me-2"></i>6a. calle 1-87 Zona 10, Ciudad de Guatemala</p>
+            </div>
+
+            <div class="col-md-4 text-center mb-4 mb-md-0">
+                <h6 class="fw-bold">REDES SOCIALES</h6>
+                <div class="social-icons">
+                    <a href="#"><i class="bi bi-facebook"></i></a>
+                    <a href="#"><i class="bi bi-instagram"></i></a>
+                    <a href="#"><i class="bi bi-tiktok"></i></a>
+                    <a href="#"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#"><i class="bi bi-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-center text-md-end">
+                <h5 class="fw-bold mb-0">BECAS</h5>
+                <small>MINEDUC</small>
+            </div>
+        </div>
+    </div>
+</footer>
+
+@code {
+    private record Stat(string Icon, string Number, string Label);
+    private record Feature(string Icon, string Title, string Description);
+
+    private List<Stat> Stats = new()
+    {
+        new("bi-mortarboard-fill", "23", "Convocatorias de becas"),
+        new("bi-globe-americas", "10", "Instituciones aliadas"),
+        new("bi-building", "16", "Áreas de estudio"),
+    };
+
+    
+}
