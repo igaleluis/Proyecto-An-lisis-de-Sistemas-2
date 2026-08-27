@@ -1,0 +1,109 @@
+/* CSS for Home component */
+/* HERO */
+.hero-slide {
+    height: 480px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-bg-1 {
+    background-image: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.15)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80');
+}
+
+.hero-bg-2 {
+    background-image: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.15)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80');
+}
+
+.hero-bg-3 {
+    background-image: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.15)), url('https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1600&q=80');
+}
+
+.hero-title {
+    color: #fff;
+    font-weight: 700;
+    font-size: 2.5rem;
+    text-shadow: 0 2px 6px rgba(0,0,0,.4);
+}
+
+/* STATS BAND */
+.stats-band {
+    background-color: #f5a623;
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    color: #fff;
+}
+
+.stats-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    line-height: 1;
+}
+
+.stats-label {
+    color: #1e3a8a;
+    font-weight: 600;
+}
+
+/* QUÉ SOMOS */
+.section-title {
+    color: #1e3a8a;
+    font-weight: 800;
+    letter-spacing: .5px;
+}
+
+.section-divider {
+    border-top: 3px solid #1e3a8a;
+    width: 100%;
+    opacity: 1;
+}
+
+.about-text {
+    color: #1e3a8a;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+/* FEATURES */
+.feature-icon {
+    font-size: 2.5rem;
+    color: #f5a623;
+}
+
+.feature-card {
+    transition: transform .2s ease;
+}
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+    }
+
+/* FOOTER */
+.footer-band {
+    background-color: #1e3a8a;
+    color: #fff;
+}
+
+    .footer-band a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+.social-icons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    margin: 0 4px;
+    font-size: 1.1rem;
+}
+
+    .social-icons a:hover {
+        background: rgba(255,255,255,.3);
+    }
