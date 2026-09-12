@@ -1,0 +1,569 @@
+/* CSS for cargar-documentacion component */
+@page
+
+"/cargar-documentacion"
+
+<PageTitle > Sistema de Becas - Cargar documentación</PageTitle >
+
+<div class="documentos-page" >
+
+<div class="documentos-container" >
+
+<div class="documentos-card" >
+<!-- ENCABEZADO -->
+<div class="documentos-header" >
+
+<div class="logo-circle" >
+📄
+</div >
+
+<h1 > Sistema de Becas</h1 >
+
+<p > Cargar documentación</p >
+
+</div >
+<!-- CONTENIDO -->
+<div class="contenido" >
+
+<div class="form-title" >
+
+<h2 > Documentación de la solicitud</h2 >
+
+<p >
+Seleccione la solicitud y cargue los documentos requeridos.
+</p >
+
+</div >
+<!-- SOLICITUD -->
+<div class="form-group" >
+
+<label > Solicitud</label >
+
+<select @bind="solicitudSeleccionada" >
+
+<option value="" >
+Seleccione una solicitud
+</option >
+
+<option value="0001" >
+Solicitud #0001
+</option >
+
+<option value="0002" >
+Solicitud #0002
+</option >
+
+</select >
+
+</div >
+<!-- DOCUMENTOS -->
+<div class="documentos-section" >
+
+<h3 > Documentos requeridos</h3 >
+
+<p class="descripcion" >
+Adjunte los documentos correspondientes a la solicitud.
+</p >
+<!-- DPI -->
+<div class="documento-item" >
+
+<div class="documento-info" >
+
+<div class="documento-icon" >
+📄
+</div >
+
+<div >
+
+<strong > DPI</strong >
+
+<span >
+Documento de identificación
+</span >
+
+</div >
+
+</div >
+
+<div class="documento-carga" >
+
+<span class="estado-pendiente" >
+Pendiente
+</span >
+
+<input type="file"
+accept=".pdf,.jpg,.jpeg,.png" / >
+
+</div >
+
+</div >
+<!-- CONSTANCIA -->
+<div class="documento-item" >
+
+<div class="documento-info" >
+
+<div class="documento-icon" >
+📄
+</div >
+
+<div >
+
+<strong > Constancia de estudios</strong >
+
+<span >
+Constancia emitida por la institución educativa
+</span >
+
+</div >
+
+</div >
+
+<div class="documento-carga" >
+
+<span class="estado-pendiente" >
+Pendiente
+</span >
+
+<input type="file"
+accept=".pdf,.jpg,.jpeg,.png" / >
+
+</div >
+
+</div >
+<!-- CERTIFICACIÓN -->
+<div class="documento-item" >
+
+<div class="documento-info" >
+
+<div class="documento-icon" >
+📄
+</div >
+
+<div >
+
+<strong > Certificación de notas</strong >
+
+<span >
+Certificación de calificaciones
+</span >
+
+</div >
+
+</div >
+
+<div class="documento-carga" >
+
+<span class="estado-pendiente" >
+Pendiente
+</span >
+
+<input type="file"
+accept=".pdf,.jpg,.jpeg,.png" / >
+
+</div >
+
+</div >
+
+</div >
+<!-- OBSERVACIONES -->
+<div class="form-group observaciones" >
+
+<label > Observaciones</label >
+
+<textarea rows="4"
+placeholder="Ingrese alguna observación sobre la documentación..." > </textarea >
+
+</div >
+<!-- BOTONES -->
+<div class="botones" >
+
+<button type="button"
+class="btn-cancelar" >
+Cancelar
+</button >
+
+<button type="button"
+class="btn-guardar" >
+Guardar documentación
+</button >
+
+</div >
+<!-- SEGURIDAD -->
+<div class="seguridad" >
+🔒 Información protegida
+</div >
+
+</div >
+
+</div >
+
+
+<div class="footer" >
+Sistema de Becas
+</div >
+
+</div >
+
+</div >
+
+
+<style >
+/* ================================
+       PÁGINA
+       ================================ */
+.documentos-page {
+    min-height: 100vh;
+    background: #f4f7fb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.documentos-container {
+    width: 100%;
+    max-width: 900px;
+}
+
+
+/* ================================
+       TARJETA
+       ================================ */
+
+.documentos-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+}
+
+
+/* ================================
+       ENCABEZADO
+       ================================ */
+
+.documentos-header {
+    background: #2563eb;
+    color: white;
+    text-align: center;
+    padding: 30px 20px;
+}
+
+
+    .documentos-header h1 {
+        margin: 10px 0 5px;
+        font-size: 28px;
+    }
+
+
+    .documentos-header p {
+        margin: 0;
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+
+.logo-circle {
+    width: 65px;
+    height: 65px;
+    margin: auto;
+    background: #facc15;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+
+/* ================================
+       CONTENIDO
+       ================================ */
+
+.contenido {
+    padding: 35px;
+}
+
+
+.form-title {
+    margin-bottom: 25px;
+}
+
+
+    .form-title h2 {
+        margin: 0 0 6px;
+        color: #1e3a8a;
+        font-size: 22px;
+    }
+
+
+    .form-title p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+
+/* ================================
+       FORMULARIOS
+       ================================ */
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #374151;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        outline: none;
+    }
+
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+
+.observaciones textarea {
+    resize: vertical;
+}
+
+
+/* ================================
+       DOCUMENTOS
+       ================================ */
+
+.documentos-section {
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+
+
+    .documentos-section h3 {
+        margin: 0 0 5px;
+        color: #1e3a8a;
+        font-size: 18px;
+    }
+
+
+.descripcion {
+    margin: 0 0 15px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+.documento-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 18px;
+    margin-bottom: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+
+.documento-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+
+.documento-icon {
+    width: 42px;
+    height: 42px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+
+.documento-info strong {
+    display: block;
+    color: #374151;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+
+.documento-info span {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+
+.documento-carga {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+
+    .documento-carga input[type="file"] {
+        max-width: 260px;
+        font-size: 12px;
+    }
+
+
+.estado-pendiente {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* ================================
+       BOTONES
+       ================================ */
+
+.botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+
+    .botones button {
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+
+.btn-cancelar {
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+
+    .btn-cancelar:hover {
+        background: #f3f4f6;
+    }
+
+
+.btn-guardar {
+    background: #facc15;
+    color: #1e3a8a;
+    border: 1px solid #facc15;
+}
+
+
+    .btn-guardar:hover {
+        background: #eab308;
+    }
+
+
+/* ================================
+       SEGURIDAD
+       ================================ */
+
+.seguridad {
+    text-align: center;
+    margin-top: 25px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* ================================
+       FOOTER
+       ================================ */
+
+.footer {
+    text-align: center;
+    margin-top: 15px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* ================================
+       RESPONSIVE
+       ================================ */
+
+@media (max-width: 700px) {
+
+    .documentos-page {
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+
+
+    .contenido {
+        padding: 25px 20px;
+    }
+
+
+    .documento-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+
+    .documento-carga {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+
+        .documento-carga input[type="file"] {
+            max-width: 100%;
+            width: 100%;
+        }
+
+
+    .botones {
+        flex-direction: column;
+    }
+
+
+        .botones button {
+            width: 100%;
+        }
+}
+
+</style >
+
+
+@code {
+    private string solicitudSeleccionada = "";
+}

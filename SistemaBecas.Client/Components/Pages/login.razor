@@ -1,2 +1,119 @@
 @page "/login"
-<H1>login</H1>
+
+<PageTitle>Sistema de Becas - Login</PageTitle>
+
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
+
+    <div class="row justify-content-center w-100">
+
+        <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+
+            <!-- TARJETA DE LOGIN -->
+            <RadzenCard Variant="Variant.Outlined">
+
+                <!-- ENCABEZADO -->
+                <div class="text-center mb-4">
+
+                    <h1 class="text-primary">
+                        Sistema de Becas
+                    </h1>
+
+                    <p class="text-muted">
+                        Ingrese sus datos para acceder
+                    </p>
+
+                </div>
+
+
+                <!-- CORREO -->
+                <div class="mb-3">
+
+                    <RadzenFormField Text="Correo electrónico"
+                                     Variant="Variant.Outlined"
+                                     Style="width:100%">
+
+                        <RadzenTextBox @bind-Value="correo"
+                                       Placeholder="Ingrese su correo"
+                                       Style="width:100%" />
+
+                    </RadzenFormField>
+
+                </div>
+
+
+                <!-- CONTRASEÑA -->
+                <div class="mb-3">
+
+                    <RadzenFormField Text="Contraseña"
+                                     Variant="Variant.Outlined"
+                                     Style="width:100%">
+
+                        <RadzenPassword @bind-Value="password"
+                                        Placeholder="Ingrese su contraseña"
+                                        Style="width:100%" />
+
+                    </RadzenFormField>
+
+                </div>
+
+
+                <!-- BOTÓN INICIAR SESIÓN -->
+                <div class="d-grid">
+
+                    <RadzenButton Text="Iniciar sesión"
+                                  Icon="login"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Size="ButtonSize.Large"
+                                  Click="@IniciarSesion" />
+
+                </div>
+
+
+                <!-- SEGURIDAD -->
+                <div class="text-center text-muted mt-3">
+
+                    🔒 Acceso seguro
+
+                </div>
+
+
+                <!-- RECUPERAR CONTRASEÑA -->
+                <div class="text-center mt-3">
+
+                    <RadzenLink Text="¿Olvidaste tu contraseña?"
+                                Path="#" />
+
+                </div>
+
+            </RadzenCard>
+
+
+            <!-- PIE -->
+            <div class="text-center text-muted mt-3">
+
+                Sistema de Becas
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+
+    private string correo = "";
+
+    private string password = "";
+
+
+    private void IniciarSesion()
+    {
+        // Por ahora solamente es el prototipo.
+        // La validación con la base de datos
+        // se conectará posteriormente.
+    }
+
+}
