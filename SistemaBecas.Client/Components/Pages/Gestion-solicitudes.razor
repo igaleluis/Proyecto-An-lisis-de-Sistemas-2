@@ -1,0 +1,1092 @@
+@page "/gestion-solicitudes"
+
+@using Radzen
+@using Radzen.Blazor
+
+<PageTitle>Gestión de Solicitudes</PageTitle>
+
+
+<RadzenStack Gap="1.5rem"
+             Style="
+    padding: 2rem;
+    background-color: #f4f7fb;
+    min-height: 100vh;">
+
+
+    <!-- ====================================================== -->
+    <!-- ENCABEZADO                                             -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        background: linear-gradient(135deg, #1565c0, #1e88e5);
+        color: white;
+        border-radius: 16px;
+        border: none;
+        padding: 2rem;">
+
+        <RadzenRow AlignItems="AlignItems.Center">
+
+            <RadzenColumn Size="12" SizeMD="8">
+
+                <RadzenText Text="Gestión de Solicitudes"
+                            TextStyle="TextStyle.H4"
+                            Style="
+                color: white;
+                font-weight: 700;
+                margin-bottom: 6px;" />
+
+                <RadzenText Text="Aprobar o rechazar solicitudes de beca"
+                            Style="
+                color: rgba(255,255,255,0.9);
+                font-size: 15px;" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="12"
+                          SizeMD="4"
+                          Style="text-align: right;">
+
+                <RadzenBadge Text="7 solicitudes"
+                             Style="
+                background: rgba(255,255,255,0.2);
+                color: white;
+                padding: 8px 14px;
+                border-radius: 20px;
+                font-size: 14px;" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- ESTADÍSTICAS                                           -->
+    <!-- ====================================================== -->
+
+    <RadzenRow>
+
+        <!-- PENDIENTES -->
+
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0 2px 8px rgba(21,101,192,0.10);">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Pendientes"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="3"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #64b5f6;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="hourglass_empty"
+                                    Style="
+                        font-size: 38px;
+                        color: #64b5f6;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <!-- APROBADAS -->
+
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0 2px 8px rgba(21,101,192,0.10);">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Aprobadas"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="2"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #1565c0;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="check_circle"
+                                    Style="
+                        font-size: 38px;
+                        color: #1565c0;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <!-- RECHAZADAS -->
+
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0 2px 8px rgba(21,101,192,0.10);">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Rechazadas"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="2"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #94a3b8;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="cancel"
+                                    Style="
+                        font-size: 38px;
+                        color: #94a3b8;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+
+
+    <!-- ====================================================== -->
+    <!-- FILTROS                                                -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        border-radius: 12px;
+        background-color: #f7fbff;
+        border: 1px solid #e3edf7;">
+
+        <RadzenText Text="Filtros de búsqueda"
+                    TextStyle="TextStyle.H6"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 5px;" />
+
+        <RadzenText Text="Utilice los filtros para encontrar una solicitud."
+                    Style="
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 20px;" />
+
+
+        <RadzenRow AlignItems="AlignItems.End">
+
+
+            <!-- ESTADO -->
+
+            <RadzenColumn Size="12" SizeMD="3">
+
+                <RadzenFormField Text="Estado"
+                                 Style="width: 100%;">
+
+                    <RadzenDropDown TValue="string"
+                                    Data="@(new[]
+                                                        {
+                                        "Pendiente",
+                                        "Aprobada",
+                                        "Rechazada"
+                                    })"
+                                    Placeholder="Todos"
+                                    AllowClear="true"
+                                    Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- CONVOCATORIA -->
+
+            <RadzenColumn Size="12" SizeMD="3">
+
+                <RadzenFormField Text="Convocatoria"
+                                 Style="width: 100%;">
+
+                    <RadzenDropDown TValue="string"
+                                    Data="@(new[]
+                                                        {
+                                        "Beca Nacional Universitaria 2026",
+                                        "Beca Internacional Posgrado",
+                                        "Beca Técnica Media",
+                                        "Beca Investigación Interna"
+                                    })"
+                                    Placeholder="Todas"
+                                    AllowClear="true"
+                                    Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- BUSCAR ESTUDIANTE -->
+
+            <RadzenColumn Size="12" SizeMD="4">
+
+                <RadzenFormField Text="Buscar estudiante"
+                                 Style="width: 100%;">
+
+                    <RadzenTextBox TValue="string"
+                                   Placeholder="Nombre o DPI"
+                                   Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- BOTÓN -->
+
+            <RadzenColumn Size="12" SizeMD="2">
+
+                <RadzenButton Text="Buscar"
+                              Icon="search"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Style="width: 100%;" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- TABLA                                                   -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        overflow-x: auto;">
+
+        <RadzenText Text="Solicitudes"
+                    TextStyle="TextStyle.H6"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 5px;" />
+
+        <RadzenText Text="Listado de solicitudes de beca"
+                    Style="
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 20px;" />
+
+
+        <!-- ENCABEZADO -->
+
+        <RadzenRow Style="
+            background-color: #1565c0;
+            color: white;
+            padding: 14px 10px;
+            font-weight: 700;
+            min-width: 1100px;">
+
+            <RadzenColumn Size="1">
+                Solicitud
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Estudiante
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Convocatoria
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Fecha solicitud
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Punteo
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Estado
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Acciones
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- ================================================== -->
+        <!-- SOLICITUD 1001 -->
+        <!-- ================================================== -->
+
+        <RadzenRow Style="
+            padding: 15px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1100px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+
+                <strong>1001</strong>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <strong>
+                    Ana López Martínez
+                </strong>
+
+                <br />
+
+                <small style="color:#6b7280;">
+                    DPI: 1234 5678 9012
+                </small>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                Beca Nacional Universitaria 2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                12/04/2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="88"
+                             BadgeStyle="BadgeStyle.Primary" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Pendiente"
+                             BadgeStyle="BadgeStyle.Info" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             Gap="0.3rem">
+
+                    <RadzenButton Icon="visibility"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="check"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="close"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                </RadzenStack>
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- ================================================== -->
+        <!-- SOLICITUD 1002 -->
+        <!-- ================================================== -->
+
+        <RadzenRow Style="
+            padding: 15px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1100px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+
+                <strong>1002</strong>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <strong>
+                    Carlos Ramírez Pérez
+                </strong>
+
+                <br />
+
+                <small style="color:#6b7280;">
+                    DPI: 9876 5432 1098
+                </small>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                Beca Nacional Universitaria 2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                10/04/2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="72"
+                             BadgeStyle="BadgeStyle.Info" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Aprobada"
+                             BadgeStyle="BadgeStyle.Primary" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <RadzenButton Icon="visibility"
+                              ButtonStyle="ButtonStyle.Light"
+                              Size="ButtonSize.Small" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- ================================================== -->
+        <!-- SOLICITUD 1003 -->
+        <!-- ================================================== -->
+
+        <RadzenRow Style="
+            padding: 15px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1100px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+
+                <strong>1003</strong>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <strong>
+                    María García Solís
+                </strong>
+
+                <br />
+
+                <small style="color:#6b7280;">
+                    DPI: 4321 8765 2109
+                </small>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                Beca Internacional Posgrado
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                08/04/2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="55"
+                             BadgeStyle="BadgeStyle.Light" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Rechazada"
+                             BadgeStyle="BadgeStyle.Light" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <RadzenButton Icon="visibility"
+                              ButtonStyle="ButtonStyle.Light"
+                              Size="ButtonSize.Small" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- ================================================== -->
+        <!-- SOLICITUD 1004 -->
+        <!-- ================================================== -->
+
+        <RadzenRow Style="
+            padding: 15px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1100px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+
+                <strong>1004</strong>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <strong>
+                    José Hernández Díaz
+                </strong>
+
+                <br />
+
+                <small style="color:#6b7280;">
+                    DPI: 5678 1234 3456
+                </small>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                Beca Técnica Media
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                15/04/2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="91"
+                             BadgeStyle="BadgeStyle.Primary" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Pendiente"
+                             BadgeStyle="BadgeStyle.Info" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             Gap="0.3rem">
+
+                    <RadzenButton Icon="visibility"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="check"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="close"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                </RadzenStack>
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- ================================================== -->
+        <!-- SOLICITUD 1005 -->
+        <!-- ================================================== -->
+
+        <RadzenRow Style="
+            padding: 15px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1100px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+
+                <strong>1005</strong>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <strong>
+                    Laura Martínez Ruiz
+                </strong>
+
+                <br />
+
+                <small style="color:#6b7280;">
+                    DPI: 8765 4321 6543
+                </small>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                Beca Investigación Interna
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                14/04/2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="67"
+                             BadgeStyle="BadgeStyle.Info" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Aprobada"
+                             BadgeStyle="BadgeStyle.Primary" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <RadzenButton Icon="visibility"
+                              ButtonStyle="ButtonStyle.Light"
+                              Size="ButtonSize.Small" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- ================================================== -->
+        <!-- SOLICITUD 1006 -->
+        <!-- ================================================== -->
+
+        <RadzenRow Style="
+            padding: 15px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1100px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+
+                <strong>1006</strong>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <strong>
+                    Pedro Sánchez López
+                </strong>
+
+                <br />
+
+                <small style="color:#6b7280;">
+                    DPI: 3456 7890 7890
+                </small>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                Beca Nacional Universitaria 2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                11/04/2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="40"
+                             BadgeStyle="BadgeStyle.Light" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Rechazada"
+                             BadgeStyle="BadgeStyle.Light" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <RadzenButton Icon="visibility"
+                              ButtonStyle="ButtonStyle.Light"
+                              Size="ButtonSize.Small" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- ================================================== -->
+        <!-- SOLICITUD 1007 -->
+        <!-- ================================================== -->
+
+        <RadzenRow Style="
+            padding: 15px 10px;
+            min-width: 1100px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+
+                <strong>1007</strong>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <strong>
+                    Sofía Morales Cruz
+                </strong>
+
+                <br />
+
+                <small style="color:#6b7280;">
+                    DPI: 6543 2109 0123
+                </small>
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                Beca Internacional Posgrado
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                09/04/2026
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="83"
+                             BadgeStyle="BadgeStyle.Primary" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Pendiente"
+                             BadgeStyle="BadgeStyle.Info" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="2">
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             Gap="0.3rem">
+
+                    <RadzenButton Icon="visibility"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="check"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="close"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                </RadzenStack>
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- PREVISUALIZACIÓN: DETALLE                              -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        max-width: 550px;
+        width: 100%;
+        margin: 1rem auto;
+        border-radius: 14px;">
+
+        <RadzenText Text="Detalle de Solicitud"
+                    TextStyle="TextStyle.H5"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 20px;" />
+
+
+        <RadzenStack Gap="0.7rem">
+
+            <RadzenText Text="Solicitud"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="1001"
+                        Style="font-weight:600;" />
+
+
+            <RadzenText Text="Estudiante"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="Ana López Martínez"
+                        Style="font-weight:600;" />
+
+
+            <RadzenText Text="DPI"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="1234 5678 9012" />
+
+
+            <RadzenText Text="Convocatoria"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="Beca Nacional Universitaria 2026" />
+
+
+            <RadzenText Text="Fecha"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="12/04/2026" />
+
+
+            <RadzenText Text="Punteo"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenBadge Text="88"
+                         BadgeStyle="BadgeStyle.Primary" />
+
+
+            <RadzenText Text="Estado"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenBadge Text="Pendiente"
+                         BadgeStyle="BadgeStyle.Info" />
+
+
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         JustifyContent="JustifyContent.End"
+                         Gap="0.5rem"
+                         Style="margin-top:15px;">
+
+                <RadzenButton Text="Rechazar"
+                              Icon="close"
+                              ButtonStyle="ButtonStyle.Light" />
+
+                <RadzenButton Text="Aprobar"
+                              Icon="check"
+                              ButtonStyle="ButtonStyle.Primary" />
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- PREVISUALIZACIÓN: APROBAR                              -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        max-width: 450px;
+        width: 100%;
+        margin: 1rem auto;
+        border-radius: 14px;">
+
+        <RadzenText Text="Aprobar solicitud"
+                    TextStyle="TextStyle.H5"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 15px;" />
+
+        <RadzenText Text="¿Desea aprobar la solicitud 1001 de Ana López Martínez?"
+                    Style="
+        color:#374151;
+        line-height:1.5;" />
+
+
+        <RadzenStack Orientation="Orientation.Horizontal"
+                     JustifyContent="JustifyContent.End"
+                     Gap="0.5rem"
+                     Style="margin-top:20px;">
+
+            <RadzenButton Text="Cancelar"
+                          ButtonStyle="ButtonStyle.Light" />
+
+            <RadzenButton Text="Aprobar"
+                          Icon="check"
+                          ButtonStyle="ButtonStyle.Primary" />
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- PREVISUALIZACIÓN: RECHAZAR                             -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        max-width: 450px;
+        width: 100%;
+        margin: 1rem auto 2rem;
+        border-radius: 14px;">
+
+        <RadzenText Text="Rechazar solicitud"
+                    TextStyle="TextStyle.H5"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 15px;" />
+
+        <RadzenText Text="¿Desea rechazar la solicitud 1001 de Ana López Martínez?"
+                    Style="
+        color:#374151;
+        line-height:1.5;" />
+
+
+        <RadzenStack Orientation="Orientation.Horizontal"
+                     JustifyContent="JustifyContent.End"
+                     Gap="0.5rem"
+                     Style="margin-top:20px;">
+
+            <RadzenButton Text="Cancelar"
+                          ButtonStyle="ButtonStyle.Light" />
+
+            <RadzenButton Text="Rechazar"
+                          Icon="close"
+                          ButtonStyle="ButtonStyle.Light" />
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+</RadzenStack>

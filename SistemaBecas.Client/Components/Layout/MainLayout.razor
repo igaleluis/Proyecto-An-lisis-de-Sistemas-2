@@ -27,6 +27,7 @@
 
             </RadzenStack>
 
+
             <RadzenLink Path="/Login"
                         Text="Iniciar Sesión"
                         Icon="login"
@@ -51,7 +52,9 @@
                                  Icon="add_ad">
 
                 <RadzenPanelMenuItem Text="Administrar Convocatorias"
-                                     Path="/"
+
+                                     Path="/adminconvocatorias"
+
                                      Click="@CloseSidebar" />
 
             </RadzenPanelMenuItem>
@@ -62,7 +65,9 @@
                                  Icon="person">
 
                 <RadzenPanelMenuItem Text="Registrar Estudiantes"
+
                                      Path="/registrar-estudiante"
+
                                      Click="@CloseSidebar" />
 
             </RadzenPanelMenuItem>
@@ -70,6 +75,7 @@
 
             <!-- SOLICITUDES -->
             <RadzenPanelMenuItem Text="Solicitudes"
+
                                  Icon="description">
 
                 <RadzenPanelMenuItem Text="Gestionar Solicitudes"
@@ -95,7 +101,25 @@
                                      Path="/"
                                      Click="@CloseSidebar" />
 
+
+
+                <RadzenPanelMenuItem Text="Gestionar Solicitudes"
+                                     Path="/gestion-solicitudes"
+                                     Click="@CloseSidebar" />
+
+                <RadzenPanelMenuItem Text="Cargar Documentación"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+                <RadzenPanelMenuItem Text="Consultar Estado de Becas"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
             </RadzenPanelMenuItem>
+
+
+          
+
 
 
             <!-- COMITÉS -->
@@ -103,7 +127,9 @@
                                  Icon="group">
 
                 <RadzenPanelMenuItem Text="Gestionar Comités Evaluadores"
+
                                      Path="/gestionar-comites-evaluadores"
+
                                      Click="@CloseSidebar" />
 
             </RadzenPanelMenuItem>
