@@ -1,0 +1,611 @@
+﻿@page "/gestion-solicitudes"
+@inject DialogService DialogService
+<PageTitle>Gestión de Solicitudes</PageTitle>
+
+
+<div class="container-fluid">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Gestión de Solicitudes</h3>
+            <p class="text-muted mb-0">
+                Aprobar o rechazar solicitudes de beca
+            </p>
+        </div>
+
+        <RadzenBadge Text="@($"{solicitudes.Count} solicitudes")"
+                     BadgeStyle="BadgeStyle.Secondary"
+                     IsPill = "true"
+                     Style="font-size: 14px; padding: 8px 14px;" />
+    </div>
+
+
+    <!-- FILTROS -->
+    <RadzenCard class="mb-4">
+
+        <div class="mb-3">
+            <h5 class="fw-bold mb-1">Filtros de búsqueda</h5>
+            <span class="text-muted">
+                Utilice los filtros para encontrar una solicitud.
+            </span>
+        </div>
+
+        <RadzenRow Gap="1rem">
+
+            <!-- ESTADO -->
+            <RadzenColumn Size="12" SizeMD="3">
+
+                <RadzenFormField Text="Estado" Variant="Variant.Outlined" Style="width:100%">
+                    <RadzenDropDown @bind-Value="estadoFiltro"
+                                    Data="@estados"
+                                    Placeholder="Todos"
+                                    AllowClear="true"
+                                    Style="width:100%;" />
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- CONVOCATORIA -->
+            <RadzenColumn Size="12" SizeMD="3">
+
+                <RadzenFormField Text="Convocatoria" Variant="Variant.Outlined" Style="width:100%">
+                    <RadzenDropDown @bind-Value="convocatoriaFiltro"
+                                    Data="@convocatorias"
+                                    TextProperty="Nombre"
+                                    ValueProperty="IdConvocatoria"
+                                    Placeholder="Todas"
+                                    AllowClear="true"
+                                    Style="width:100%;" />
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- BUSCAR ESTUDIANTE -->
+            <RadzenColumn Size="12" SizeMD="4">
+
+                <RadzenFormField Text="Buscar estudiante" Variant="Variant.Outlined" Style="width:100%">
+
+                    <RadzenTextBox @bind-Value="busqueda"
+                                   Placeholder="Nombre o DPI"
+                                   Style="width:100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- BOTÓN -->
+            <RadzenColumn Size="12" SizeMD="2" class="d-flex align-items-end">
+
+                <RadzenButton Text="Buscar"
+                              Icon="search"
+                              ButtonStyle="ButtonStyle.Secondary"
+                              Click="@Buscar"
+                              Style="width:100%;" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- TARJETAS DE ESTADO -->
+
+    <RadzenRow Gap="1rem" class="mb-4">
+
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard class="status-card">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <div class="text-muted">Pendientes</div>
+                        <h3 class="fw-bold mb-0">
+                            @solicitudes.Count(x => x.Estado == "Pendiente")
+                        </h3>
+                    </div>
+
+                    <RadzenIcon Icon="pending_actions"
+                                Style="font-size:40px; color:#f59e0b;" />
+
+                </div>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard class="status-card">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <div class="text-muted">Aprobadas</div>
+                        <h3 class="fw-bold mb-0">
+                            @solicitudes.Count(x => x.Estado == "Aprobada")
+                        </h3>
+                    </div>
+
+                    <RadzenIcon Icon="check_circle"
+                                Style="font-size:40px; color:#16a34a;" />
+
+                </div>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard class="status-card">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <div class="text-muted">Rechazadas</div>
+                        <h3 class="fw-bold mb-0">
+                            @solicitudes.Count(x => x.Estado == "Rechazada")
+                        </h3>
+                    </div>
+
+                    <RadzenIcon Icon="cancel"
+                                Style="font-size:40px; color:#dc2626;" />
+
+                </div>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+
+
+    <!-- TABLA -->
+
+    <RadzenCard>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div>
+                <h5 class="fw-bold mb-1">Solicitudes</h5>
+                <span class="text-muted">
+                    Listado de solicitudes de beca
+                </span>
+            </div>
+
+        </div>
+
+
+        <RadzenDataGrid @ref="grid"
+                        Data="@solicitudesFiltradas"
+                        TItem="SolicitudModelo"
+                        AllowPaging="true"
+                        AllowSorting="true"
+                        AllowFiltering="true"
+                        PageSize="8"
+                        Responsive="true"
+                        EmptyText="No se encontraron solicitudes.">
+
+            <Columns>
+
+                <!-- ID -->
+
+                <RadzenDataGridColumn TItem="SolicitudDemo"
+                                      Property="IdSolicitud"
+                                      Title="Solicitud"
+                                      Width="110px" />
+
+                <!-- ESTUDIANTE -->
+
+                <RadzenDataGridColumn TItem="SolicitudDemo"
+                                      Title="Estudiante"
+                                      Width="220px">
+
+                    <Template Context="solicitud">
+
+                        <div>
+                            <div class="fw-semibold">
+                                @solicitud.Estudiante
+                            </div>
+
+                            <small class="text-muted">
+                                DPI: @solicitud.DPI
+                            </small>
+                        </div>
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+
+                <!-- CONVOCATORIA -->
+
+                <RadzenDataGridColumn TItem="SolicitudDemo"
+                                      Property="Convocatoria"
+                                      Title="Convocatoria"
+                                      Width="180px" />
+
+
+                <!-- FECHA -->
+
+                <RadzenDataGridColumn TItem="SolicitudDemo"
+                                      Property="FechaSolicitud"
+                                      Title="Fecha solicitud"
+                                      Width="140px">
+
+                    <Template Context="solicitud">
+                        @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+
+                <!-- PUNTEO -->
+
+                <RadzenDataGridColumn TItem="SolicitudDemo"
+                                      Title="Punteo"
+                                      Width="100px">
+
+                    <Template Context="solicitud">
+
+                        <RadzenBadge Text="@solicitud.Punteo.ToString()"
+                                     BadgeStyle="@ObtenerBadgePunteo(solicitud.Punteo)" />
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+
+                <!-- ESTADO -->
+
+                <RadzenDataGridColumn TItem="SolicitudDemo"
+                                      Title="Estado"
+                                      Width="130px">
+
+                    <Template Context="solicitud">
+
+                        @if (solicitud.Estado == "Pendiente")
+                        {
+                            <RadzenBadge Text="Pendiente"
+                                         BadgeStyle="BadgeStyle.Warning" />
+                        }
+                        else if (solicitud.Estado == "Aprobada")
+                        {
+                            <RadzenBadge Text="Aprobada"
+                                         BadgeStyle="BadgeStyle.Success" />
+                        }
+                        else
+                        {
+                            <RadzenBadge Text="Rechazada"
+                                         BadgeStyle="BadgeStyle.Danger" />
+                        }
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+
+                <!-- ACCIÓN -->
+
+                <RadzenDataGridColumn TItem="SolicitudModelo"
+                                      Title="Acciones"
+                                      Width="130px"
+                                      Sortable="false">
+
+                    <Template Context="solicitud">
+
+                        <RadzenButton Icon="visibility"
+                                      Text="Ver"
+                                      ButtonStyle="ButtonStyle.Light"
+                                      Size="ButtonSize.Small"
+                                      Click="@(() => AbrirDetalle(solicitud))" />
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+            </Columns>
+
+        </RadzenDataGrid>
+
+    </RadzenCard>
+
+</div>
+
+
+
+
+@code {
+
+    private RadzenDataGrid<SolicitudModelo>? grid;
+
+    private string? estadoFiltro;
+
+    private int? convocatoriaFiltro;
+
+    private string busqueda = string.Empty;
+
+    private bool mostrarDetalle = false;
+
+    private string justificacion = string.Empty;
+
+    private SolicitudModelo? solicitudSeleccionada;
+
+
+    private List<string> estados = new()
+    {
+        "Pendiente",
+        "Aprobada",
+        "Rechazada"
+    };
+
+
+    private List<ConvocatoriaDemo> convocatorias = new()
+    {
+        new ConvocatoriaDemo
+        {
+            IdConvocatoria = 1,
+            Nombre = "Becas Universitarias 2026"
+        },
+
+        new ConvocatoriaDemo
+        {
+            IdConvocatoria = 2,
+            Nombre = "Beca Excelencia Académica"
+        },
+
+        new ConvocatoriaDemo
+        {
+            IdConvocatoria = 3,
+            Nombre = "Beca Apoyo Económico"
+        }
+    };
+
+
+    private List<SolicitudModelo> solicitudes = new()
+    {
+        new SolicitudModelo
+        {
+            IdSolicitud = 1001,
+            Estudiante = "Juan Carlos Pérez López",
+            DPI = "1234567890101",
+            Telefono = "5555-1234",
+            FechaNacimiento = new DateTime(2004, 5, 12),
+            Convocatoria = "Becas Universitarias 2026",
+            IdConvocatoria = 1,
+            FechaSolicitud = new DateTime(2026, 8, 25),
+            Estado = "Pendiente",
+            Punteo = 92,
+            Observaciones = "Solicitud presentada para apoyo económico universitario.",
+            ObservacionesEvaluacion = "El estudiante cumple con los criterios establecidos."
+        },
+
+        new SolicitudModelo
+        {
+            IdSolicitud = 1002,
+            Estudiante = "María Fernanda López García",
+            DPI = "2345678901022",
+            Telefono = "4444-2233",
+            FechaNacimiento = new DateTime(2003, 9, 21),
+            Convocatoria = "Beca Excelencia Académica",
+            IdConvocatoria = 2,
+            FechaSolicitud = new DateTime(2026, 8, 26),
+            Estado = "Pendiente",
+            Punteo = 88,
+            Observaciones = "Solicitud de beca por excelencia académica.",
+            ObservacionesEvaluacion = "Buen rendimiento académico."
+        },
+
+        new SolicitudModelo
+        {
+            IdSolicitud = 1003,
+            Estudiante = "Carlos Alberto García Pérez",
+            DPI = "3456789012033",
+            Telefono = "5555-3322",
+            FechaNacimiento = new DateTime(2005, 2, 10),
+            Convocatoria = "Beca Apoyo Económico",
+            IdConvocatoria = 3,
+            FechaSolicitud = new DateTime(2026, 8, 27),
+            Estado = "Pendiente",
+            Punteo = 81,
+            Observaciones = "Solicitud de apoyo económico.",
+            ObservacionesEvaluacion = "Cumple parcialmente los criterios."
+        },
+
+        new SolicitudModelo
+        {
+            IdSolicitud = 1004,
+            Estudiante = "Ana Sofía Martínez",
+            DPI = "4567890123044",
+            Telefono = "5555-4433",
+            FechaNacimiento = new DateTime(2004, 11, 3),
+            Convocatoria = "Becas Universitarias 2026",
+            IdConvocatoria = 1,
+            FechaSolicitud = new DateTime(2026, 8, 20),
+            Estado = "Aprobada",
+            Punteo = 95,
+            Observaciones = "Solicitud aprobada.",
+            ObservacionesEvaluacion = "Excelente desempeño académico."
+        },
+
+        new SolicitudModelo
+        {
+            IdSolicitud = 1005,
+            Estudiante = "Luis Fernando Ramírez",
+            DPI = "5678901234055",
+            Telefono = "5555-5544",
+            FechaNacimiento = new DateTime(2003, 7, 18),
+            Convocatoria = "Beca Apoyo Económico",
+            IdConvocatoria = 3,
+            FechaSolicitud = new DateTime(2026, 8, 18),
+            Estado = "Rechazada",
+            Punteo = 62,
+            Observaciones = "No cumple con los requisitos mínimos.",
+            ObservacionesEvaluacion = "Punteo inferior al requerido."
+        },
+
+        new SolicitudModelo
+        {
+            IdSolicitud = 1006,
+            Estudiante = "Daniela Alejandra Morales",
+            DPI = "6789012345066",
+            Telefono = "5555-6655",
+            FechaNacimiento = new DateTime(2004, 3, 25),
+            Convocatoria = "Beca Excelencia Académica",
+            IdConvocatoria = 2,
+            FechaSolicitud = new DateTime(2026, 8, 28),
+            Estado = "Pendiente",
+            Punteo = 90,
+            Observaciones = "Solicitud de beca académica.",
+            ObservacionesEvaluacion = "Excelente promedio académico."
+        }
+    };
+
+
+    private IEnumerable<SolicitudModelo> solicitudesFiltradas =>
+        solicitudes.Where(x =>
+            (string.IsNullOrEmpty(estadoFiltro) ||
+             x.Estado == estadoFiltro)
+            &&
+            (!convocatoriaFiltro.HasValue ||
+             x.IdConvocatoria == convocatoriaFiltro.Value)
+            &&
+            (string.IsNullOrWhiteSpace(busqueda) ||
+             x.Estudiante.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+             x.DPI.Contains(busqueda, StringComparison.OrdinalIgnoreCase))
+        );
+
+
+    private void Buscar()
+    {
+        // La propiedad solicitudesFiltradas se actualiza automáticamente.
+        StateHasChanged();
+    }
+
+
+    private void SeleccionarSolicitud(SolicitudModelo solicitud)
+    {
+        AbrirDetalle(solicitud);
+    }
+
+
+    private async Task AbrirDetalle(SolicitudModelo solicitud)
+    {
+        var resultado = await DialogService.OpenAsync<GestionSolicitudDetalle>(
+            $"Solicitud #{solicitud.IdSolicitud}",
+            new Dictionary<string, object>
+            {
+            { "Solicitud", solicitud }
+            },
+            new DialogOptions
+            {
+                Width = "900px",
+                Height = "90vh",
+                Resizable = true,
+                Draggable = true,
+                CloseDialogOnOverlayClick = false
+            });
+
+        if (resultado is true)
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+
+    private void CerrarDetalle()
+    {
+        mostrarDetalle = false;
+        solicitudSeleccionada = null;
+    }
+
+
+    private void AprobarSolicitud(SolicitudModelo solicitud)
+    {
+        if (string.IsNullOrWhiteSpace(justificacion))
+        {
+            justificacion = "Solicitud aprobada por cumplir con los requisitos establecidos.";
+        }
+
+        solicitud.Estado = "Aprobada";
+
+        mostrarDetalle = false;
+
+        StateHasChanged();
+    }
+
+
+    private void RechazarSolicitud(SolicitudModelo solicitud)
+    {
+        if (string.IsNullOrWhiteSpace(justificacion))
+        {
+            justificacion = "Solicitud rechazada por no cumplir con los requisitos establecidos.";
+        }
+
+        solicitud.Estado = "Rechazada";
+
+        mostrarDetalle = false;
+
+        StateHasChanged();
+    }
+
+
+    private BadgeStyle ObtenerBadgePunteo(decimal punteo)
+    {
+        if (punteo >= 90)
+            return BadgeStyle.Success;
+
+        if (punteo >= 75)
+            return BadgeStyle.Info;
+
+        if (punteo >= 60)
+            return BadgeStyle.Warning;
+
+        return BadgeStyle.Danger;
+    }
+
+
+    public class SolicitudDemo
+    {
+        public int IdSolicitud { get; set; }
+
+        public string Estudiante { get; set; } = string.Empty;
+
+        public string DPI { get; set; } = string.Empty;
+
+        public string Telefono { get; set; } = string.Empty;
+
+        public DateTime FechaNacimiento { get; set; }
+
+        public int IdConvocatoria { get; set; }
+
+        public string Convocatoria { get; set; } = string.Empty;
+
+        public DateTime FechaSolicitud { get; set; }
+
+        public string Estado { get; set; } = string.Empty;
+
+        public decimal Punteo { get; set; }
+
+        public string Observaciones { get; set; } = string.Empty;
+
+        public string ObservacionesEvaluacion { get; set; } = string.Empty;
+    }
+
+
+    public class ConvocatoriaDemo
+    {
+        public int IdConvocatoria { get; set; }
+
+        public string Nombre { get; set; } = string.Empty;
+    }
+
+}

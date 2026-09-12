@@ -1,0 +1,265 @@
+﻿@using Radzen
+@using Radzen.Blazor
+@using SistemaBecas.Client.Components.Pages
+
+@inject DialogService DialogService
+
+<RadzenCard class="mb-3">
+
+    <h5 class="fw-bold mb-3">
+        <RadzenIcon Icon="person" class="me-2" />
+        Información del estudiante
+    </h5>
+
+    <RadzenRow Gap="1rem">
+
+        <RadzenColumn Size="12" SizeMD="6">
+            <div class="detail-label">
+                Nombre completo
+            </div>
+
+            <div class="detail-value">
+                @Solicitud.Estudiante
+            </div>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMD="6">
+            <div class="detail-label">
+                DPI
+            </div>
+
+            <div class="detail-value">
+                @Solicitud.DPI
+            </div>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMD="6">
+            <div class="detail-label">
+                Teléfono
+            </div>
+
+            <div class="detail-value">
+                @Solicitud.Telefono
+            </div>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMD="6">
+            <div class="detail-label">
+                Fecha de nacimiento
+            </div>
+
+            <div class="detail-value">
+                @Solicitud.FechaNacimiento.ToString("dd/MM/yyyy")
+            </div>
+        </RadzenColumn>
+
+    </RadzenRow>
+
+</RadzenCard>
+
+
+<RadzenCard class="mb-3">
+
+    <h5 class="fw-bold mb-3">
+        <RadzenIcon Icon="description" class="me-2" />
+        Información de la solicitud
+    </h5>
+
+    <RadzenRow Gap="1rem">
+
+        <RadzenColumn Size="12" SizeMD="6">
+            <div class="detail-label">
+                Convocatoria
+            </div>
+
+            <div class="detail-value">
+                @Solicitud.Convocatoria
+            </div>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMD="6">
+            <div class="detail-label">
+                Fecha de solicitud
+            </div>
+
+            <div class="detail-value">
+                @Solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
+            </div>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12">
+            <div class="detail-label">
+                Observaciones
+            </div>
+
+            <div class="detail-value">
+                @Solicitud.Observaciones
+            </div>
+        </RadzenColumn>
+
+    </RadzenRow>
+
+</RadzenCard>
+
+
+<RadzenCard class="mb-3">
+
+    <h5 class="fw-bold mb-3">
+        <RadzenIcon Icon="grading" class="me-2" />
+        Evaluación
+    </h5>
+
+    <RadzenRow Gap="1rem">
+
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <div class="detail-label">
+                Punteo
+            </div>
+
+            <div class="score">
+                @Solicitud.Punteo / 100
+            </div>
+
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMD="8">
+
+            <div class="detail-label">
+                Observaciones del evaluador
+            </div>
+
+            <div class="detail-value">
+                @Solicitud.ObservacionesEvaluacion
+            </div>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+
+</RadzenCard>
+
+
+<RadzenCard class="mb-3">
+
+    <h5 class="fw-bold mb-3">
+        <RadzenIcon Icon="folder" class="me-2" />
+        Documentos
+    </h5>
+
+    <div class="document-item">
+
+        <div>
+            <RadzenIcon Icon="description" class="me-2" />
+            DPI
+        </div>
+
+        <RadzenBadge Text="Presentado"
+                     BadgeStyle="BadgeStyle.Success"
+                     IsPill="true" />
+
+    </div>
+
+    <div class="document-item">
+
+        <div>
+            <RadzenIcon Icon="description" class="me-2" />
+            Constancia de estudios
+        </div>
+
+        <RadzenBadge Text="Presentado"
+                     BadgeStyle="BadgeStyle.Success" />
+
+    </div>
+
+    <div class="document-item">
+
+        <div>
+            <RadzenIcon Icon="description" class="me-2" />
+            Comprobante de ingresos
+        </div>
+
+        <RadzenBadge Text="Pendiente"
+                     BadgeStyle="BadgeStyle.Warning" />
+
+    </div>
+
+</RadzenCard>
+
+
+@if (Solicitud.Estado == "Pendiente")
+{
+    <RadzenCard>
+
+        <h5 class="fw-bold mb-3">
+            <RadzenIcon Icon="gavel" class="me-2" />
+            Decisión
+        </h5>
+
+        <RadzenFormField Text="Justificación"
+                         Variant="Variant.Outlined"
+                         Style="width:100%;">
+
+            <RadzenTextArea @bind-Value="justificacion"
+                            Rows="4"
+                            Placeholder="Ingrese la justificación de la decisión..."
+                            Style="width:100%;" />
+
+        </RadzenFormField>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+
+            <RadzenButton Text="Rechazar"
+                          Icon="cancel"
+                          ButtonStyle="ButtonStyle.Danger"
+                          Click="@Rechazar" />
+
+            <RadzenButton Text="Aprobar"
+                          Icon="check_circle"
+                          ButtonStyle="ButtonStyle.Success"
+                          Click="@Aprobar" />
+
+        </div>
+
+    </RadzenCard>
+}
+else
+{
+    <RadzenAlert AlertStyle="AlertStyle.Info">
+        Esta solicitud ya fue procesada.
+    </RadzenAlert>
+}
+@code {
+    [Parameter]
+    public SolicitudModelo Solicitud { get; set; } = new();
+
+    private string justificacion = string.Empty;
+
+
+    private void Aprobar()
+    {
+        if (string.IsNullOrWhiteSpace(justificacion))
+        {
+            justificacion =
+                "Solicitud aprobada por cumplir con los requisitos establecidos.";
+        }
+
+        Solicitud.Estado = "Aprobada";
+
+        DialogService.Close(true);
+    }
+
+
+    private void Rechazar()
+    {
+        if (string.IsNullOrWhiteSpace(justificacion))
+        {
+            justificacion =
+                "Solicitud rechazada por no cumplir con los requisitos establecidos.";
+        }
+
+        Solicitud.Estado = "Rechazada";
+
+        DialogService.Close(true);
+    }
+}
