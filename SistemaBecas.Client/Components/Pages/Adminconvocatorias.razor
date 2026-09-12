@@ -1,0 +1,905 @@
+@page "/adminconvocatorias"
+
+@using Radzen
+@using Radzen.Blazor
+
+<PageTitle>Administración de Convocatorias</PageTitle>
+
+<RadzenStack Gap="1.5rem"
+             Style="padding: 2rem; background-color: #f4f7fb; min-height: 100vh;">
+
+    <!-- ====================================================== -->
+    <!-- ENCABEZADO                                             -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        background: linear-gradient(135deg, #1565c0, #1e88e5);
+        color: white;
+        border-radius: 16px;
+        border: none;
+        padding: 2rem;">
+
+        <RadzenRow AlignItems="AlignItems.Center">
+
+            <RadzenColumn Size="12" SizeMD="8">
+
+                <RadzenText Text="Administración de Convocatorias"
+                            TextStyle="TextStyle.H4"
+                            Style="
+                color: white;
+                font-weight: 700;
+                margin-bottom: 6px;" />
+
+                <RadzenText Text="Crear, editar y gestionar convocatorias de becas"
+                            Style="
+                color: rgba(255,255,255,0.9);
+                font-size: 15px;" />
+
+            </RadzenColumn>
+
+            <RadzenColumn Size="12"
+                          SizeMD="4"
+                          Style="text-align: right;">
+
+                <RadzenButton Text="Nueva Convocatoria"
+                              Icon="add"
+                              ButtonStyle="ButtonStyle.Light" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- ESTADÍSTICAS                                           -->
+    <!-- ====================================================== -->
+
+    <RadzenRow>
+
+        <!-- ACTIVAS -->
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Activas"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="2"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #1565c0;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="check_circle"
+                                    Style="
+                        font-size: 38px;
+                        color: #1565c0;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <!-- PRÓXIMAS -->
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Próximas"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="1"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #64b5f6;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="event"
+                                    Style="
+                        font-size: 38px;
+                        color: #64b5f6;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <!-- CERRADAS -->
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Cerradas"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="2"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #94a3b8;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="lock"
+                                    Style="
+                        font-size: 38px;
+                        color: #94a3b8;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+
+
+    <!-- ====================================================== -->
+    <!-- FILTROS                                                -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        border-radius: 12px;
+        background-color: #f7fbff;
+        border: 1px solid #e3edf7;">
+
+        <RadzenText Text="Filtros de búsqueda"
+                    TextStyle="TextStyle.H6"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 5px;" />
+
+        <RadzenText Text="Utilice los filtros para encontrar una convocatoria."
+                    Style="
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 20px;" />
+
+
+        <RadzenRow AlignItems="AlignItems.End">
+
+            <!-- ESTADO -->
+
+            <RadzenColumn Size="12" SizeMD="3">
+
+                <RadzenFormField Text="Estado"
+                                 Style="width: 100%;">
+
+                    <RadzenDropDown TValue="string"
+                                    Data="@(new[] { "Activa", "Próxima", "Cerrada" })"
+                                    Placeholder="Todos"
+                                    AllowClear="true"
+                                    Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- TIPO -->
+
+            <RadzenColumn Size="12" SizeMD="3">
+
+                <RadzenFormField Text="Tipo"
+                                 Style="width: 100%;">
+
+                    <RadzenDropDown TValue="string"
+                                    Data="@(new[] { "Nacional", "Internacional", "Internos" })"
+                                    Placeholder="Todos"
+                                    AllowClear="true"
+                                    Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- BUSCAR -->
+
+            <RadzenColumn Size="12" SizeMD="4">
+
+                <RadzenFormField Text="Buscar convocatoria"
+                                 Style="width: 100%;">
+
+                    <RadzenTextBox TValue="string"
+                                   Placeholder="Nombre o código"
+                                   Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- BOTÓN -->
+
+            <RadzenColumn Size="12" SizeMD="2">
+
+                <RadzenButton Text="Buscar"
+                              Icon="search"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Style="width: 100%;" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- TABLA VISUAL                                           -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        overflow-x: auto;">
+
+        <RadzenText Text="Convocatorias"
+                    TextStyle="TextStyle.H6"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 5px;" />
+
+        <RadzenText Text="Listado de convocatorias de becas"
+                    Style="
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 20px;" />
+
+
+        <!-- ENCABEZADO -->
+
+        <RadzenRow Style="
+            background-color: #f1f5f9;
+            padding: 14px 10px;
+            font-weight: 700;
+            color: #475569;
+            min-width: 1050px;">
+
+            <RadzenColumn Size="1">
+                Código
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Nombre
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Tipo
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Fecha inicio
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Fecha fin
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Monto
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Estado
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Acciones
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- FILA 1 -->
+
+        <RadzenRow Style="
+            padding: 16px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1050px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+                <strong>CONV-2026-001</strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Beca Nacional Universitaria 2026
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Nacional
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                01/03/2026
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                15/12/2026
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                <strong style="color:#1565c0;">
+                    Q 15,000
+                </strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Activa"
+                             BadgeStyle="BadgeStyle.Primary" />
+
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             Gap="0.3rem">
+
+                    <RadzenButton Icon="edit"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="visibility"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="delete"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Size="ButtonSize.Small" />
+
+                </RadzenStack>
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- FILA 2 -->
+
+        <RadzenRow Style="
+            padding: 16px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1050px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+                <strong>CONV-2026-002</strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Beca Internacional Posgrado
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Internacional
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                01/11/2026
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                31/03/2027
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                <strong style="color:#1565c0;">
+                    Q 45,000
+                </strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Próxima"
+                             BadgeStyle="BadgeStyle.Info" />
+
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             Gap="0.3rem">
+
+                    <RadzenButton Icon="edit"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="visibility"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="delete"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Size="ButtonSize.Small" />
+
+                </RadzenStack>
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- FILA 3 -->
+
+        <RadzenRow Style="
+            padding: 16px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1050px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+                <strong>CONV-2025-015</strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Beca Técnica Media
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Nacional
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                01/09/2025
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                15/12/2025
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                <strong style="color:#1565c0;">
+                    Q 8,000
+                </strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Cerrada"
+                             BadgeStyle="BadgeStyle.Light" />
+
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             Gap="0.3rem">
+
+                    <RadzenButton Icon="edit"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="visibility"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="delete"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Size="ButtonSize.Small" />
+
+                </RadzenStack>
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- FILA 4 -->
+
+        <RadzenRow Style="
+            padding: 16px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            min-width: 1050px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+                <strong>CONV-2026-003</strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Beca Investigación Interna
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Internos
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                15/04/2026
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                15/10/2026
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                <strong style="color:#1565c0;">
+                    Q 12,000
+                </strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Activa"
+                             BadgeStyle="BadgeStyle.Primary" />
+
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             Gap="0.3rem">
+
+                    <RadzenButton Icon="edit"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="visibility"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="delete"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Size="ButtonSize.Small" />
+
+                </RadzenStack>
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+
+        <!-- FILA 5 -->
+
+        <RadzenRow Style="
+            padding: 16px 10px;
+            min-width: 1050px;
+            align-items: center;">
+
+            <RadzenColumn Size="1">
+                <strong>CONV-2025-018</strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                Beca Deportiva Nacional
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                Nacional
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                01/06/2025
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                30/09/2025
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+                <strong style="color:#1565c0;">
+                    Q 10,000
+                </strong>
+            </RadzenColumn>
+
+            <RadzenColumn Size="1">
+
+                <RadzenBadge Text="Cerrada"
+                             BadgeStyle="BadgeStyle.Light" />
+
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             Gap="0.3rem">
+
+                    <RadzenButton Icon="edit"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="visibility"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small" />
+
+                    <RadzenButton Icon="delete"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Size="ButtonSize.Small" />
+
+                </RadzenStack>
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- FORMULARIO - PREVISUALIZACIÓN                          -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        max-width: 600px;
+        width: 100%;
+        margin: 1rem auto;
+        border-radius: 14px;">
+
+        <RadzenText Text="Nueva Convocatoria"
+                    TextStyle="TextStyle.H5"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 20px;" />
+
+        <RadzenStack Gap="1rem">
+
+            <RadzenFormField Text="Nombre"
+                             Style="width: 100%;">
+
+                <RadzenTextBox TValue="string"
+                               Placeholder="Nombre de la convocatoria"
+                               Style="width: 100%;" />
+
+            </RadzenFormField>
+
+
+            <RadzenFormField Text="Tipo"
+                             Style="width: 100%;">
+
+                <RadzenDropDown TValue="string"
+                                Data="@(new[] {
+                                    "Nacional",
+                                    "Internacional",
+                                    "Internos"
+                                })"
+                                Placeholder="Seleccione un tipo"
+                                Style="width: 100%;" />
+
+            </RadzenFormField>
+
+
+            <RadzenRow>
+
+                <RadzenColumn Size="12" SizeMD="6">
+
+                    <RadzenFormField Text="Fecha inicio"
+                                     Style="width: 100%;">
+
+                        <RadzenDatePicker TValue="DateTime?"
+                                          DateFormat="dd/MM/yyyy"
+                                          Style="width: 100%;" />
+
+                    </RadzenFormField>
+
+                </RadzenColumn>
+
+
+                <RadzenColumn Size="12" SizeMD="6">
+
+                    <RadzenFormField Text="Fecha fin"
+                                     Style="width: 100%;">
+
+                        <RadzenDatePicker TValue="DateTime?"
+                                          DateFormat="dd/MM/yyyy"
+                                          Style="width: 100%;" />
+
+                    </RadzenFormField>
+
+                </RadzenColumn>
+
+            </RadzenRow>
+
+
+            <RadzenFormField Text="Monto (Q)"
+                             Style="width: 100%;">
+
+                <RadzenNumeric TValue="decimal?"
+                               Min="0"
+                               Step="500"
+                               Format="N0"
+                               Style="width: 100%;" />
+
+            </RadzenFormField>
+
+
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         JustifyContent="JustifyContent.End"
+                         Gap="0.5rem"
+                         Style="margin-top: 10px;">
+
+                <RadzenButton Text="Cancelar"
+                              ButtonStyle="ButtonStyle.Light" />
+
+                <RadzenButton Text="Guardar"
+                              Icon="save"
+                              ButtonStyle="ButtonStyle.Primary" />
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- DETALLE - PREVISUALIZACIÓN                             -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        max-width: 500px;
+        width: 100%;
+        margin: 1rem auto;
+        border-radius: 14px;">
+
+        <RadzenText Text="Detalle de Convocatoria"
+                    TextStyle="TextStyle.H5"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 20px;" />
+
+        <RadzenStack Gap="0.7rem">
+
+            <RadzenText Text="Código"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="CONV-2026-001"
+                        Style="font-weight:600;" />
+
+
+            <RadzenText Text="Nombre"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="Beca Nacional Universitaria 2026"
+                        Style="font-weight:600;" />
+
+
+            <RadzenText Text="Tipo"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="Nacional" />
+
+
+            <RadzenText Text="Fecha inicio"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="01/03/2026" />
+
+
+            <RadzenText Text="Fecha fin"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="15/12/2026" />
+
+
+            <RadzenText Text="Monto"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenText Text="Q 15,000"
+                        Style="
+            font-weight:700;
+            color:#1565c0;" />
+
+
+            <RadzenText Text="Estado"
+                        Style="font-size:12px;color:#6b7280;" />
+
+            <RadzenBadge Text="Activa"
+                         BadgeStyle="BadgeStyle.Primary" />
+
+
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         JustifyContent="JustifyContent.End"
+                         Style="margin-top:15px;">
+
+                <RadzenButton Text="Cerrar"
+                              ButtonStyle="ButtonStyle.Light" />
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- CONFIRMACIÓN - PREVISUALIZACIÓN                        -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        max-width: 450px;
+        width: 100%;
+        margin: 1rem auto 2rem;
+        border-radius: 14px;">
+
+        <RadzenText Text="Confirmar eliminación"
+                    TextStyle="TextStyle.H5"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 15px;" />
+
+        <RadzenText Text="¿Desea eliminar la convocatoria?"
+                    Style="color:#374151;" />
+
+        <RadzenText Text="Beca Nacional Universitaria 2026"
+                    Style="
+        font-weight:600;
+        margin-top:5px;" />
+
+
+        <RadzenStack Orientation="Orientation.Horizontal"
+                     JustifyContent="JustifyContent.End"
+                     Gap="0.5rem"
+                     Style="margin-top:20px;">
+
+            <RadzenButton Text="Cancelar"
+                          ButtonStyle="ButtonStyle.Light" />
+
+            <RadzenButton Text="Eliminar"
+                          Icon="delete"
+                          ButtonStyle="ButtonStyle.Danger" />
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+</RadzenStack>
