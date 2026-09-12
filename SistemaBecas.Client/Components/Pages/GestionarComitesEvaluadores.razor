@@ -1,0 +1,343 @@
+﻿@page "/gestionar-comites-evaluadores"
+
+<PageTitle>Gestionar Comités Evaluadores</PageTitle>
+
+<div class="page-container">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div class="header-content">
+            <div>
+                <h1>Gestión de comités evaluadores</h1>
+                <p>Administre los comités evaluadores de la plataforma</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="content-container">
+
+        <!-- REGISTRAR COMITÉ -->
+        <div class="form-card">
+
+            <div class="card-title">
+                Registrar comité
+            </div>
+
+            <div class="card-description">
+                Ingrese la información del nuevo comité evaluador.
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Nombre del comité
+                    </label>
+
+                    <RadzenTextBox @bind-Value="nombreComite"
+                                   Placeholder="Ingrese el nombre del comité"
+                                   Style="width:100%" />
+                </div>
+
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Fecha
+                    </label>
+
+                    <RadzenDatePicker @bind-Value="fechaComite"
+                                      DateFormat="dd/MM/yyyy"
+                                      Style="width:100%" />
+                </div>
+
+
+                <div class="form-group full">
+                    <label class="form-label">
+                        Descripción
+                    </label>
+
+                    <RadzenTextArea @bind-Value="descripcionComite"
+                                    Placeholder="Ingrese la descripción del comité"
+                                    Rows="4"
+                                    Style="width:100%" />
+                </div>
+
+            </div>
+
+
+            <!-- EVALUADORES -->
+            <div class="evaluators-container">
+
+                <div class="evaluators-title">
+                    Asignar evaluadores
+                </div>
+
+                <div class="evaluators-description">
+                    Seleccione los evaluadores que formarán parte del comité.
+                </div>
+
+
+                @foreach (var evaluador in evaluadores)
+                {
+                    <div class="evaluator-item">
+
+                        <RadzenCheckBox @bind-Value="evaluador.Seleccionado" />
+
+                        <div>
+                            <div class="evaluator-name">
+                                @evaluador.Nombre
+                            </div>
+
+                            <div class="evaluator-position">
+                                @evaluador.Cargo
+                            </div>
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- BOTONES -->
+            <div class="button-container">
+
+                <button class="btn-secondary"
+                        @onclick="Cancelar">
+                    Cancelar
+                </button>
+
+                <button class="btn-primary"
+                        @onclick="GuardarComite">
+                    Guardar comité
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- TABLA -->
+        <div class="table-card">
+
+            <div class="card-title">
+                Comités registrados
+            </div>
+
+            <div class="card-description">
+                Consulte y administre los comités evaluadores registrados.
+            </div>
+
+            <div class="table-container">
+
+                <table class="committee-table">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del comité</th>
+                            <th>Fecha</th>
+                            <th>Evaluadores</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var comite in comites)
+                        {
+                            <tr>
+
+                                <td>
+                                    @comite.Id.ToString("D3")
+                                </td>
+
+                                <td>
+                                    @comite.Nombre
+                                </td>
+
+                                <td>
+                                    @comite.Fecha.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    @comite.CantidadEvaluadores
+                                </td>
+
+                                <td>
+                                    <span class="status-active">
+                                        @comite.Estado
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    <div class="action-buttons">
+
+                                        <button class="btn-edit"
+                                                @onclick="() => EditarComite(comite)">
+                                            Editar
+                                        </button>
+
+                                        <button class="btn-view"
+                                                @onclick="() => VerComite(comite)">
+                                            Ver
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+
+    private string nombreComite = "";
+
+    private DateTime? fechaComite = DateTime.Today;
+
+    private string descripcionComite = "";
+
+
+    private List<Evaluador> evaluadores = new()
+    {
+        new Evaluador
+        {
+            Id = 1,
+            Nombre = "Evaluador 1",
+            Cargo = "Analista académico"
+        },
+
+        new Evaluador
+        {
+            Id = 2,
+            Nombre = "Evaluador 2",
+            Cargo = "Coordinador"
+        },
+
+        new Evaluador
+        {
+            Id = 3,
+            Nombre = "Evaluador 3",
+            Cargo = "Supervisor"
+        }
+    };
+
+
+    private List<Comite> comites = new()
+    {
+        new Comite
+        {
+            Id = 1,
+            Nombre = "Comité de Becas 2026",
+            Fecha = new DateTime(2026, 9, 15),
+            CantidadEvaluadores = 3,
+            Estado = "Activo"
+        },
+
+        new Comite
+        {
+            Id = 2,
+            Nombre = "Comité de Evaluación General",
+            Fecha = new DateTime(2026, 9, 20),
+            CantidadEvaluadores = 4,
+            Estado = "Activo"
+        }
+    };
+
+
+    private void GuardarComite()
+    {
+        if (string.IsNullOrWhiteSpace(nombreComite))
+            return;
+
+        int cantidadEvaluadores =
+            evaluadores.Count(e => e.Seleccionado);
+
+        comites.Add(new Comite
+        {
+            Id = comites.Count + 1,
+            Nombre = nombreComite,
+            Fecha = fechaComite ?? DateTime.Today,
+            CantidadEvaluadores = cantidadEvaluadores,
+            Estado = "Activo"
+        });
+
+        nombreComite = "";
+        descripcionComite = "";
+        fechaComite = DateTime.Today;
+
+        foreach (var evaluador in evaluadores)
+        {
+            evaluador.Seleccionado = false;
+        }
+    }
+
+
+    private void Cancelar()
+    {
+        nombreComite = "";
+        descripcionComite = "";
+        fechaComite = DateTime.Today;
+
+        foreach (var evaluador in evaluadores)
+        {
+            evaluador.Seleccionado = false;
+        }
+    }
+
+
+    private void EditarComite(Comite comite)
+    {
+        nombreComite = comite.Nombre;
+        fechaComite = comite.Fecha;
+    }
+
+
+    private void VerComite(Comite comite)
+    {
+        // Próximamente se mostrará el detalle del comité.
+    }
+
+
+    public class Evaluador
+    {
+        public int Id { get; set; }
+
+        public string Nombre { get; set; } = "";
+
+        public string Cargo { get; set; } = "";
+
+        public bool Seleccionado { get; set; }
+    }
+
+
+    public class Comite
+    {
+        public int Id { get; set; }
+
+        public string Nombre { get; set; } = "";
+
+        public DateTime Fecha { get; set; }
+
+        public int CantidadEvaluadores { get; set; }
+
+        public string Estado { get; set; } = "";
+    }
+}

@@ -1,0 +1,246 @@
+@page "/registrar-estudiante"
+
+
+<PageTitle>Registro de estudiante</PageTitle>
+
+<div class="container-fluid py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-lg-10">
+
+            <RadzenCard Variant="Variant.Outlined">
+
+                <!-- ENCABEZADO -->
+                <div class="bg-primary text-white text-center p-4 rounded-top">
+
+                    <div class="mb-2">
+                        <span style="font-size: 40px;">🎓</span>
+                    </div>
+
+                    <h1 class="mb-1">
+                        Sistema de Becas
+                    </h1>
+
+                    <p class="mb-0">
+                        Registro de estudiante
+                    </p>
+
+                </div>
+
+
+                <!-- CONTENIDO -->
+                <div class="p-4">
+
+                    <!-- TÍTULO -->
+                    <div class="mb-4">
+
+                        <h2 class="text-primary">
+                            Datos del estudiante
+                        </h2>
+
+                        <p class="text-muted">
+                            Complete la información solicitada para registrar al estudiante.
+                        </p>
+
+                    </div>
+
+
+                    <!-- NOMBRES Y APELLIDOS -->
+                    <RadzenRow Gap="1rem">
+
+                        <RadzenColumn Size="12" SizeMD="6">
+
+                            <RadzenFormField Text="Nombres"
+                                             Variant="Variant.Outlined"
+                                             Style="width:100%">
+
+                                <RadzenTextBox
+                                    Placeholder="Ingrese los nombres"
+                                    Style="width:100%" />
+
+                            </RadzenFormField>
+
+                        </RadzenColumn>
+
+
+                        <RadzenColumn Size="12" SizeMD="6">
+
+                            <RadzenFormField Text="Apellidos"
+                                             Variant="Variant.Outlined"
+                                             Style="width:100%">
+
+                                <RadzenTextBox
+                                    Placeholder="Ingrese los apellidos"
+                                    Style="width:100%" />
+
+                            </RadzenFormField>
+
+                        </RadzenColumn>
+
+                    </RadzenRow>
+
+
+                    <div class="mb-3"></div>
+
+
+                    <!-- DPI Y FECHA -->
+                    <RadzenRow Gap="1rem">
+
+                        <RadzenColumn Size="12" SizeMD="6">
+
+                            <RadzenFormField Text="DPI"
+                                             Variant="Variant.Outlined"
+                                             Style="width:100%">
+
+                                <RadzenTextBox
+                                    Placeholder="Ingrese el número de DPI"
+                                    Style="width:100%" />
+
+                            </RadzenFormField>
+
+                        </RadzenColumn>
+
+
+                        <RadzenColumn Size="12" SizeMD="6">
+
+                            <RadzenFormField Text="Fecha de nacimiento"
+                                             Variant="Variant.Outlined"
+                                             Style="width:100%">
+
+                                <RadzenDatePicker
+                                    TValue="DateOnly"
+                                    Style="width:100%" />
+
+                            </RadzenFormField>
+
+                        </RadzenColumn>
+
+                    </RadzenRow>
+
+
+                    <div class="mb-3"></div>
+
+
+                    <!-- CORREO Y TELÉFONO -->
+                    <RadzenRow Gap="1rem">
+
+                        <RadzenColumn Size="12" SizeMD="6">
+
+                            <RadzenFormField Text="Correo electrónico"
+                                             Variant="Variant.Outlined"
+                                             Style="width:100%">
+
+                                <RadzenTextBox
+                                    Placeholder="ejemplo@correo.com"
+                                    Style="width:100%" />
+
+                            </RadzenFormField>
+
+                        </RadzenColumn>
+
+
+                        <RadzenColumn Size="12" SizeMD="6">
+
+                            <RadzenFormField Text="Teléfono"
+                                             Variant="Variant.Outlined"
+                                             Style="width:100%">
+
+                                <RadzenTextBox
+                                    Placeholder="Ingrese el teléfono"
+                                    Style="width:100%" />
+
+                            </RadzenFormField>
+
+                        </RadzenColumn>
+
+                    </RadzenRow>
+
+
+                    <div class="mb-3"></div>
+
+
+                    <!-- DIRECCIÓN -->
+                    <RadzenFormField Text="Dirección"
+                                     Variant="Variant.Outlined"
+                                     Style="width:100%">
+
+                        <RadzenTextArea
+                            Rows="3"
+                            Placeholder="Ingrese la dirección del estudiante"
+                            Style="width:100%" />
+
+                    </RadzenFormField>
+
+
+                    <div class="mb-4"></div>
+
+
+                    <!-- ESTADO -->
+                    <RadzenFormField Text="Estado"
+                                     Variant="Variant.Outlined"
+                                     Style="width:100%">
+
+                        <RadzenDropDown
+                            Placeholder="Seleccione un estado"
+                            Style="width:100%"
+                            Data="@estados"
+                            @bind-Value="@estadoSeleccionado" />
+
+                    </RadzenFormField>
+
+
+                    <!-- BOTONES -->
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+
+                        <RadzenButton
+                            Text="Cancelar"
+                            ButtonStyle="ButtonStyle.Light"
+                            Variant="Variant.Outlined"
+                            Icon="close" />
+
+                        <RadzenButton
+                            Text="Registrar estudiante"
+                            ButtonStyle="ButtonStyle.Primary"
+                            Icon="save" />
+
+                    </div>
+
+
+                    <!-- SEGURIDAD -->
+                    <div class="text-center text-muted mt-4">
+
+                        🔒 Información protegida
+
+                    </div>
+
+                </div>
+
+            </RadzenCard>
+
+
+            <!-- PIE -->
+            <div class="text-center text-muted mt-3">
+
+                Sistema de Becas
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+
+    private string? estadoSeleccionado;
+
+    private List<string> estados = new()
+    {
+        "Activo",
+        "Inactivo"
+    };
+
+}

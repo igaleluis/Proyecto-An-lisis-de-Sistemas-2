@@ -1,0 +1,339 @@
+﻿@page "/consultar-estado-beca"
+
+<PageTitle>Consultar Estado de la Beca</PageTitle>
+
+<div class="page-container">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div class="header-content">
+            <div>
+                <h1>Consulta del estado de la beca</h1>
+                <p>Consulte el estado actual de su solicitud de beca</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CONTENIDO -->
+    <div class="content-container">
+
+        <!-- BUSCADOR -->
+        <div class="search-card">
+
+            <div class="card-title">
+                Consultar solicitud
+            </div>
+
+            <div class="card-description">
+                Ingrese el número de solicitud para consultar su estado.
+            </div>
+
+            <div class="search-container">
+
+                <div class="search-input">
+
+                    <label class="form-label">
+                        Número de solicitud
+                    </label>
+
+                    <RadzenTextBox @bind-Value="numeroSolicitud"
+                                   Placeholder="Ej. 0001"
+                                   Style="width:100%" />
+
+                </div>
+
+                <button class="btn-primary"
+                        @onclick="ConsultarSolicitud">
+                    Consultar
+                </button>
+
+            </div>
+
+        </div>
+
+
+        @if (mostrarResultado)
+        {
+            <!-- INFORMACIÓN DE LA SOLICITUD -->
+            <div class="info-card">
+
+                <div class="card-title">
+                    Información de la solicitud
+                </div>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            Número de solicitud
+                        </span>
+
+                        <span class="info-value">
+                            #@solicitud.Numero
+                        </span>
+                    </div>
+
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            Estudiante
+                        </span>
+
+                        <span class="info-value">
+                            @solicitud.Estudiante
+                        </span>
+                    </div>
+
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            Convocatoria
+                        </span>
+
+                        <span class="info-value">
+                            @solicitud.Convocatoria
+                        </span>
+                    </div>
+
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            Fecha de solicitud
+                        </span>
+
+                        <span class="info-value">
+                            @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ESTADO ACTUAL -->
+            <div class="status-card">
+
+                <div class="card-title">
+                    Estado actual
+                </div>
+
+                <div class="current-status">
+
+                    <span class="status-badge">
+                        @solicitud.Estado
+                    </span>
+
+                    <p>
+                        Su solicitud se encuentra actualmente en este estado.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- HISTORIAL -->
+            <div class="history-card">
+
+                <div class="card-title">
+                    Historial de la solicitud
+                </div>
+
+                <div class="timeline">
+
+                    @foreach (var historial in historialSolicitud)
+                    {
+                        <div class="timeline-item">
+
+                            <div class="timeline-point"></div>
+
+                            <div class="timeline-content">
+
+                                <div class="timeline-title">
+                                    @historial.Estado
+                                </div>
+
+                                <div class="timeline-date">
+                                    @historial.Fecha.ToString("dd/MM/yyyy")
+                                </div>
+
+                                <div class="timeline-description">
+                                    @historial.Descripcion
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- INFORMACIÓN DE LA BECA -->
+            <div class="scholarship-card">
+
+                <div class="card-title">
+                    Información de la beca
+                </div>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            Estado
+                        </span>
+
+                        <span class="info-value">
+                            @beca.Estado
+                        </span>
+                    </div>
+
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            Monto
+                        </span>
+
+                        <span class="info-value">
+                            @beca.Monto
+                        </span>
+                    </div>
+
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            Fecha de inicio
+                        </span>
+
+                        <span class="info-value">
+                            @beca.FechaInicio
+                        </span>
+                    </div>
+
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            Fecha de finalización
+                        </span>
+
+                        <span class="info-value">
+                            @beca.FechaFin
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@code {
+
+    private string numeroSolicitud = "";
+
+    private bool mostrarResultado = false;
+
+
+    private Solicitud solicitud = new()
+    {
+        Numero = "0001",
+        Estudiante = "Juan Pérez",
+        Convocatoria = "Becas Universitarias 2026",
+        FechaSolicitud = new DateTime(2026, 9, 5),
+        Estado = "En evaluación"
+    };
+
+
+    private List<Historial> historialSolicitud = new()
+    {
+        new Historial
+        {
+            Estado = "Solicitud registrada",
+            Fecha = new DateTime(2026, 9, 5),
+            Descripcion = "La solicitud fue registrada correctamente."
+        },
+
+        new Historial
+        {
+            Estado = "Documentación recibida",
+            Fecha = new DateTime(2026, 9, 6),
+            Descripcion = "La documentación requerida fue recibida."
+        },
+
+        new Historial
+        {
+            Estado = "En evaluación",
+            Fecha = new DateTime(2026, 9, 7),
+            Descripcion = "La solicitud se encuentra en proceso de evaluación."
+        },
+
+        new Historial
+        {
+            Estado = "Decisión del comité",
+            Fecha = new DateTime(2026, 9, 7),
+            Descripcion = "Pendiente de decisión por parte del comité evaluador."
+        }
+    };
+
+
+    private Beca beca = new()
+    {
+        Estado = "Pendiente",
+        Monto = "Pendiente",
+        FechaInicio = "Pendiente",
+        FechaFin = "Pendiente"
+    };
+
+
+    private void ConsultarSolicitud()
+    {
+        if (!string.IsNullOrWhiteSpace(numeroSolicitud))
+        {
+            mostrarResultado = true;
+        }
+    }
+
+
+    public class Solicitud
+    {
+        public string Numero { get; set; } = "";
+
+        public string Estudiante { get; set; } = "";
+
+        public string Convocatoria { get; set; } = "";
+
+        public DateTime FechaSolicitud { get; set; }
+
+        public string Estado { get; set; } = "";
+    }
+
+
+    public class Historial
+    {
+        public string Estado { get; set; } = "";
+
+        public DateTime Fecha { get; set; }
+
+        public string Descripcion { get; set; } = "";
+    }
+
+
+    public class Beca
+    {
+        public string Estado { get; set; } = "";
+
+        public string Monto { get; set; } = "";
+
+        public string FechaInicio { get; set; } = "";
+
+        public string FechaFin { get; set; } = "";
+    }
+}

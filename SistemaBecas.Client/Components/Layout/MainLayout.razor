@@ -27,9 +27,11 @@
 
             </RadzenStack>
 
-            <RadzenButton Text="Iniciar Sesión"
-                          Icon="login"
-                          ButtonStyle="ButtonStyle.Primary" />
+
+            <RadzenLink Path="/Login"
+                        Text="Iniciar Sesión"
+                        Icon="login"
+                        class="login-button" />
 
         </RadzenStack>
     </RadzenHeader>
@@ -50,7 +52,9 @@
                                  Icon="add_ad">
 
                 <RadzenPanelMenuItem Text="Administrar Convocatorias"
+
                                      Path="/adminconvocatorias"
+
                                      Click="@CloseSidebar" />
 
             </RadzenPanelMenuItem>
@@ -61,7 +65,9 @@
                                  Icon="person">
 
                 <RadzenPanelMenuItem Text="Registrar Estudiantes"
-                                     Path="/"
+
+                                     Path="/registrar-estudiante"
+
                                      Click="@CloseSidebar" />
 
             </RadzenPanelMenuItem>
@@ -69,7 +75,32 @@
 
             <!-- SOLICITUDES -->
             <RadzenPanelMenuItem Text="Solicitudes"
-                                 Icon="description" >
+
+                                 Icon="description">
+
+                <RadzenPanelMenuItem Text="Gestionar Solicitudes"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+                <RadzenPanelMenuItem Text="Cargar Documentación"
+                                     Path="/cargar-documentacion"
+                                     Click="@CloseSidebar" />
+
+                <RadzenPanelMenuItem Text="Consultar Estado de Becas"
+                                     Path="/consultar-estado-beca"
+                                     Click="@CloseSidebar" />
+
+            </RadzenPanelMenuItem>
+
+
+            <!-- EVALUACIONES -->
+            <RadzenPanelMenuItem Text="Evaluaciones"
+                                 Icon="quiz">
+
+                <RadzenPanelMenuItem Text="Administrar Evaluaciones"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
 
 
                 <RadzenPanelMenuItem Text="Gestionar Solicitudes"
@@ -87,15 +118,8 @@
             </RadzenPanelMenuItem>
 
 
-            <!-- EVALUACIONES -->
-            <RadzenPanelMenuItem Text="Evaluaciones"
-                                 Icon="quiz">
+          
 
-                <RadzenPanelMenuItem Text="Administrar Evaluaciones"
-                                     Path="/"
-                                     Click="@CloseSidebar" />
-
-            </RadzenPanelMenuItem>
 
 
             <!-- COMITÉS -->
@@ -103,7 +127,9 @@
                                  Icon="group">
 
                 <RadzenPanelMenuItem Text="Gestionar Comités Evaluadores"
-                                     Path="/"
+
+                                     Path="/gestionar-comites-evaluadores"
+
                                      Click="@CloseSidebar" />
 
             </RadzenPanelMenuItem>

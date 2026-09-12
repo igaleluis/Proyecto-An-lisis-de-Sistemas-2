@@ -96,3 +96,19 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.login-button {
+    background: #ff7043;
+    color: white !important;
+    padding: 10px 22px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .login-button:hover {
+        background: #f4511e;
+    }
