@@ -1,0 +1,896 @@
+@page "/adminconvocatorias"
+<PageTitle>Administración de Convocatorias</PageTitle>
+
+<div class="convocatorias-page">
+
+    <div class="convocatorias-container">
+
+        <div class="convocatorias-card">
+
+            <!-- ENCABEZADO -->
+            <div class="convocatorias-header">
+
+                <div class="header-texto">
+                    <h1>Administración de Convocatorias</h1>
+                    <p>Crear, editar y gestionar convocatorias de becas</p>
+                </div>
+
+                <button type="button" class="btn-nueva" @onclick="() => AbrirFormulario(null)">
+                    + Nueva Convocatoria
+                </button>
+
+            </div>
+
+            <!-- CONTENIDO -->
+            <div class="contenido">
+
+                <!-- TARJETAS DE ESTADO -->
+                <div class="stats-row">
+
+                    <div class="stat-box">
+                        <div>
+                            <div class="stat-label">Activas</div>
+                            <div class="stat-value azul">@convocatorias.Count(x => x.Estado == "Activa")</div>
+                        </div>
+                        <div class="stat-icon">🚀</div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div>
+                            <div class="stat-label">Próximas</div>
+                            <div class="stat-value celeste">@convocatorias.Count(x => x.Estado == "Próxima")</div>
+                        </div>
+                        <div class="stat-icon">🕒</div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div>
+                            <div class="stat-label">Cerradas</div>
+                            <div class="stat-value gris">@convocatorias.Count(x => x.Estado == "Cerrada")</div>
+                        </div>
+                        <div class="stat-icon">🔒</div>
+                    </div>
+
+                </div>
+
+                <!-- FILTROS -->
+                <div class="filter-card">
+
+                    <div class="form-title">
+                        <h3>Filtros de búsqueda</h3>
+                        <p>Utilice los filtros para encontrar una convocatoria.</p>
+                    </div>
+
+                    <div class="filter-row">
+
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <select @bind="estadoFiltro">
+                                <option value="">Todos</option>
+                                @foreach (var e in estados)
+                                {
+                                    <option value="@e">@e</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select @bind="tipoFiltro">
+                                <option value="">Todos</option>
+                                @foreach (var t in tipos)
+                                {
+                                    <option value="@t">@t</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group grow">
+                            <label>Buscar convocatoria</label>
+                            <input type="text" @bind="busqueda" placeholder="Nombre o código" />
+                        </div>
+
+                        <div class="form-group btn-wrap">
+                            <button type="button" class="btn-buscar" @onclick="Buscar">
+                                Buscar
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- TABLA -->
+                <div class="table-card">
+
+                    <div class="form-title">
+                        <h3>Convocatorias</h3>
+                        <p>Listado de convocatorias de becas</p>
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Fecha inicio</th>
+                                    <th>Fecha fin</th>
+                                    <th>Monto (Q)</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (convocatoriasFiltradas.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="8" class="empty-text">No se encontraron convocatorias.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var c in convocatoriasFiltradas)
+                                    {
+                                        <tr>
+                                            <td>@c.Codigo</td>
+                                            <td>@c.Nombre</td>
+                                            <td>@c.Tipo</td>
+                                            <td>@c.FechaInicio.ToString("dd/MM/yyyy")</td>
+                                            <td>@c.FechaFin.ToString("dd/MM/yyyy")</td>
+                                            <td class="monto">@c.Monto.ToString("N0")</td>
+                                            <td>
+                                                @if (c.Estado == "Activa")
+                                                {
+                                                    <span class="badge-activa">Activa</span>
+                                                }
+                                                else if (c.Estado == "Próxima")
+                                                {
+                                                    <span class="badge-proxima">Próxima</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge-cerrada">Cerrada</span>
+                                                }
+                                            </td>
+                                            <td class="acciones">
+                                                <button class="btn-icon" title="Editar" @onclick="() => AbrirFormulario(c)">✏️</button>
+                                                <button class="btn-icon" title="Ver" @onclick="() => VerDetalle(c)">👁️</button>
+                                                <button class="btn-icon btn-danger" title="Eliminar" @onclick="() => PedirEliminar(c)">🗑️</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL: NUEVA / EDITAR CONVOCATORIA -->
+@if (mostrarFormulario && convocatoriaForm is not null)
+{
+    <div class="modal-overlay">
+        <div class="modal-box">
+
+            <h3>@(esNuevaConvocatoria ? "Nueva Convocatoria" : "Editar Convocatoria")</h3>
+
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" @bind="convocatoriaForm.Nombre" placeholder="Nombre de la convocatoria" />
+            </div>
+
+            <div class="form-group">
+                <label>Tipo</label>
+                <select @bind="convocatoriaForm.Tipo">
+                    @foreach (var t in tipos)
+                    {
+                        <option value="@t">@t</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-row">
+                <div class="form-group">
+                    <label>Fecha inicio</label>
+                    <input type="date" @bind="convocatoriaForm.FechaInicio" />
+                </div>
+                <div class="form-group">
+                    <label>Fecha fin</label>
+                    <input type="date" @bind="convocatoriaForm.FechaFin" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Monto (Q)</label>
+                <input type="number" min="0" step="500" @bind="convocatoriaForm.Monto" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(mensajeError))
+            {
+                <div class="error-msg">@mensajeError</div>
+            }
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" @onclick="CerrarFormulario">Cancelar</button>
+                <button type="button" class="btn-guardar" @onclick="GuardarFormulario">Guardar</button>
+            </div>
+
+        </div>
+    </div>
+}
+
+
+<!-- MODAL: DETALLE -->
+@if (mostrarDetalle && convocatoriaDetalle is not null)
+{
+    <div class="modal-overlay">
+        <div class="modal-box">
+
+            <h3>Detalle: @convocatoriaDetalle.Nombre</h3>
+
+            <div class="detalle-item"><strong>Código:</strong> @convocatoriaDetalle.Codigo</div>
+            <div class="detalle-item"><strong>Nombre:</strong> @convocatoriaDetalle.Nombre</div>
+            <div class="detalle-item"><strong>Tipo:</strong> @convocatoriaDetalle.Tipo</div>
+            <div class="detalle-item"><strong>Inicio:</strong> @convocatoriaDetalle.FechaInicio.ToString("dd/MM/yyyy")</div>
+            <div class="detalle-item"><strong>Fin:</strong> @convocatoriaDetalle.FechaFin.ToString("dd/MM/yyyy")</div>
+            <div class="detalle-item"><strong>Monto:</strong> Q@(convocatoriaDetalle.Monto.ToString("N0"))</div>
+            <div class="detalle-item"><strong>Estado:</strong> @convocatoriaDetalle.Estado</div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" @onclick="() => mostrarDetalle = false">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+}
+
+
+<!-- MODAL: CONFIRMAR ELIMINACIÓN -->
+@if (mostrarConfirmarEliminar && convocatoriaAEliminar is not null)
+{
+    <div class="modal-overlay">
+        <div class="modal-box modal-box-sm">
+
+            <h3>Confirmar eliminación</h3>
+            <p>¿Desea eliminar la convocatoria "@convocatoriaAEliminar.Nombre"?</p>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" @onclick="() => mostrarConfirmarEliminar = false">Cancelar</button>
+                <button type="button" class="btn-eliminar" @onclick="ConfirmarEliminar">Eliminar</button>
+            </div>
+
+        </div>
+    </div>
+}
+
+
+<style>
+    /* ================================
+       PÁGINA
+       ================================ */
+    .convocatorias-page {
+        min-height: 100vh;
+        background: #f4f7fb;
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .convocatorias-container {
+        width: 100%;
+        max-width: 1200px;
+    }
+
+    /* ================================
+       TARJETA PRINCIPAL
+       ================================ */
+    .convocatorias-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
+        overflow: hidden;
+    }
+
+    /* ================================
+       ENCABEZADO
+       ================================ */
+    .convocatorias-header {
+        background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+        color: white;
+        padding: 30px 35px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .header-texto h1 {
+        margin: 0 0 5px;
+        font-size: 26px;
+    }
+
+    .header-texto p {
+        margin: 0;
+        font-size: 15px;
+        opacity: 0.9;
+    }
+
+    .btn-nueva {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.4);
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .btn-nueva:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+    /* ================================
+       CONTENIDO
+       ================================ */
+    .contenido {
+        padding: 35px;
+    }
+
+    /* ================================
+       TARJETAS DE ESTADO
+       ================================ */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .stat-box {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(21,101,192,0.10);
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform 0.15s;
+    }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+        }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+        .stat-value.azul {
+            color: #1565c0;
+        }
+
+        .stat-value.celeste {
+            color: #64b5f6;
+        }
+
+        .stat-value.gris {
+            color: #94a3b8;
+        }
+
+    .stat-icon {
+        font-size: 34px;
+    }
+
+    /* ================================
+       FILTROS
+       ================================ */
+    .filter-card {
+        border: 1px solid #e3edf7;
+        border-radius: 12px;
+        background: #f7fbff;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .form-title {
+        margin-bottom: 18px;
+    }
+
+        .form-title h3 {
+            margin: 0 0 4px;
+            color: #1565c0;
+            font-size: 18px;
+        }
+
+        .form-title p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+    .filter-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .form-group {
+        flex: 1;
+        min-width: 160px;
+        margin-bottom: 0;
+    }
+
+        .form-group.grow {
+            flex: 2;
+        }
+
+        .form-group.btn-wrap {
+            flex: 0 0 auto;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            outline: none;
+        }
+
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                border-color: #1565c0;
+                box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+            }
+
+    .btn-buscar {
+        padding: 11px 22px;
+        border-radius: 8px;
+        border: none;
+        background: #1565c0;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+        .btn-buscar:hover {
+            background: #0d47a1;
+        }
+
+    /* ================================
+       TABLA
+       ================================ */
+    .table-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(21,101,192,0.10);
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+    thead tr {
+        background: #1565c0;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px 10px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #eef1f5;
+    }
+
+        tbody tr:hover {
+            background: #f7fbff;
+        }
+
+    .monto {
+        font-weight: 600;
+        color: #1565c0;
+    }
+
+    .empty-text {
+        text-align: center;
+        color: #94a3b8;
+        padding: 25px 0;
+    }
+
+    .acciones {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-icon {
+        border: 1px solid #d1d5db;
+        background: white;
+        border-radius: 6px;
+        padding: 6px 9px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+        .btn-icon:hover {
+            background: #f3f4f6;
+        }
+
+        .btn-icon.btn-danger:hover {
+            background: #fee2e2;
+        }
+
+    /* ================================
+       BADGES
+       ================================ */
+    .badge-activa {
+        background: #1565c0;
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-proxima {
+        background: #64b5f6;
+        color: #0d47a1;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-cerrada {
+        background: #e8eef3;
+        color: #94a3b8;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* ================================
+       MODALES
+       ================================ */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+    }
+
+    .modal-box {
+        background: white;
+        border-radius: 14px;
+        padding: 30px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .modal-box-sm {
+        max-width: 420px;
+    }
+
+    .modal-box h3 {
+        margin: 0 0 20px;
+        color: #1565c0;
+        font-size: 19px;
+    }
+
+    .modal-box .form-group {
+        margin-bottom: 16px;
+    }
+
+    .detalle-item {
+        padding: 6px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+        color: #374151;
+    }
+
+    .error-msg {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+        .modal-actions button {
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+    .btn-cancelar {
+        background: white;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+        .btn-cancelar:hover {
+            background: #f3f4f6;
+        }
+
+    .btn-guardar {
+        background: #1565c0;
+        color: white;
+        border: 1px solid #1565c0;
+    }
+
+        .btn-guardar:hover {
+            background: #0d47a1;
+        }
+
+    .btn-eliminar {
+        background: #dc2626;
+        color: white;
+        border: 1px solid #dc2626;
+    }
+
+        .btn-eliminar:hover {
+            background: #b91c1c;
+        }
+
+    /* ================================
+       RESPONSIVE
+       ================================ */
+    @@media (max-width: 800px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+
+        .contenido {
+            padding: 25px 20px;
+        }
+
+        .convocatorias-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+
+@code {
+
+    // --- Estado de filtros ---
+    string? estadoFiltro;
+    string? tipoFiltro;
+    string? busqueda;
+
+    readonly string[] estados = { "Activa", "Próxima", "Cerrada" };
+    readonly string[] tipos = { "Nacional", "Internacional", "Internos" };
+
+    // --- Estado de modales ---
+    bool mostrarFormulario;
+    bool mostrarDetalle;
+    bool mostrarConfirmarEliminar;
+    bool esNuevaConvocatoria;
+    string? mensajeError;
+
+    ConvocatoriaDemo? convocatoriaForm;
+    ConvocatoriaDemo? convocatoriaDetalle;
+    ConvocatoriaDemo? convocatoriaAEliminar;
+
+    // --- Datos demo ---
+    List<ConvocatoriaDemo> convocatorias = new()
+    {
+        new ConvocatoriaDemo { IdConvocatoria = 1, Codigo = "CONV-2026-001", Nombre = "Beca Nacional Universitaria 2026", Tipo = "Nacional", FechaInicio = new(2026,3,1),   FechaFin = new(2026,12,15), Monto = 15000, Estado = "Activa" },
+        new ConvocatoriaDemo { IdConvocatoria = 2, Codigo = "CONV-2026-002", Nombre = "Beca Internacional Posgrado",        Tipo = "Internacional", FechaInicio = new(2026,11,1),  FechaFin = new(2027,3,31),  Monto = 45000, Estado = "Próxima" },
+        new ConvocatoriaDemo { IdConvocatoria = 3, Codigo = "CONV-2025-015", Nombre = "Beca Técnica Media",                Tipo = "Nacional", FechaInicio = new(2025,9,1),   FechaFin = new(2025,12,15), Monto = 8000,  Estado = "Cerrada" },
+        new ConvocatoriaDemo { IdConvocatoria = 4, Codigo = "CONV-2026-003", Nombre = "Beca Investigación Interna",       Tipo = "Internos", FechaInicio = new(2026,4,15),  FechaFin = new(2026,10,15), Monto = 12000, Estado = "Activa" },
+        new ConvocatoriaDemo { IdConvocatoria = 5, Codigo = "CONV-2025-018", Nombre = "Beca Deportiva Nacional",          Tipo = "Nacional", FechaInicio = new(2025,6,1),   FechaFin = new(2025,9,30),  Monto = 10000, Estado = "Cerrada" },
+    };
+
+    List<ConvocatoriaDemo> convocatoriasFiltradas = new();
+
+    protected override void OnInitialized()
+    {
+        convocatoriasFiltradas = new List<ConvocatoriaDemo>(convocatorias);
+    }
+
+    // --- Filtro ---
+    void Buscar()
+    {
+        convocatoriasFiltradas = convocatorias.Where(c =>
+            (string.IsNullOrWhiteSpace(estadoFiltro) || c.Estado == estadoFiltro) &&
+            (string.IsNullOrWhiteSpace(tipoFiltro) || c.Tipo == tipoFiltro) &&
+            (string.IsNullOrWhiteSpace(busqueda) || c.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase)
+                                                       || c.Codigo.Contains(busqueda, StringComparison.OrdinalIgnoreCase))
+        ).ToList();
+    }
+
+    // --- Formulario (crear / editar) ---
+    void AbrirFormulario(ConvocatoriaDemo? conv)
+    {
+        esNuevaConvocatoria = conv is null;
+        mensajeError = null;
+
+        convocatoriaForm = esNuevaConvocatoria
+            ? new ConvocatoriaDemo { Tipo = tipos[0], FechaInicio = DateTime.Today, FechaFin = DateTime.Today }
+            : new ConvocatoriaDemo
+            {
+                IdConvocatoria = conv!.IdConvocatoria,
+                Codigo = conv.Codigo,
+                Nombre = conv.Nombre,
+                Tipo = conv.Tipo,
+                FechaInicio = conv.FechaInicio,
+                FechaFin = conv.FechaFin,
+                Monto = conv.Monto,
+                Estado = conv.Estado
+            };
+
+        mostrarFormulario = true;
+    }
+
+    void CerrarFormulario()
+    {
+        mostrarFormulario = false;
+        convocatoriaForm = null;
+        mensajeError = null;
+    }
+
+    void GuardarFormulario()
+    {
+        if (convocatoriaForm is null) return;
+
+        if (string.IsNullOrWhiteSpace(convocatoriaForm.Nombre))
+        {
+            mensajeError = "El nombre es obligatorio.";
+            return;
+        }
+
+        if (convocatoriaForm.FechaFin.Date < convocatoriaForm.FechaInicio.Date)
+        {
+            mensajeError = "La fecha de fin no puede ser anterior a la fecha de inicio.";
+            return;
+        }
+
+        if (convocatoriaForm.Monto < 0)
+        {
+            mensajeError = "El monto no puede ser negativo.";
+            return;
+        }
+
+        if (esNuevaConvocatoria)
+        {
+            int nuevoId = convocatorias.Count == 0 ? 1 : convocatorias.Max(x => x.IdConvocatoria) + 1;
+            convocatoriaForm.IdConvocatoria = nuevoId;
+            convocatoriaForm.Codigo = $"CONV-{DateTime.Today.Year}-{nuevoId:000}";
+            convocatoriaForm.Estado = DeterminarEstado(convocatoriaForm);
+            convocatorias.Add(convocatoriaForm);
+        }
+        else
+        {
+            var original = convocatorias.First(x => x.IdConvocatoria == convocatoriaForm.IdConvocatoria);
+            original.Nombre = convocatoriaForm.Nombre;
+            original.Tipo = convocatoriaForm.Tipo;
+            original.FechaInicio = convocatoriaForm.FechaInicio;
+            original.FechaFin = convocatoriaForm.FechaFin;
+            original.Monto = convocatoriaForm.Monto;
+            original.Estado = DeterminarEstado(original);
+        }
+
+        Buscar();
+        CerrarFormulario();
+    }
+
+    string DeterminarEstado(ConvocatoriaDemo c)
+    {
+        var hoy = DateTime.Today;
+        if (hoy < c.FechaInicio.Date) return "Próxima";
+        if (hoy > c.FechaFin.Date) return "Cerrada";
+        return "Activa";
+    }
+
+    // --- Detalle ---
+    void VerDetalle(ConvocatoriaDemo conv)
+    {
+        convocatoriaDetalle = conv;
+        mostrarDetalle = true;
+    }
+
+    // --- Eliminar ---
+    void PedirEliminar(ConvocatoriaDemo conv)
+    {
+        convocatoriaAEliminar = conv;
+        mostrarConfirmarEliminar = true;
+    }
+
+    void ConfirmarEliminar()
+    {
+        if (convocatoriaAEliminar is not null)
+        {
+            convocatorias.Remove(convocatoriaAEliminar);
+            Buscar();
+        }
+
+        mostrarConfirmarEliminar = false;
+        convocatoriaAEliminar = null;
+    }
+
+    // --- Modelo demo ---
+    public class ConvocatoriaDemo
+    {
+        public int IdConvocatoria { get; set; }
+        public string Codigo { get; set; } = "";
+        public string Nombre { get; set; } = "";
+        public string Tipo { get; set; } = "";
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
+        public decimal Monto { get; set; }
+        public string Estado { get; set; } = "";
+    }
+
+}
