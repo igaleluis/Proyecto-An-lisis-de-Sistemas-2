@@ -1,15 +1,35 @@
 ﻿@inherits LayoutComponentBase
+@using Radzen
 
+<RadzenDialog />
+
+<RadzenNotification />
+
+<RadzenTooltip />
+
+<RadzenContextMenu />
 <RadzenLayout>
 
     <RadzenHeader>
         <RadzenStack Orientation="Orientation.Horizontal"
                      AlignItems="AlignItems.Center"
-                     Gap="1rem">
+                     JustifyContent="JustifyContent.SpaceBetween"
+                     Gap="1rem"
+                     class="rz-p-2">
 
-            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         AlignItems="AlignItems.Center"
+                         Gap="1rem">
 
-            <RadzenLabel Text="Sistema de Becas" />
+                <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+
+                <RadzenLabel Text="Sistema de Becas" />
+
+            </RadzenStack>
+
+            <RadzenButton Text="Iniciar Sesión"
+                          Icon="login"
+                          ButtonStyle="ButtonStyle.Primary" />
 
         </RadzenStack>
     </RadzenHeader>
@@ -17,36 +37,99 @@
 
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
 
-        <RadzenPanelMenu>
+        <RadzenPanelMenu Multiple="false">
 
             <RadzenPanelMenuItem Text="Inicio"
                                  Icon="home"
-                                 Path="/" />
+                                 Path="/"
+                                 Click="@CloseSidebar" />
 
-            <RadzenPanelMenuItem Text="Becas"
-                                 Icon="school">
 
-                <RadzenPanelMenuItem Text="Listado de becas"
-                                     Icon="list"
-                                     Path="/becas" />
+            <!-- CONVOCATORIAS -->
+            <RadzenPanelMenuItem Text="Convocatorias"
+                                 Icon="add_ad">
 
-                <RadzenPanelMenuItem Text="Nueva beca"
-                                     Icon="add"
-                                     Path="/becas/nueva" />
+                <RadzenPanelMenuItem Text="Administrar Convocatorias"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
 
             </RadzenPanelMenuItem>
 
+
+            <!-- ESTUDIANTES -->
+            <RadzenPanelMenuItem Text="Estudiantes"
+                                 Icon="person">
+
+                <RadzenPanelMenuItem Text="Registrar Estudiantes"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+            </RadzenPanelMenuItem>
+
+
+            <!-- SOLICITUDES -->
             <RadzenPanelMenuItem Text="Solicitudes"
                                  Icon="description"
-                                 Path="/adminconvocatorias" />
+                                 Path="/adminconvocatorias" >
 
-            <RadzenPanelMenuItem Text="Usuarios"
-                                 Icon="account_circle"
-                                 Path="/gestion-solicitudes" />
 
+                <RadzenPanelMenuItem Text="Gestionar Solicitudes"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+                <RadzenPanelMenuItem Text="Cargar Documentación"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+                <RadzenPanelMenuItem Text="Consultar Estado de Becas"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+            </RadzenPanelMenuItem>
+
+
+            <!-- EVALUACIONES -->
+            <RadzenPanelMenuItem Text="Evaluaciones"
+                                 Icon="quiz">
+
+                <RadzenPanelMenuItem Text="Administrar Evaluaciones"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+            </RadzenPanelMenuItem>
+
+
+            <!-- COMITÉS -->
+            <RadzenPanelMenuItem Text="Comités"
+                                 Icon="group">
+
+                <RadzenPanelMenuItem Text="Gestionar Comités Evaluadores"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+            </RadzenPanelMenuItem>
+
+
+            <!-- RESOLUCIÓN -->
+            <RadzenPanelMenuItem Text="Resolución"
+                                 Icon="rule">
+
+                <RadzenPanelMenuItem Text="Aprobar o Rechazar Solicitudes"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+            </RadzenPanelMenuItem>
+
+
+            <!-- REPORTES -->
             <RadzenPanelMenuItem Text="Reportes"
-                                 Icon="bar_chart"
-                                 Path="/reportes" />
+                                 Icon="picture_as_pdf">
+
+                <RadzenPanelMenuItem Text="Generar Reportes Básicos"
+                                     Path="/"
+                                     Click="@CloseSidebar" />
+
+            </RadzenPanelMenuItem>
 
         </RadzenPanelMenu>
 
@@ -70,5 +153,13 @@
 @code {
 
     bool sidebarExpanded = true;
+
+    
+
+
+    void CloseSidebar()
+    {
+        sidebarExpanded = false;
+    }
 
 }
