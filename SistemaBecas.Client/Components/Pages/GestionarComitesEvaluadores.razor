@@ -1,212 +1,335 @@
 ﻿@page "/gestionar-comites-evaluadores"
 
+@using Radzen
+@using Radzen.Blazor
+
 <PageTitle>Gestionar Comités Evaluadores</PageTitle>
 
-<div class="page-container">
+<RadzenStack Gap="1.5rem"
+             Style="padding: 2rem; background-color: #f4f7fb; min-height: 100vh;">
 
-    <!-- ENCABEZADO -->
-    <div class="page-header">
-        <div class="header-content">
-            <div>
-                <h1>Gestión de comités evaluadores</h1>
-                <p>Administre los comités evaluadores de la plataforma</p>
-            </div>
-        </div>
-    </div>
+    <!-- ====================================================== -->
+    <!-- ENCABEZADO                                             -->
+    <!-- ====================================================== -->
 
-    <!-- CONTENIDO -->
-    <div class="content-container">
+    <RadzenCard Style="background: linear-gradient(135deg, #1565c0, #1976d2); color: white;">
 
-        <!-- REGISTRAR COMITÉ -->
-        <div class="form-card">
+        <RadzenStack Gap="0.5rem">
 
-            <div class="card-title">
-                Registrar comité
-            </div>
+            <RadzenText Text="Gestión de comités evaluadores"
+                        TextStyle="TextStyle.H3"
+                        Style="color: white; margin: 0;" />
 
-            <div class="card-description">
-                Ingrese la información del nuevo comité evaluador.
-            </div>
+            <RadzenText Text="Administre los comités evaluadores de la plataforma"
+                        Style="color: white; margin: 0;" />
 
-            <div class="form-grid">
+        </RadzenStack>
 
-                <div class="form-group">
-                    <label class="form-label">
-                        Nombre del comité
-                    </label>
-
-                    <RadzenTextBox @bind-Value="nombreComite"
-                                   Placeholder="Ingrese el nombre del comité"
-                                   Style="width:100%" />
-                </div>
+    </RadzenCard>
 
 
-                <div class="form-group">
-                    <label class="form-label">
-                        Fecha
-                    </label>
+    <!-- ====================================================== -->
+    <!-- REGISTRAR COMITÉ                                       -->
+    <!-- ====================================================== -->
 
-                    <RadzenDatePicker @bind-Value="fechaComite"
-                                      DateFormat="dd/MM/yyyy"
-                                      Style="width:100%" />
-                </div>
+    <RadzenCard>
 
+        <RadzenStack Gap="1.5rem">
 
-                <div class="form-group full">
-                    <label class="form-label">
-                        Descripción
-                    </label>
+            <RadzenStack Gap="0.5rem">
 
-                    <RadzenTextArea @bind-Value="descripcionComite"
-                                    Placeholder="Ingrese la descripción del comité"
-                                    Rows="4"
-                                    Style="width:100%" />
-                </div>
+                <RadzenText Text="Registrar comité"
+                            TextStyle="TextStyle.H5"
+                            Style="margin: 0;" />
 
-            </div>
+                <RadzenText Text="Ingrese la información del nuevo comité evaluador."
+                            Style="margin: 0; color: #666;" />
+
+            </RadzenStack>
 
 
-            <!-- EVALUADORES -->
-            <div class="evaluators-container">
+            <!-- DATOS DEL COMITÉ -->
 
-                <div class="evaluators-title">
-                    Asignar evaluadores
-                </div>
+            <RadzenRow Gap="1rem">
 
-                <div class="evaluators-description">
-                    Seleccione los evaluadores que formarán parte del comité.
-                </div>
+                <!-- NOMBRE -->
 
+                <RadzenColumn Size="12"
+                              SizeMD="6">
 
-                @foreach (var evaluador in evaluadores)
-                {
-                    <div class="evaluator-item">
+                    <RadzenFormField Text="Nombre del comité"
+                                     Variant="Variant.Outlined"
+                                     Style="width: 100%;">
 
-                        <RadzenCheckBox @bind-Value="evaluador.Seleccionado" />
+                        <RadzenTextBox @bind-Value="nombreComite"
+                                       Placeholder="Ingrese el nombre del comité"
+                                       Style="width: 100%;" />
 
-                        <div>
-                            <div class="evaluator-name">
-                                @evaluador.Nombre
-                            </div>
+                    </RadzenFormField>
 
-                            <div class="evaluator-position">
-                                @evaluador.Cargo
-                            </div>
-                        </div>
-
-                    </div>
-                }
-
-            </div>
+                </RadzenColumn>
 
 
-            <!-- BOTONES -->
-            <div class="button-container">
+                <!-- FECHA -->
 
-                <button class="btn-secondary"
-                        @onclick="Cancelar">
-                    Cancelar
-                </button>
+                <RadzenColumn Size="12"
+                              SizeMD="6">
 
-                <button class="btn-primary"
-                        @onclick="GuardarComite">
-                    Guardar comité
-                </button>
+                    <RadzenFormField Text="Fecha"
+                                     Variant="Variant.Outlined"
+                                     Style="width: 100%;">
 
-            </div>
+                        <RadzenDatePicker @bind-Value="fechaComite"
+                                          DateFormat="dd/MM/yyyy"
+                                          Style="width: 100%;" />
 
-        </div>
+                    </RadzenFormField>
+
+                </RadzenColumn>
 
 
-        <!-- TABLA -->
-        <div class="table-card">
+                <!-- DESCRIPCIÓN -->
 
-            <div class="card-title">
-                Comités registrados
-            </div>
+                <RadzenColumn Size="12">
 
-            <div class="card-description">
-                Consulte y administre los comités evaluadores registrados.
-            </div>
+                    <RadzenFormField Text="Descripción"
+                                     Variant="Variant.Outlined"
+                                     Style="width: 100%;">
 
-            <div class="table-container">
+                        <RadzenTextArea @bind-Value="descripcionComite"
+                                        Placeholder="Ingrese la descripción del comité"
+                                        Rows="4"
+                                        Style="width: 100%;" />
 
-                <table class="committee-table">
+                    </RadzenFormField>
 
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre del comité</th>
-                            <th>Fecha</th>
-                            <th>Evaluadores</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
+                </RadzenColumn>
 
-                    <tbody>
+            </RadzenRow>
 
-                        @foreach (var comite in comites)
+
+            <!-- ====================================================== -->
+            <!-- EVALUADORES                                             -->
+            <!-- ====================================================== -->
+
+            <RadzenCard Variant="Variant.Outlined">
+
+                <RadzenStack Gap="1rem">
+
+                    <RadzenText Text="Asignar evaluadores"
+                                TextStyle="TextStyle.H6"
+                                Style="margin: 0;" />
+
+                    <RadzenText Text="Seleccione los evaluadores que formarán parte del comité."
+                                Style="margin: 0; color: #666;" />
+
+
+                    <RadzenStack Gap="0.8rem">
+
+                        @foreach (var evaluador in evaluadores)
                         {
-                            <tr>
+                            <RadzenCard Variant="Variant.Outlined">
 
-                                <td>
-                                    @comite.Id.ToString("D3")
-                                </td>
+                                <RadzenStack Orientation="Orientation.Horizontal"
+                                             Gap="1rem"
+                                             AlignItems="AlignItems.Center">
 
-                                <td>
-                                    @comite.Nombre
-                                </td>
+                                    <RadzenCheckBox @bind-Value="evaluador.Seleccionado" />
 
-                                <td>
-                                    @comite.Fecha.ToString("dd/MM/yyyy")
-                                </td>
+                                    <RadzenStack Gap="0.2rem">
 
-                                <td>
-                                    @comite.CantidadEvaluadores
-                                </td>
+                                        <RadzenText Text="@evaluador.Nombre"
+                                                    TextStyle="TextStyle.Body1"
+                                                    Style="font-weight: 600; margin: 0;" />
 
-                                <td>
-                                    <span class="status-active">
-                                        @comite.Estado
-                                    </span>
-                                </td>
+                                        <RadzenText Text="@evaluador.Cargo"
+                                                    Style="margin: 0; color: #666;" />
 
-                                <td>
+                                    </RadzenStack>
 
-                                    <div class="action-buttons">
+                                </RadzenStack>
 
-                                        <button class="btn-edit"
-                                                @onclick="() => EditarComite(comite)">
-                                            Editar
-                                        </button>
-
-                                        <button class="btn-view"
-                                                @onclick="() => VerComite(comite)">
-                                            Ver
-                                        </button>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
+                            </RadzenCard>
                         }
 
-                    </tbody>
+                    </RadzenStack>
 
-                </table>
+                </RadzenStack>
 
-            </div>
+            </RadzenCard>
 
-        </div>
 
-    </div>
+            <!-- ====================================================== -->
+            <!-- BOTONES                                                 -->
+            <!-- ====================================================== -->
 
-</div>
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         Gap="1rem"
+                         JustifyContent="JustifyContent.End">
+
+                <RadzenButton Text="Cancelar"
+                              Icon="close"
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="@Cancelar" />
+
+                <RadzenButton Text="Guardar comité"
+                              Icon="save"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@GuardarComite" />
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- COMITÉS REGISTRADOS                                    -->
+    <!-- ====================================================== -->
+
+    <RadzenCard>
+
+        <RadzenStack Gap="1.5rem">
+
+            <RadzenStack Gap="0.5rem">
+
+                <RadzenText Text="Comités registrados"
+                            TextStyle="TextStyle.H5"
+                            Style="margin: 0;" />
+
+                <RadzenText Text="Consulte y administre los comités evaluadores registrados."
+                            Style="margin: 0; color: #666;" />
+
+            </RadzenStack>
+
+
+            <RadzenDataGrid Data="@comites"
+                            TItem="ComiteMock"
+                            AllowPaging="true"
+                            PageSize="5"
+                            AllowSorting="true"
+                            AllowFiltering="true"
+                            Responsive="true"
+                            EmptyText="No hay comités registrados">
+
+                <Columns>
+
+                    <!-- ID -->
+
+                    <RadzenDataGridColumn TItem="ComiteMock"
+                                          Property="IdComite"
+                                          Title="ID"
+                                          Width="80px">
+
+                        <Template Context="comite">
+
+                            @comite.IdComite.ToString("D3")
+
+                        </Template>
+
+                    </RadzenDataGridColumn>
+
+
+                    <!-- NOMBRE -->
+
+                    <RadzenDataGridColumn TItem="ComiteMock"
+                                          Property="Nombre"
+                                          Title="Nombre del comité" />
+
+
+                    <!-- FECHA -->
+
+                    <RadzenDataGridColumn TItem="ComiteMock"
+                                          Property="Fecha"
+                                          Title="Fecha">
+
+                        <Template Context="comite">
+
+                            @comite.Fecha.ToString("dd/MM/yyyy")
+
+                        </Template>
+
+                    </RadzenDataGridColumn>
+
+
+                    <!-- EVALUADORES -->
+
+                    <RadzenDataGridColumn TItem="ComiteMock"
+                                          Title="Evaluadores">
+
+                        <Template Context="comite">
+
+                            @comite.Evaluadores.Count
+
+                        </Template>
+
+                    </RadzenDataGridColumn>
+
+
+                    <!-- ESTADO -->
+
+                    <RadzenDataGridColumn TItem="ComiteMock"
+                                          Property="Estado"
+                                          Title="Estado">
+
+                        <Template Context="comite">
+
+                            <RadzenBadge Text="@comite.Estado"
+                                         BadgeStyle="@ObtenerBadgeEstado(comite.Estado)" />
+
+                        </Template>
+
+                    </RadzenDataGridColumn>
+
+
+                    <!-- ACCIONES -->
+
+                    <RadzenDataGridColumn TItem="ComiteMock"
+                                          Title="Acciones"
+                                          Sortable="false"
+                                          Filterable="false"
+                                          Width="180px">
+
+                        <Template Context="comite">
+
+                            <RadzenStack Orientation="Orientation.Horizontal"
+                                         Gap="0.5rem">
+
+                                <RadzenButton Icon="edit"
+                                              Text="Editar"
+                                              ButtonStyle="ButtonStyle.Light"
+                                              Size="ButtonSize.Small"
+                                              Click="@(() => EditarComite(comite))" />
+
+                                <RadzenButton Icon="visibility"
+                                              Text="Ver"
+                                              ButtonStyle="ButtonStyle.Secondary"
+                                              Size="ButtonSize.Small"
+                                              Click="@(() => VerComite(comite))" />
+
+                            </RadzenStack>
+
+                        </Template>
+
+                    </RadzenDataGridColumn>
+
+                </Columns>
+
+            </RadzenDataGrid>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+</RadzenStack>
 
 
 @code {
+
+    // ============================================================
+    // DATOS DEL COMITÉ
+    // ============================================================
 
     private string nombreComite = "";
 
@@ -215,85 +338,123 @@
     private string descripcionComite = "";
 
 
-    private List<Evaluador> evaluadores = new()
+    // ============================================================
+    // EVALUADORES MOCK
+    // Corresponden a la tabla Evaluador
+    // ============================================================
+
+    private List<EvaluadorMock> evaluadores = new()
     {
-        new Evaluador
+        new EvaluadorMock
         {
-            Id = 1,
-            Nombre = "Evaluador 1",
+            IdEvaluador = 1,
+            IdUsuario = 1,
+            Nombre = "Juan Pérez López",
             Cargo = "Analista académico"
         },
 
-        new Evaluador
+        new EvaluadorMock
         {
-            Id = 2,
-            Nombre = "Evaluador 2",
-            Cargo = "Coordinador"
+            IdEvaluador = 2,
+            IdUsuario = 2,
+            Nombre = "María García López",
+            Cargo = "Coordinadora"
         },
 
-        new Evaluador
+        new EvaluadorMock
         {
-            Id = 3,
-            Nombre = "Evaluador 3",
+            IdEvaluador = 3,
+            IdUsuario = 3,
+            Nombre = "Carlos Hernández",
             Cargo = "Supervisor"
         }
     };
 
 
-    private List<Comite> comites = new()
+    // ============================================================
+    // COMITÉS MOCK
+    // ============================================================
+
+    private List<ComiteMock> comites = new()
     {
-        new Comite
+        new ComiteMock
         {
-            Id = 1,
+            IdComite = 1,
             Nombre = "Comité de Becas 2026",
             Fecha = new DateTime(2026, 9, 15),
-            CantidadEvaluadores = 3,
-            Estado = "Activo"
+            Descripcion = "Comité encargado de evaluar las solicitudes de becas universitarias.",
+            Estado = "Activo",
+            Evaluadores = new List<int> { 1, 2, 3 }
         },
 
-        new Comite
+        new ComiteMock
         {
-            Id = 2,
+            IdComite = 2,
             Nombre = "Comité de Evaluación General",
             Fecha = new DateTime(2026, 9, 20),
-            CantidadEvaluadores = 4,
-            Estado = "Activo"
+            Descripcion = "Comité encargado de realizar evaluaciones generales de solicitudes.",
+            Estado = "Activo",
+            Evaluadores = new List<int> { 1, 2 }
         }
     };
 
+
+    // ============================================================
+    // GUARDAR
+    // ============================================================
 
     private void GuardarComite()
     {
         if (string.IsNullOrWhiteSpace(nombreComite))
             return;
 
-        int cantidadEvaluadores =
-            evaluadores.Count(e => e.Seleccionado);
 
-        comites.Add(new Comite
+        var evaluadoresSeleccionados = evaluadores
+            .Where(e => e.Seleccionado)
+            .Select(e => e.IdEvaluador)
+            .ToList();
+
+
+        comites.Add(new ComiteMock
         {
-            Id = comites.Count + 1,
+            IdComite = comites.Count + 1,
+
             Nombre = nombreComite,
+
             Fecha = fechaComite ?? DateTime.Today,
-            CantidadEvaluadores = cantidadEvaluadores,
-            Estado = "Activo"
+
+            Descripcion = descripcionComite,
+
+            Estado = "Activo",
+
+            Evaluadores = evaluadoresSeleccionados
         });
 
-        nombreComite = "";
-        descripcionComite = "";
-        fechaComite = DateTime.Today;
 
-        foreach (var evaluador in evaluadores)
-        {
-            evaluador.Seleccionado = false;
-        }
+        LimpiarFormulario();
     }
 
+
+    // ============================================================
+    // CANCELAR
+    // ============================================================
 
     private void Cancelar()
     {
+        LimpiarFormulario();
+    }
+
+
+    // ============================================================
+    // LIMPIAR
+    // ============================================================
+
+    private void LimpiarFormulario()
+    {
         nombreComite = "";
+
         descripcionComite = "";
+
         fechaComite = DateTime.Today;
 
         foreach (var evaluador in evaluadores)
@@ -303,22 +464,62 @@
     }
 
 
-    private void EditarComite(Comite comite)
+    // ============================================================
+    // EDITAR
+    // ============================================================
+
+    private void EditarComite(ComiteMock comite)
     {
         nombreComite = comite.Nombre;
+
         fechaComite = comite.Fecha;
+
+        descripcionComite = comite.Descripcion;
+
+
+        foreach (var evaluador in evaluadores)
+        {
+            evaluador.Seleccionado =
+                comite.Evaluadores.Contains(evaluador.IdEvaluador);
+        }
     }
 
 
-    private void VerComite(Comite comite)
+    // ============================================================
+    // VER
+    // ============================================================
+
+    private void VerComite(ComiteMock comite)
     {
         // Próximamente se mostrará el detalle del comité.
     }
 
 
-    public class Evaluador
+    // ============================================================
+    // BADGE ESTADO
+    // ============================================================
+
+    private BadgeStyle ObtenerBadgeEstado(string estado)
     {
-        public int Id { get; set; }
+        return estado switch
+        {
+            "Activo" => BadgeStyle.Success,
+            "Inactivo" => BadgeStyle.Light,
+            "Finalizado" => BadgeStyle.Info,
+            _ => BadgeStyle.Light
+        };
+    }
+
+
+    // ============================================================
+    // EVALUADOR
+    // ============================================================
+
+    public class EvaluadorMock
+    {
+        public int IdEvaluador { get; set; }
+
+        public int IdUsuario { get; set; }
 
         public string Nombre { get; set; } = "";
 
@@ -328,16 +529,23 @@
     }
 
 
-    public class Comite
+    // ============================================================
+    // COMITÉ
+    // ============================================================
+
+    public class ComiteMock
     {
-        public int Id { get; set; }
+        public int IdComite { get; set; }
 
         public string Nombre { get; set; } = "";
 
         public DateTime Fecha { get; set; }
 
-        public int CantidadEvaluadores { get; set; }
+        public string Descripcion { get; set; } = "";
 
         public string Estado { get; set; } = "";
+
+        public List<int> Evaluadores { get; set; } = new();
     }
+
 }

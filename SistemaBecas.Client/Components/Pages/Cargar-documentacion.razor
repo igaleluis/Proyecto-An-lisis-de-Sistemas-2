@@ -1,316 +1,499 @@
 @page "/cargar-documentacion"
 
+@using Radzen
+@using Radzen.Blazor
+
 <PageTitle>Sistema de Becas - Cargar documentación</PageTitle>
 
+<RadzenStack Gap="1.5rem"
+             Style="padding: 2rem; background-color: #f4f7fb; min-height: 100vh;">
 
-<div class="container-fluid py-4">
+    <!-- ====================================================== -->
+    <!-- CONTENEDOR PRINCIPAL                                   -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        max-width: 1000px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0;
+        overflow: hidden;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;">
 
-    <div class="row justify-content-center">
+        <!-- ================================================== -->
+        <!-- ENCABEZADO                                         -->
+        <!-- ================================================== -->
 
-        <div class="col-12 col-lg-10">
+        <RadzenCard Style="
+            background: linear-gradient(135deg, #1565c0, #1e88e5);
+            color: white;
+            border: none;
+            border-radius: 0;
+            padding: 2rem;">
 
-            <RadzenCard Variant="Variant.Outlined">
+            <RadzenStack AlignItems="AlignItems.Center"
+                         Gap="0.5rem">
 
-                <!-- ENCABEZADO -->
-                <div class="bg-primary text-white text-center p-4 rounded-top">
+                <RadzenIcon Icon="description"
+                            Style="
+                font-size:48px;
+                color:white;" />
 
-                    <div class="mb-2">
-                        <span style="font-size: 40px;">📄</span>
-                    </div>
+                <RadzenText Text="Sistema de Becas"
+                            TextStyle="TextStyle.H4"
+                            Style="
+                color:white;
+                font-weight:700;
+                margin:0;" />
 
-                    <h1 class="mb-1">
-                        Sistema de Becas
-                    </h1>
+                <RadzenText Text="Cargar documentación"
+                            Style="
+                color:rgba(255,255,255,0.9);
+                font-size:16px;" />
 
-                    <p class="mb-0">
-                        Cargar documentación
-                    </p>
+            </RadzenStack>
 
-                </div>
+        </RadzenCard>
 
 
-                <!-- CONTENIDO -->
-                <div class="p-4">
+        <!-- ================================================== -->
+        <!-- CONTENIDO                                          -->
+        <!-- ================================================== -->
 
-                    <!-- TÍTULO -->
-                    <div class="mb-4">
+        <RadzenStack Gap="1.5rem"
+                     Style="padding:2rem;">
 
-                        <h2 class="text-primary">
-                            Documentación de la solicitud
-                        </h2>
+            <!-- TÍTULO -->
 
-                        <p class="text-muted">
-                            Seleccione la solicitud y cargue los documentos requeridos.
-                        </p>
+            <RadzenStack Gap="0.3rem">
 
-                    </div>
+                <RadzenText Text="Documentación de la solicitud"
+                            TextStyle="TextStyle.H5"
+                            Style="
+                color:#1565c0;
+                font-weight:700;" />
 
+                <RadzenText Text="Seleccione una solicitud y cargue los documentos requeridos."
+                            Style="
+                color:#6b7280;
+                font-size:14px;" />
 
-                    <!-- SOLICITUD -->
-                    <RadzenFormField Text="Solicitud"
-                                     Variant="Variant.Outlined"
-                                     Style="width:100%">
+            </RadzenStack>
 
-                        <RadzenDropDown Data="@solicitudes"
-                                        @bind-Value="@solicitudSeleccionada"
-                                        Placeholder="Seleccione una solicitud"
-                                        Style="width:100%" />
 
-                    </RadzenFormField>
+            <!-- ================================================== -->
+            <!-- SOLICITUD                                           -->
+            <!-- ================================================== -->
 
+            <RadzenFormField Text="Solicitud"
+                             Variant="Variant.Outlined"
+                             Style="width:100%;">
 
-                    <!-- DOCUMENTOS REQUERIDOS -->
-                    <div class="mt-4 mb-3">
+                <RadzenDropDown TValue="int?"
+                                Data="@solicitudes"
+                                TextProperty="Descripcion"
+                                ValueProperty="IdSolicitud"
+                                @bind-Value="@solicitudSeleccionada"
+                                Placeholder="Seleccione una solicitud"
+                                AllowClear="true"
+                                Style="width:100%;" />
 
-                        <h3 class="text-primary">
-                            Documentos requeridos
-                        </h3>
+            </RadzenFormField>
 
-                        <p class="text-muted">
-                            Adjunte los documentos correspondientes a la solicitud.
-                        </p>
 
-                    </div>
+            <!-- ================================================== -->
+            <!-- INFORMACIÓN DE SOLICITUD                            -->
+            <!-- ================================================== -->
 
+            <RadzenCard Variant="Variant.Outlined"
+                        Style="
+                border-radius:12px;
+                background-color:#f8fafc;
+                padding:1.2rem;">
 
-                    <!-- DPI -->
-                    <RadzenCard Variant="Variant.Outlined" class="mb-3">
+                <RadzenRow>
 
-                        <RadzenRow AlignItems="AlignItems.Center"
-                                   Gap="1rem">
+                    <RadzenColumn Size="12"
+                                  SizeMD="4">
 
-                            <RadzenColumn Size="12" SizeMD="7">
+                        <RadzenText Text="Solicitud"
+                                    Style="
+                        color:#6b7280;
+                        font-size:12px;" />
 
-                                <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenText Text="#0001"
+                                    Style="
+                        font-weight:700;
+                        margin-top:4px;" />
 
-                                    <RadzenColumn Size="2">
+                    </RadzenColumn>
 
-                                        <span style="font-size:30px;">
-                                            📄
-                                        </span>
 
-                                    </RadzenColumn>
+                    <RadzenColumn Size="12"
+                                  SizeMD="4">
 
-                                    <RadzenColumn Size="10">
+                        <RadzenText Text="Estudiante"
+                                    Style="
+                        color:#6b7280;
+                        font-size:12px;" />
 
-                                        <strong>DPI</strong>
+                        <RadzenText Text="Juan Pérez López"
+                                    Style="
+                        font-weight:600;
+                        margin-top:4px;" />
 
-                                        <div class="text-muted">
-                                            Documento de identificación
-                                        </div>
+                    </RadzenColumn>
 
-                                    </RadzenColumn>
 
-                                </RadzenRow>
+                    <RadzenColumn Size="12"
+                                  SizeMD="4">
 
-                            </RadzenColumn>
+                        <RadzenText Text="Convocatoria"
+                                    Style="
+                        color:#6b7280;
+                        font-size:12px;" />
 
+                        <RadzenText Text="Beca Nacional Universitaria 2026"
+                                    Style="
+                        font-weight:600;
+                        margin-top:4px;" />
 
-                            <RadzenColumn Size="12" SizeMD="5">
+                    </RadzenColumn>
 
-                                <div class="text-md-end">
-
-                                    <RadzenBadge Text="Pendiente"
-                                                 BadgeStyle="BadgeStyle.Warning" />
-
-                                    <div class="mt-2">
-
-                                        <InputFile accept=".pdf,.jpg,.jpeg,.png" />
-
-                                    </div>
-
-                                </div>
-
-                            </RadzenColumn>
-
-                        </RadzenRow>
-
-                    </RadzenCard>
-
-
-                    <!-- CONSTANCIA DE ESTUDIOS -->
-                    <RadzenCard Variant="Variant.Outlined" class="mb-3">
-
-                        <RadzenRow AlignItems="AlignItems.Center"
-                                   Gap="1rem">
-
-                            <RadzenColumn Size="12" SizeMD="7">
-
-                                <RadzenRow AlignItems="AlignItems.Center">
-
-                                    <RadzenColumn Size="2">
-
-                                        <span style="font-size:30px;">
-                                            📄
-                                        </span>
-
-                                    </RadzenColumn>
-
-                                    <RadzenColumn Size="10">
-
-                                        <strong>
-                                            Constancia de estudios
-                                        </strong>
-
-                                        <div class="text-muted">
-                                            Constancia emitida por la institución educativa
-                                        </div>
-
-                                    </RadzenColumn>
-
-                                </RadzenRow>
-
-                            </RadzenColumn>
-
-
-                            <RadzenColumn Size="12" SizeMD="5">
-
-                                <div class="text-md-end">
-
-                                    <RadzenBadge Text="Pendiente"
-                                                 BadgeStyle="BadgeStyle.Warning" />
-
-                                    <div class="mt-2">
-
-                                        <InputFile accept=".pdf,.jpg,.jpeg,.png" />
-
-                                    </div>
-
-                                </div>
-
-                            </RadzenColumn>
-
-                        </RadzenRow>
-
-                    </RadzenCard>
-
-
-                    <!-- CERTIFICACIÓN DE NOTAS -->
-                    <RadzenCard Variant="Variant.Outlined" class="mb-3">
-
-                        <RadzenRow AlignItems="AlignItems.Center"
-                                   Gap="1rem">
-
-                            <RadzenColumn Size="12" SizeMD="7">
-
-                                <RadzenRow AlignItems="AlignItems.Center">
-
-                                    <RadzenColumn Size="2">
-
-                                        <span style="font-size:30px;">
-                                            📄
-                                        </span>
-
-                                    </RadzenColumn>
-
-                                    <RadzenColumn Size="10">
-
-                                        <strong>
-                                            Certificación de notas
-                                        </strong>
-
-                                        <div class="text-muted">
-                                            Certificación de calificaciones
-                                        </div>
-
-                                    </RadzenColumn>
-
-                                </RadzenRow>
-
-                            </RadzenColumn>
-
-
-                            <RadzenColumn Size="12" SizeMD="5">
-
-                                <div class="text-md-end">
-
-                                    <RadzenBadge Text="Pendiente"
-                                                 BadgeStyle="BadgeStyle.Warning" />
-
-                                    <div class="mt-2">
-
-                                        <InputFile accept=".pdf,.jpg,.jpeg,.png" />
-
-                                    </div>
-
-                                </div>
-
-                            </RadzenColumn>
-
-                        </RadzenRow>
-
-                    </RadzenCard>
-
-
-                    <!-- OBSERVACIONES -->
-                    <div class="mt-4">
-
-                        <RadzenFormField Text="Observaciones"
-                                         Variant="Variant.Outlined"
-                                         Style="width:100%">
-
-                            <RadzenTextArea Rows="4"
-                                            Placeholder="Ingrese alguna observación sobre la documentación..."
-                                            Style="width:100%" />
-
-                        </RadzenFormField>
-
-                    </div>
-
-
-                    <!-- BOTONES -->
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-
-                        <RadzenButton Text="Cancelar"
-                                      Icon="close"
-                                      ButtonStyle="ButtonStyle.Light"
-                                      Variant="Variant.Outlined" />
-
-                        <RadzenButton Text="Guardar documentación"
-                                      Icon="save"
-                                      ButtonStyle="ButtonStyle.Primary" />
-
-                    </div>
-
-
-                    <!-- SEGURIDAD -->
-                    <div class="text-center text-muted mt-4">
-
-                        🔒 Información protegida
-
-                    </div>
-
-                </div>
+                </RadzenRow>
 
             </RadzenCard>
 
 
-            <!-- PIE -->
-            <div class="text-center text-muted mt-3">
+            <!-- ================================================== -->
+            <!-- DOCUMENTOS REQUERIDOS                              -->
+            <!-- ================================================== -->
 
-                Sistema de Becas
+            <RadzenStack Gap="0.3rem">
 
-            </div>
+                <RadzenText Text="Documentos requeridos"
+                            TextStyle="TextStyle.H6"
+                            Style="
+                color:#1565c0;
+                font-weight:700;" />
 
-        </div>
+                <RadzenText Text="Adjunte los documentos correspondientes a la solicitud."
+                            Style="
+                color:#6b7280;
+                font-size:14px;" />
 
-    </div>
+            </RadzenStack>
 
-</div>
+
+            <!-- ================================================== -->
+            <!-- DPI                                                 -->
+            <!-- ================================================== -->
+
+            <RadzenCard Variant="Variant.Outlined"
+                        Style="
+                border-radius:12px;
+                padding:1.2rem;">
+
+                <RadzenRow AlignItems="AlignItems.Center"
+                           Gap="1rem">
+
+                    <RadzenColumn Size="12"
+                                  SizeMD="7">
+
+                        <RadzenRow AlignItems="AlignItems.Center">
+
+                            <RadzenColumn Size="2">
+
+                                <RadzenIcon Icon="badge"
+                                            Style="
+                                font-size:32px;
+                                color:#1565c0;" />
+
+                            </RadzenColumn>
+
+                            <RadzenColumn Size="10">
+
+                                <RadzenText Text="DPI"
+                                            Style="
+                                font-weight:700;
+                                font-size:16px;" />
+
+                                <RadzenText Text="Documento de identificación"
+                                            Style="
+                                color:#6b7280;
+                                font-size:13px;" />
+
+                                <RadzenBadge Text="Obligatorio"
+                                             BadgeStyle="BadgeStyle.Info"
+                                             Style="margin-top:5px;" />
+
+                            </RadzenColumn>
+
+                        </RadzenRow>
+
+                    </RadzenColumn>
+
+
+                    <RadzenColumn Size="12"
+                                  SizeMD="5">
+
+                        <RadzenStack AlignItems="AlignItems.End"
+                                     Gap="0.5rem">
+
+                            <RadzenBadge Text="Pendiente"
+                                         BadgeStyle="BadgeStyle.Warning" />
+
+                            <InputFile accept=".pdf,.jpg,.jpeg,.png" />
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+
+            <!-- ================================================== -->
+            <!-- CONSTANCIA DE ESTUDIOS                             -->
+            <!-- ================================================== -->
+
+            <RadzenCard Variant="Variant.Outlined"
+                        Style="
+                border-radius:12px;
+                padding:1.2rem;">
+
+                <RadzenRow AlignItems="AlignItems.Center"
+                           Gap="1rem">
+
+                    <RadzenColumn Size="12"
+                                  SizeMD="7">
+
+                        <RadzenRow AlignItems="AlignItems.Center">
+
+                            <RadzenColumn Size="2">
+
+                                <RadzenIcon Icon="school"
+                                            Style="
+                                font-size:32px;
+                                color:#1565c0;" />
+
+                            </RadzenColumn>
+
+                            <RadzenColumn Size="10">
+
+                                <RadzenText Text="Constancia de estudios"
+                                            Style="
+                                font-weight:700;
+                                font-size:16px;" />
+
+                                <RadzenText Text="Constancia emitida por la institución educativa"
+                                            Style="
+                                color:#6b7280;
+                                font-size:13px;" />
+
+                                <RadzenBadge Text="Obligatorio"
+                                             BadgeStyle="BadgeStyle.Info"
+                                             Style="margin-top:5px;" />
+
+                            </RadzenColumn>
+
+                        </RadzenRow>
+
+                    </RadzenColumn>
+
+
+                    <RadzenColumn Size="12"
+                                  SizeMD="5">
+
+                        <RadzenStack AlignItems="AlignItems.End"
+                                     Gap="0.5rem">
+
+                            <RadzenBadge Text="Pendiente"
+                                         BadgeStyle="BadgeStyle.Warning" />
+
+                            <InputFile accept=".pdf,.jpg,.jpeg,.png" />
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+
+            <!-- ================================================== -->
+            <!-- CERTIFICACIÓN DE NOTAS                             -->
+            <!-- ================================================== -->
+
+            <RadzenCard Variant="Variant.Outlined"
+                        Style="
+                border-radius:12px;
+                padding:1.2rem;">
+
+                <RadzenRow AlignItems="AlignItems.Center"
+                           Gap="1rem">
+
+                    <RadzenColumn Size="12"
+                                  SizeMD="7">
+
+                        <RadzenRow AlignItems="AlignItems.Center">
+
+                            <RadzenColumn Size="2">
+
+                                <RadzenIcon Icon="article"
+                                            Style="
+                                font-size:32px;
+                                color:#1565c0;" />
+
+                            </RadzenColumn>
+
+                            <RadzenColumn Size="10">
+
+                                <RadzenText Text="Certificación de notas"
+                                            Style="
+                                font-weight:700;
+                                font-size:16px;" />
+
+                                <RadzenText Text="Certificación de calificaciones"
+                                            Style="
+                                color:#6b7280;
+                                font-size:13px;" />
+
+                                <RadzenBadge Text="Obligatorio"
+                                             BadgeStyle="BadgeStyle.Info"
+                                             Style="margin-top:5px;" />
+
+                            </RadzenColumn>
+
+                        </RadzenRow>
+
+                    </RadzenColumn>
+
+
+                    <RadzenColumn Size="12"
+                                  SizeMD="5">
+
+                        <RadzenStack AlignItems="AlignItems.End"
+                                     Gap="0.5rem">
+
+                            <RadzenBadge Text="Pendiente"
+                                         BadgeStyle="BadgeStyle.Warning" />
+
+                            <InputFile accept=".pdf,.jpg,.jpeg,.png" />
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+
+            <!-- ================================================== -->
+            <!-- OBSERVACIONES                                      -->
+            <!-- ================================================== -->
+
+            <RadzenFormField Text="Observaciones"
+                             Variant="Variant.Outlined"
+                             Style="width:100%;">
+
+                <RadzenTextArea Rows="4"
+                                @bind-Value="@observaciones"
+                                Placeholder="Ingrese alguna observación sobre la documentación..."
+                                Style="width:100%;" />
+
+            </RadzenFormField>
+
+
+            <!-- ================================================== -->
+            <!-- BOTONES                                            -->
+            <!-- ================================================== -->
+
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         JustifyContent="JustifyContent.End"
+                         Gap="0.5rem">
+
+                <RadzenButton Text="Cancelar"
+                              Icon="close"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Outlined" />
+
+                <RadzenButton Text="Guardar documentación"
+                              Icon="save"
+                              ButtonStyle="ButtonStyle.Primary" />
+
+            </RadzenStack>
+
+
+            <!-- ================================================== -->
+            <!-- SEGURIDAD                                          -->
+            <!-- ================================================== -->
+
+            <RadzenStack AlignItems="AlignItems.Center"
+                         Gap="0.3rem"
+                         Style="margin-top:0.5rem;">
+
+                <RadzenIcon Icon="lock"
+                            Style="
+                color:#6b7280;
+                font-size:20px;" />
+
+                <RadzenText Text="Información protegida"
+                            Style="
+                color:#6b7280;
+                font-size:13px;" />
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- PIE                                                     -->
+    <!-- ====================================================== -->
+
+    <RadzenText Text="Sistema de Becas"
+                Style="
+    text-align:center;
+    color:#6b7280;
+    font-size:13px;" />
+
+</RadzenStack>
 
 
 @code {
 
-    private string? solicitudSeleccionada;
+    private int? solicitudSeleccionada;
 
-    private List<string> solicitudes = new()
+    private string observaciones = "";
+
+    private List<SolicitudMock> solicitudes = new()
     {
-        "Solicitud #0001",
-        "Solicitud #0002"
+        new SolicitudMock
+        {
+            IdSolicitud = 1,
+            Descripcion = "Solicitud #0001 - Juan Pérez López"
+        },
+
+        new SolicitudMock
+        {
+            IdSolicitud = 2,
+            Descripcion = "Solicitud #0002 - María García López"
+        }
     };
 
+
+    public class SolicitudMock
+    {
+        public int IdSolicitud { get; set; }
+
+        public string Descripcion { get; set; } = "";
+    }
+
 }
-
-
-
-

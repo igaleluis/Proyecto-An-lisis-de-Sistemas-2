@@ -1,105 +1,103 @@
 @page "/login"
 
+@using Radzen
+@using Radzen.Blazor
+
 <PageTitle>Sistema de Becas - Login</PageTitle>
 
-<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
+<RadzenStack JustifyContent="JustifyContent.Center"
+             AlignItems="AlignItems.Center"
+             Style="min-height: 100vh; padding: 2rem; background-color: #f4f7fb;">
 
-    <div class="row justify-content-center w-100">
+    <!-- TARJETA DE LOGIN -->
+    <RadzenCard Variant="Variant.Outlined"
+                Style="width: 100%; max-width: 450px;">
 
-        <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+        <RadzenStack Gap="1.5rem">
 
-            <!-- TARJETA DE LOGIN -->
-            <RadzenCard Variant="Variant.Outlined">
+            <!-- ENCABEZADO -->
+            <RadzenStack Gap="0.5rem"
+                         AlignItems="AlignItems.Center">
 
-                <!-- ENCABEZADO -->
-                <div class="text-center mb-4">
+                <RadzenIcon Icon="school"
+                            Style="font-size: 48px; color: #1565c0;" />
 
-                    <h1 class="text-primary">
-                        Sistema de Becas
-                    </h1>
+                <RadzenText Text="Sistema de Becas"
+                            TextStyle="TextStyle.H4"
+                            Style="color: #1565c0; font-weight: 700; margin: 0;" />
 
-                    <p class="text-muted">
-                        Ingrese sus datos para acceder
-                    </p>
+                <RadzenText Text="Ingrese sus datos para acceder"
+                            Style="color: #666; margin: 0;" />
 
-                </div>
-
-
-                <!-- CORREO -->
-                <div class="mb-3">
-
-                    <RadzenFormField Text="Correo electrónico"
-                                     Variant="Variant.Outlined"
-                                     Style="width:100%">
-
-                        <RadzenTextBox @bind-Value="correo"
-                                       Placeholder="Ingrese su correo"
-                                       Style="width:100%" />
-
-                    </RadzenFormField>
-
-                </div>
+            </RadzenStack>
 
 
-                <!-- CONTRASEÑA -->
-                <div class="mb-3">
+            <!-- CORREO -->
+            <RadzenFormField Text="Correo electrónico"
+                             Variant="Variant.Outlined"
+                             Style="width: 100%;">
 
-                    <RadzenFormField Text="Contraseña"
-                                     Variant="Variant.Outlined"
-                                     Style="width:100%">
+                <RadzenTextBox @bind-Value="correo"
+                               Placeholder="Ingrese su correo"
+                               Style="width: 100%;" />
 
-                        <RadzenPassword @bind-Value="password"
-                                        Placeholder="Ingrese su contraseña"
-                                        Style="width:100%" />
-
-                    </RadzenFormField>
-
-                </div>
+            </RadzenFormField>
 
 
-                <!-- BOTÓN INICIAR SESIÓN -->
-                <div class="d-grid">
+            <!-- CONTRASEÑA -->
+            <RadzenFormField Text="Contraseña"
+                             Variant="Variant.Outlined"
+                             Style="width: 100%;">
 
-                    <RadzenButton Text="Iniciar sesión"
-                                  Icon="login"
-                                  ButtonStyle="ButtonStyle.Primary"
-                                  Size="ButtonSize.Large"
-                                  Click="@IniciarSesion" />
+                <RadzenPassword @bind-Value="password"
+                                Placeholder="Ingrese su contraseña"
+                                Style="width: 100%;" />
 
-                </div>
-
-
-                <!-- SEGURIDAD -->
-                <div class="text-center text-muted mt-3">
-
-                    🔒 Acceso seguro
-
-                </div>
+            </RadzenFormField>
 
 
-                <!-- RECUPERAR CONTRASEÑA -->
-                <div class="text-center mt-3">
-
-                    <RadzenLink Text="¿Olvidaste tu contraseña?"
-                                Path="#" />
-
-                </div>
-
-            </RadzenCard>
+            <!-- BOTÓN -->
+            <RadzenButton Text="Iniciar sesión"
+                          Icon="login"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Size="ButtonSize.Large"
+                          Click="@IniciarSesion"
+                          Style="width: 100%;" />
 
 
-            <!-- PIE -->
-            <div class="text-center text-muted mt-3">
+            <!-- SEGURIDAD -->
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         JustifyContent="JustifyContent.Center"
+                         AlignItems="AlignItems.Center"
+                         Gap="0.5rem">
 
-                Sistema de Becas
+                <RadzenIcon Icon="lock"
+                            Style="font-size: 18px; color: #666;" />
 
-            </div>
+                <RadzenText Text="Acceso seguro"
+                            Style="color: #666; margin: 0;" />
 
-        </div>
+            </RadzenStack>
 
-    </div>
 
-</div>
+            <!-- RECUPERAR CONTRASEÑA -->
+            <RadzenStack AlignItems="AlignItems.Center">
+
+                <RadzenLink Text="¿Olvidaste tu contraseña?"
+                            Path="#" />
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <!-- PIE -->
+    <RadzenText Text="Sistema de Becas"
+                Style="color: #666; margin: 0;" />
+
+</RadzenStack>
 
 
 @code {

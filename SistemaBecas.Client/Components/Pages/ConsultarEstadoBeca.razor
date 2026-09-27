@@ -1,238 +1,306 @@
 ﻿@page "/consultar-estado-beca"
 
+@using Radzen
+@using Radzen.Blazor
+
 <PageTitle>Consultar Estado de la Beca</PageTitle>
 
-<div class="page-container">
+<RadzenStack Gap="1.5rem"
+             Style="padding: 2rem; background-color: #f4f7fb; min-height: 100vh;">
 
     <!-- ENCABEZADO -->
-    <div class="page-header">
-        <div class="header-content">
-            <div>
-                <h1>Consulta del estado de la beca</h1>
-                <p>Consulte el estado actual de su solicitud de beca</p>
-            </div>
-        </div>
-    </div>
+    <RadzenCard Style="background: linear-gradient(135deg, #1565c0, #1976d2); color: white;">
+        <RadzenStack Gap="0.5rem">
+            <RadzenText Text="Consulta del estado de la beca"
+                        TextStyle="TextStyle.H3"
+                        Style="color: white; margin: 0;" />
+
+            <RadzenText Text="Consulte el estado actual de su solicitud de beca"
+                        Style="color: white; margin: 0;" />
+        </RadzenStack>
+    </RadzenCard>
 
 
-    <!-- CONTENIDO -->
-    <div class="content-container">
+    <!-- BUSCADOR -->
+    <RadzenCard>
 
-        <!-- BUSCADOR -->
-        <div class="search-card">
+        <RadzenStack Gap="1rem">
 
-            <div class="card-title">
-                Consultar solicitud
-            </div>
+            <RadzenText Text="Consultar solicitud"
+                        TextStyle="TextStyle.H5"
+                        Style="margin: 0;" />
 
-            <div class="card-description">
-                Ingrese el número de solicitud para consultar su estado.
-            </div>
+            <RadzenText Text="Ingrese el número de solicitud para consultar su estado."
+                        Style="margin: 0; color: #666;" />
 
-            <div class="search-container">
+            <RadzenRow Gap="1rem" AlignItems="AlignItems.End">
 
-                <div class="search-input">
+                <RadzenColumn Size="12" SizeMD="8">
 
-                    <label class="form-label">
-                        Número de solicitud
-                    </label>
+                    <RadzenFormField Text="Número de solicitud"
+                                     Variant="Variant.Outlined"
+                                     Style="width: 100%;">
 
-                    <RadzenTextBox @bind-Value="numeroSolicitud"
-                                   Placeholder="Ej. 0001"
-                                   Style="width:100%" />
+                        <RadzenTextBox @bind-Value="numeroSolicitud"
+                                       Placeholder="Ej. 0001"
+                                       Style="width: 100%;" />
 
-                </div>
+                    </RadzenFormField>
 
-                <button class="btn-primary"
-                        @onclick="ConsultarSolicitud">
-                    Consultar
-                </button>
+                </RadzenColumn>
 
-            </div>
+                <RadzenColumn Size="12" SizeMD="4">
 
-        </div>
+                    <RadzenButton Text="Consultar"
+                                  Icon="search"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Size="ButtonSize.Medium"
+                                  Click="@ConsultarSolicitud"
+                                  Style="width: 100%;" />
 
+                </RadzenColumn>
 
-        @if (mostrarResultado)
-        {
-            <!-- INFORMACIÓN DE LA SOLICITUD -->
-            <div class="info-card">
+            </RadzenRow>
 
-                <div class="card-title">
-                    Información de la solicitud
-                </div>
+        </RadzenStack>
 
-                <div class="info-grid">
-
-                    <div class="info-item">
-                        <span class="info-label">
-                            Número de solicitud
-                        </span>
-
-                        <span class="info-value">
-                            #@solicitud.Numero
-                        </span>
-                    </div>
+    </RadzenCard>
 
 
-                    <div class="info-item">
-                        <span class="info-label">
-                            Estudiante
-                        </span>
+    @if (mostrarResultado)
+    {
+        <!-- INFORMACIÓN DE LA SOLICITUD -->
+        <RadzenCard>
 
-                        <span class="info-value">
-                            @solicitud.Estudiante
-                        </span>
-                    </div>
+            <RadzenStack Gap="1.5rem">
 
+                <RadzenText Text="Información de la solicitud"
+                            TextStyle="TextStyle.H5"
+                            Style="margin: 0;" />
 
-                    <div class="info-item">
-                        <span class="info-label">
-                            Convocatoria
-                        </span>
+                <RadzenRow Gap="1.5rem">
 
-                        <span class="info-value">
-                            @solicitud.Convocatoria
-                        </span>
-                    </div>
+                    <RadzenColumn Size="12" SizeMD="6">
 
+                        <RadzenStack Gap="0.3rem">
 
-                    <div class="info-item">
-                        <span class="info-label">
-                            Fecha de solicitud
-                        </span>
+                            <RadzenText Text="Número de solicitud"
+                                        Style="font-weight: 600; color: #666; margin: 0;" />
 
-                        <span class="info-value">
-                            @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
-                        </span>
-                    </div>
+                            <RadzenText Text="@($"#{solicitud.Numero}")"
+                                        TextStyle="TextStyle.Body1"
+                                        Style="margin: 0;" />
 
-                </div>
+                        </RadzenStack>
 
-            </div>
+                    </RadzenColumn>
 
 
-            <!-- ESTADO ACTUAL -->
-            <div class="status-card">
+                    <RadzenColumn Size="12" SizeMD="6">
 
-                <div class="card-title">
-                    Estado actual
-                </div>
+                        <RadzenStack Gap="0.3rem">
 
-                <div class="current-status">
+                            <RadzenText Text="Estudiante"
+                                        Style="font-weight: 600; color: #666; margin: 0;" />
 
-                    <span class="status-badge">
-                        @solicitud.Estado
-                    </span>
+                            <RadzenText Text="@solicitud.Estudiante"
+                                        TextStyle="TextStyle.Body1"
+                                        Style="margin: 0;" />
 
-                    <p>
-                        Su solicitud se encuentra actualmente en este estado.
-                    </p>
+                        </RadzenStack>
 
-                </div>
-
-            </div>
+                    </RadzenColumn>
 
 
-            <!-- HISTORIAL -->
-            <div class="history-card">
+                    <RadzenColumn Size="12" SizeMD="6">
 
-                <div class="card-title">
-                    Historial de la solicitud
-                </div>
+                        <RadzenStack Gap="0.3rem">
 
-                <div class="timeline">
+                            <RadzenText Text="Convocatoria"
+                                        Style="font-weight: 600; color: #666; margin: 0;" />
+
+                            <RadzenText Text="@solicitud.Convocatoria"
+                                        TextStyle="TextStyle.Body1"
+                                        Style="margin: 0;" />
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
+
+
+                    <RadzenColumn Size="12" SizeMD="6">
+
+                        <RadzenStack Gap="0.3rem">
+
+                            <RadzenText Text="Fecha de solicitud"
+                                        Style="font-weight: 600; color: #666; margin: 0;" />
+
+                            <RadzenText Text="@solicitud.FechaSolicitud.ToString("dd/MM/yyyy")"
+                                        TextStyle="TextStyle.Body1"
+                                        Style="margin: 0;" />
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenStack>
+
+        </RadzenCard>
+
+
+        <!-- ESTADO ACTUAL -->
+        <RadzenCard>
+
+            <RadzenStack Gap="1rem">
+
+                <RadzenText Text="Estado actual"
+                            TextStyle="TextStyle.H5"
+                            Style="margin: 0;" />
+
+                <RadzenStack Gap="0.8rem"
+                             AlignItems="AlignItems.Start">
+
+                    <RadzenBadge Text="@solicitud.Estado"
+                                 BadgeStyle="BadgeStyle.Warning" />
+
+                    <RadzenText Text="Su solicitud se encuentra actualmente en este estado."
+                                Style="margin: 0; color: #666;" />
+
+                </RadzenStack>
+
+            </RadzenStack>
+
+        </RadzenCard>
+
+
+        <!-- HISTORIAL -->
+        <RadzenCard>
+
+            <RadzenStack Gap="1.5rem">
+
+                <RadzenText Text="Historial de la solicitud"
+                            TextStyle="TextStyle.H5"
+                            Style="margin: 0;" />
+
+                <RadzenStack Gap="1rem">
 
                     @foreach (var historial in historialSolicitud)
                     {
-                        <div class="timeline-item">
+                        <RadzenCard Variant="Variant.Outlined">
 
-                            <div class="timeline-point"></div>
+                            <RadzenStack Gap="0.5rem">
 
-                            <div class="timeline-content">
+                                <RadzenStack Orientation="Orientation.Horizontal"
+                                             JustifyContent="JustifyContent.SpaceBetween"
+                                             AlignItems="AlignItems.Center">
 
-                                <div class="timeline-title">
-                                    @historial.Estado
-                                </div>
+                                    <RadzenText Text="@historial.Estado"
+                                                TextStyle="TextStyle.H6"
+                                                Style="margin: 0;" />
 
-                                <div class="timeline-date">
-                                    @historial.Fecha.ToString("dd/MM/yyyy")
-                                </div>
+                                    <RadzenBadge Text="@historial.Fecha.ToString("dd/MM/yyyy")"
+                                                 BadgeStyle="BadgeStyle.Light" />
 
-                                <div class="timeline-description">
-                                    @historial.Descripcion
-                                </div>
+                                </RadzenStack>
 
-                            </div>
+                                <RadzenText Text="@historial.Descripcion"
+                                            Style="margin: 0; color: #666;" />
 
-                        </div>
+                            </RadzenStack>
+
+                        </RadzenCard>
                     }
 
-                </div>
+                </RadzenStack>
 
-            </div>
+            </RadzenStack>
 
-
-            <!-- INFORMACIÓN DE LA BECA -->
-            <div class="scholarship-card">
-
-                <div class="card-title">
-                    Información de la beca
-                </div>
-
-                <div class="info-grid">
-
-                    <div class="info-item">
-                        <span class="info-label">
-                            Estado
-                        </span>
-
-                        <span class="info-value">
-                            @beca.Estado
-                        </span>
-                    </div>
+        </RadzenCard>
 
 
-                    <div class="info-item">
-                        <span class="info-label">
-                            Monto
-                        </span>
+        <!-- INFORMACIÓN DE LA BECA -->
+        <RadzenCard>
 
-                        <span class="info-value">
-                            @beca.Monto
-                        </span>
-                    </div>
+            <RadzenStack Gap="1.5rem">
+
+                <RadzenText Text="Información de la beca"
+                            TextStyle="TextStyle.H5"
+                            Style="margin: 0;" />
+
+                <RadzenRow Gap="1.5rem">
+
+                    <RadzenColumn Size="12" SizeMD="6">
+
+                        <RadzenStack Gap="0.3rem">
+
+                            <RadzenText Text="Estado"
+                                        Style="font-weight: 600; color: #666; margin: 0;" />
+
+                            <RadzenBadge Text="@beca.Estado"
+                                         BadgeStyle="BadgeStyle.Warning" />
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
 
 
-                    <div class="info-item">
-                        <span class="info-label">
-                            Fecha de inicio
-                        </span>
+                    <RadzenColumn Size="12" SizeMD="6">
 
-                        <span class="info-value">
-                            @beca.FechaInicio
-                        </span>
-                    </div>
+                        <RadzenStack Gap="0.3rem">
+
+                            <RadzenText Text="Monto"
+                                        Style="font-weight: 600; color: #666; margin: 0;" />
+
+                            <RadzenText Text="@beca.Monto"
+                                        TextStyle="TextStyle.Body1"
+                                        Style="margin: 0;" />
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
 
 
-                    <div class="info-item">
-                        <span class="info-label">
-                            Fecha de finalización
-                        </span>
+                    <RadzenColumn Size="12" SizeMD="6">
 
-                        <span class="info-value">
-                            @beca.FechaFin
-                        </span>
-                    </div>
+                        <RadzenStack Gap="0.3rem">
 
-                </div>
+                            <RadzenText Text="Fecha de inicio"
+                                        Style="font-weight: 600; color: #666; margin: 0;" />
 
-            </div>
-        }
+                            <RadzenText Text="@beca.FechaInicio"
+                                        TextStyle="TextStyle.Body1"
+                                        Style="margin: 0;" />
 
-    </div>
+                        </RadzenStack>
 
-</div>
+                    </RadzenColumn>
+
+
+                    <RadzenColumn Size="12" SizeMD="6">
+
+                        <RadzenStack Gap="0.3rem">
+
+                            <RadzenText Text="Fecha de finalización"
+                                        Style="font-weight: 600; color: #666; margin: 0;" />
+
+                            <RadzenText Text="@beca.FechaFin"
+                                        TextStyle="TextStyle.Body1"
+                                        Style="margin: 0;" />
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenStack>
+
+        </RadzenCard>
+    }
+
+</RadzenStack>
 
 
 @code {
