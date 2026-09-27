@@ -1,0 +1,347 @@
+﻿@using Radzen
+@using Radzen.Blazor
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem">
+
+    <!-- ENCABEZADO -->
+
+    <RadzenCard Style="
+        background:linear-gradient(135deg,#1565c0,#1e88e5);
+        color:white;
+        border-radius:12px;">
+
+        <RadzenRow AlignItems="AlignItems.Center">
+
+            <RadzenColumn Size="8">
+
+                <RadzenText Text="Revisión de Solicitud"
+                            TextStyle="TextStyle.H5"
+                            Style="color:white;font-weight:700;" />
+
+                <RadzenText Text="@($"Solicitud #{Solicitud.IdSolicitud}")"
+                            Style="color:rgba(255,255,255,.9);" />
+
+            </RadzenColumn>
+
+            <RadzenColumn Size="4"
+                          Style="text-align:right;">
+
+                @if (Solicitud.Estado == "Pendiente")
+                {
+                    <RadzenBadge Text="Pendiente"
+                                 BadgeStyle="BadgeStyle.Warning" />
+                }
+                else if (Solicitud.Estado == "En revisión")
+                {
+                    <RadzenBadge Text="En revisión"
+                                 BadgeStyle="BadgeStyle.Info" />
+                }
+                else if (Solicitud.Estado == "Aprobada")
+                {
+                    <RadzenBadge Text="Aprobada"
+                                 BadgeStyle="BadgeStyle.Success" />
+                }
+                else
+                {
+                    <RadzenBadge Text="Rechazada"
+                                 BadgeStyle="BadgeStyle.Danger" />
+                }
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ESTUDIANTE -->
+
+    <RadzenCard>
+
+        <RadzenText Text="Datos del estudiante"
+                    TextStyle="TextStyle.H6"
+                    Style="color:#1565c0;font-weight:700;" />
+
+        <RadzenDivider />
+
+        <RadzenRow Gap="1rem">
+
+            <RadzenColumn Size="12" SizeMD="6">
+
+                <RadzenText Text="Nombre"
+                            Style="font-size:12px;color:#6b7280;" />
+
+                <RadzenText Text="@Solicitud.Estudiante"
+                            Style="font-weight:600;" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="12" SizeMD="6">
+
+                <RadzenText Text="DPI"
+                            Style="font-size:12px;color:#6b7280;" />
+
+                <RadzenText Text="@Solicitud.DPI"
+                            Style="font-weight:600;" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="12" SizeMD="6">
+
+                <RadzenText Text="Correo"
+                            Style="font-size:12px;color:#6b7280;" />
+
+                <RadzenText Text="@Solicitud.Correo" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="12" SizeMD="6">
+
+                <RadzenText Text="Teléfono"
+                            Style="font-size:12px;color:#6b7280;" />
+
+                <RadzenText Text="@Solicitud.Telefono" />
+
+            </RadzenColumn>
+
+
+            <RadzenColumn Size="12">
+
+                <RadzenText Text="Dirección"
+                            Style="font-size:12px;color:#6b7280;" />
+
+                <RadzenText Text="@Solicitud.Direccion" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- CONVOCATORIA -->
+
+    <RadzenCard>
+
+        <RadzenText Text="Convocatoria"
+                    TextStyle="TextStyle.H6"
+                    Style="color:#1565c0;font-weight:700;" />
+
+        <RadzenDivider />
+
+        <RadzenText Text="@Solicitud.Convocatoria"
+                    Style="font-size:16px;font-weight:600;" />
+
+        <RadzenText Text="@($"Solicitud realizada el {Solicitud.FechaSolicitud:dd/MM/yyyy}")"
+                    Style="color:#6b7280;font-size:13px;" />
+
+    </RadzenCard>
+
+
+    <!-- DOCUMENTOS -->
+
+    <RadzenCard>
+
+        <RadzenText Text="Documentos entregados"
+                    TextStyle="TextStyle.H6"
+                    Style="color:#1565c0;font-weight:700;" />
+
+        <RadzenDivider />
+
+        @foreach (var documento in Solicitud.Documentos)
+        {
+            <RadzenRow AlignItems="AlignItems.Center"
+                       Style="padding:10px 0;border-bottom:1px solid #e5e7eb;">
+
+                <RadzenColumn Size="7">
+
+                    <RadzenText Text="@documento.Nombre"
+                                Style="font-weight:600;" />
+
+                </RadzenColumn>
+
+                <RadzenColumn Size="3">
+
+                    <RadzenBadge Text="@documento.Estado"
+                                 BadgeStyle="BadgeStyle.Success" />
+
+                </RadzenColumn>
+
+                <RadzenColumn Size="2"
+                              Style="text-align:right;">
+
+                    <RadzenButton Icon="visibility"
+                                  Text="Ver"
+                                  Size="ButtonSize.Small"
+                                  ButtonStyle="ButtonStyle.Light" />
+
+                </RadzenColumn>
+
+            </RadzenRow>
+        }
+
+    </RadzenCard>
+
+
+    <!-- EVALUACIONES -->
+
+    <RadzenCard>
+
+        <RadzenText Text="Evaluaciones"
+                    TextStyle="TextStyle.H6"
+                    Style="color:#1565c0;font-weight:700;" />
+
+        <RadzenDivider />
+
+        <RadzenDataGrid TItem="EvaluacionDto"
+                        Data="@Solicitud.Evaluaciones"
+                        AllowPaging="false">
+
+            <Columns>
+
+                <RadzenDataGridColumn TItem="EvaluacionDto"
+                                      Property="Evaluador"
+                                      Title="Evaluador" />
+
+                <RadzenDataGridColumn TItem="EvaluacionDto"
+                                      Property="Punteo"
+                                      Title="Punteo" />
+
+                <RadzenDataGridColumn TItem="EvaluacionDto"
+                                      Property="Observaciones"
+                                      Title="Observaciones" />
+
+            </Columns>
+
+        </RadzenDataGrid>
+
+    </RadzenCard>
+
+
+    <!-- DECISIÓN -->
+
+    @if (Solicitud.Estado == "Pendiente" ||
+         Solicitud.Estado == "En revisión")
+    {
+        <RadzenCard>
+
+            <RadzenText Text="Decisión"
+                        TextStyle="TextStyle.H6"
+                        Style="color:#1565c0;font-weight:700;" />
+
+            <RadzenFormField Text="Justificación"
+                             Style="width:100%;">
+
+                <RadzenTextArea @bind-Value="justificacion"
+                                Rows="4"
+                                Style="width:100%;"
+                                Placeholder="Escriba la justificación..." />
+
+            </RadzenFormField>
+
+
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         JustifyContent="JustifyContent.End"
+                         Gap="0.5rem"
+                         Style="margin-top:20px;">
+
+                <RadzenButton Text="Rechazar"
+                              Icon="cancel"
+                              ButtonStyle="ButtonStyle.Danger"
+                              Click="@Rechazar" />
+
+                <RadzenButton Text="Aprobar"
+                              Icon="check_circle"
+                              ButtonStyle="ButtonStyle.Success"
+                              Click="@Aprobar" />
+
+            </RadzenStack>
+
+        </RadzenCard>
+    }
+
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public SolicitudDetalleDto Solicitud { get; set; } = new();
+
+    private string justificacion = "";
+
+
+    private void Aprobar()
+    {
+        Solicitud.Estado = "Aprobada";
+
+        DialogService.Close(true);
+    }
+
+
+    private void Rechazar()
+    {
+        if (string.IsNullOrWhiteSpace(justificacion))
+            return;
+
+        Solicitud.Estado = "Rechazada";
+
+        DialogService.Close(true);
+    }
+
+
+    public class SolicitudDetalleDto
+    {
+        public int IdSolicitud { get; set; }
+
+        public string Estudiante { get; set; } = "";
+
+        public string DPI { get; set; } = "";
+
+        public string Correo { get; set; } = "";
+
+        public string Telefono { get; set; } = "";
+
+        public string Direccion { get; set; } = "";
+
+        public string Convocatoria { get; set; } = "";
+
+        public DateTime FechaSolicitud { get; set; }
+
+        public string Estado { get; set; } = "";
+
+        public List<SolicitudDocumentoDto> Documentos { get; set; }
+            = new();
+
+        public List<EvaluacionDto> Evaluaciones { get; set; }
+            = new();
+    }
+
+
+    public class SolicitudDocumentoDto
+    {
+        public string Nombre { get; set; } = "";
+
+        public bool Obligatorio { get; set; }
+
+        public string RutaArchivo { get; set; } = "";
+
+        public string Estado { get; set; } = "";
+    }
+
+
+    public class EvaluacionDto
+    {
+        public string Evaluador { get; set; } = "";
+
+        public decimal Punteo { get; set; }
+
+        public DateTime FechaEvaluacion { get; set; }
+
+        public string Observaciones { get; set; } = "";
+    }
+
+}

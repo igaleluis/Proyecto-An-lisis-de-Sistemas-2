@@ -208,7 +208,6 @@
         font-size: 13px;
         margin-bottom: 20px;" />
 
-
         <RadzenRow AlignItems="AlignItems.End">
 
             <!-- ESTADO -->
@@ -229,27 +228,9 @@
             </RadzenColumn>
 
 
-            <!-- TIPO -->
-
-            <RadzenColumn Size="12" SizeMD="3">
-
-                <RadzenFormField Text="Tipo"
-                                 Style="width: 100%;">
-
-                    <RadzenDropDown TValue="string"
-                                    Data="@(new[] { "Nacional", "Internacional", "Internos" })"
-                                    Placeholder="Todos"
-                                    AllowClear="true"
-                                    Style="width: 100%;" />
-
-                </RadzenFormField>
-
-            </RadzenColumn>
-
-
             <!-- BUSCAR -->
 
-            <RadzenColumn Size="12" SizeMD="4">
+            <RadzenColumn Size="12" SizeMD="5">
 
                 <RadzenFormField Text="Buscar convocatoria"
                                  Style="width: 100%;">
@@ -315,24 +296,20 @@
                 Código
             </RadzenColumn>
 
-            <RadzenColumn Size="2">
+            <RadzenColumn Size="3">
                 Nombre
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
-                Tipo
-            </RadzenColumn>
-
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 Fecha inicio
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 Fecha fin
             </RadzenColumn>
 
             <RadzenColumn Size="1">
-                Monto
+                Cupos
             </RadzenColumn>
 
             <RadzenColumn Size="1">
@@ -355,29 +332,23 @@
             align-items: center;">
 
             <RadzenColumn Size="1">
-                <strong>CONV-2026-001</strong>
+                <strong>1</strong>
             </RadzenColumn>
 
-            <RadzenColumn Size="2">
+            <RadzenColumn Size="3">
                 Beca Nacional Universitaria 2026
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
-                Nacional
-            </RadzenColumn>
-
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 01/03/2026
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 15/12/2026
             </RadzenColumn>
 
             <RadzenColumn Size="1">
-                <strong style="color:#1565c0;">
-                    Q 15,000
-                </strong>
+                100
             </RadzenColumn>
 
             <RadzenColumn Size="1">
@@ -420,29 +391,23 @@
             align-items: center;">
 
             <RadzenColumn Size="1">
-                <strong>CONV-2026-002</strong>
+                <strong>2</strong>
             </RadzenColumn>
 
-            <RadzenColumn Size="2">
+            <RadzenColumn Size="3">
                 Beca Internacional Posgrado
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
-                Internacional
-            </RadzenColumn>
-
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 01/11/2026
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 31/03/2027
             </RadzenColumn>
 
             <RadzenColumn Size="1">
-                <strong style="color:#1565c0;">
-                    Q 45,000
-                </strong>
+                50
             </RadzenColumn>
 
             <RadzenColumn Size="1">
@@ -485,29 +450,23 @@
             align-items: center;">
 
             <RadzenColumn Size="1">
-                <strong>CONV-2025-015</strong>
+                <strong>3</strong>
             </RadzenColumn>
 
-            <RadzenColumn Size="2">
+            <RadzenColumn Size="3">
                 Beca Técnica Media
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
-                Nacional
-            </RadzenColumn>
-
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 01/09/2025
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 15/12/2025
             </RadzenColumn>
 
             <RadzenColumn Size="1">
-                <strong style="color:#1565c0;">
-                    Q 8,000
-                </strong>
+                75
             </RadzenColumn>
 
             <RadzenColumn Size="1">
@@ -550,29 +509,23 @@
             align-items: center;">
 
             <RadzenColumn Size="1">
-                <strong>CONV-2026-003</strong>
+                <strong>4</strong>
             </RadzenColumn>
 
-            <RadzenColumn Size="2">
+            <RadzenColumn Size="3">
                 Beca Investigación Interna
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
-                Internos
-            </RadzenColumn>
-
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 15/04/2026
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 15/10/2026
             </RadzenColumn>
 
             <RadzenColumn Size="1">
-                <strong style="color:#1565c0;">
-                    Q 12,000
-                </strong>
+                30
             </RadzenColumn>
 
             <RadzenColumn Size="1">
@@ -614,29 +567,23 @@
             align-items: center;">
 
             <RadzenColumn Size="1">
-                <strong>CONV-2025-018</strong>
+                <strong>5</strong>
             </RadzenColumn>
 
-            <RadzenColumn Size="2">
+            <RadzenColumn Size="3">
                 Beca Deportiva Nacional
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
-                Nacional
-            </RadzenColumn>
-
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 01/06/2025
             </RadzenColumn>
 
-            <RadzenColumn Size="1">
+            <RadzenColumn Size="2">
                 30/09/2025
             </RadzenColumn>
 
             <RadzenColumn Size="1">
-                <strong style="color:#1565c0;">
-                    Q 10,000
-                </strong>
+                40
             </RadzenColumn>
 
             <RadzenColumn Size="1">
@@ -677,7 +624,7 @@
     <!-- ====================================================== -->
 
     <RadzenCard Style="
-        max-width: 600px;
+        max-width: 700px;
         width: 100%;
         margin: 1rem auto;
         border-radius: 14px;">
@@ -691,6 +638,8 @@
 
         <RadzenStack Gap="1rem">
 
+            <!-- NOMBRE -->
+
             <RadzenFormField Text="Nombre"
                              Style="width: 100%;">
 
@@ -701,22 +650,21 @@
             </RadzenFormField>
 
 
-            <RadzenFormField Text="Tipo"
+            <!-- DESCRIPCIÓN -->
+
+            <RadzenFormField Text="Descripción"
                              Style="width: 100%;">
 
-                <RadzenDropDown TValue="string"
-                                Data="@(new[] {
-                                    "Nacional",
-                                    "Internacional",
-                                    "Internos"
-                                })"
-                                Placeholder="Seleccione un tipo"
+                <RadzenTextArea Placeholder="Descripción de la convocatoria"
+                                Rows="4"
                                 Style="width: 100%;" />
 
             </RadzenFormField>
 
 
-            <RadzenRow>
+            <!-- FECHAS -->
+
+            <RadzenRow Gap="1rem">
 
                 <RadzenColumn Size="12" SizeMD="6">
 
@@ -748,17 +696,38 @@
             </RadzenRow>
 
 
-            <RadzenFormField Text="Monto (Q)"
+            <!-- CUPOS -->
+
+            <RadzenFormField Text="Cupos"
                              Style="width: 100%;">
 
-                <RadzenNumeric TValue="decimal?"
+                <RadzenNumeric TValue="int?"
                                Min="0"
-                               Step="500"
-                               Format="N0"
+                               Step="1"
+                               Placeholder="Cantidad de cupos"
                                Style="width: 100%;" />
 
             </RadzenFormField>
 
+
+            <!-- ESTADO -->
+
+            <RadzenFormField Text="Estado"
+                             Style="width: 100%;">
+
+                <RadzenDropDown TValue="string"
+                                Data="@(new[] {
+                                                    "Activa",
+                                                    "Próxima",
+                                                    "Cerrada"
+                                                })"
+                                Placeholder="Seleccione un estado"
+                                Style="width: 100%;" />
+
+            </RadzenFormField>
+
+
+            <!-- BOTONES -->
 
             <RadzenStack Orientation="Orientation.Horizontal"
                          JustifyContent="JustifyContent.End"
@@ -784,7 +753,7 @@
     <!-- ====================================================== -->
 
     <RadzenCard Style="
-        max-width: 500px;
+        max-width: 600px;
         width: 100%;
         margin: 1rem auto;
         border-radius: 14px;">
@@ -798,12 +767,16 @@
 
         <RadzenStack Gap="0.7rem">
 
+            <!-- ID -->
+
             <RadzenText Text="Código"
                         Style="font-size:12px;color:#6b7280;" />
 
-            <RadzenText Text="CONV-2026-001"
+            <RadzenText Text="1"
                         Style="font-weight:600;" />
 
+
+            <!-- NOMBRE -->
 
             <RadzenText Text="Nombre"
                         Style="font-size:12px;color:#6b7280;" />
@@ -812,11 +785,16 @@
                         Style="font-weight:600;" />
 
 
-            <RadzenText Text="Tipo"
+            <!-- DESCRIPCIÓN -->
+
+            <RadzenText Text="Descripción"
                         Style="font-size:12px;color:#6b7280;" />
 
-            <RadzenText Text="Nacional" />
+            <RadzenText Text="Convocatoria dirigida a estudiantes universitarios que deseen optar a una beca para continuar sus estudios durante el año 2026."
+                        Style="color:#374151;" />
 
+
+            <!-- FECHA INICIO -->
 
             <RadzenText Text="Fecha inicio"
                         Style="font-size:12px;color:#6b7280;" />
@@ -824,20 +802,26 @@
             <RadzenText Text="01/03/2026" />
 
 
+            <!-- FECHA FIN -->
+
             <RadzenText Text="Fecha fin"
                         Style="font-size:12px;color:#6b7280;" />
 
             <RadzenText Text="15/12/2026" />
 
 
-            <RadzenText Text="Monto"
+            <!-- CUPOS -->
+
+            <RadzenText Text="Cupos"
                         Style="font-size:12px;color:#6b7280;" />
 
-            <RadzenText Text="Q 15,000"
+            <RadzenText Text="100"
                         Style="
             font-weight:700;
             color:#1565c0;" />
 
+
+            <!-- ESTADO -->
 
             <RadzenText Text="Estado"
                         Style="font-size:12px;color:#6b7280;" />
@@ -845,6 +829,8 @@
             <RadzenBadge Text="Activa"
                          BadgeStyle="BadgeStyle.Primary" />
 
+
+            <!-- BOTÓN -->
 
             <RadzenStack Orientation="Orientation.Horizontal"
                          JustifyContent="JustifyContent.End"
@@ -884,7 +870,6 @@
                     Style="
         font-weight:600;
         margin-top:5px;" />
-
 
         <RadzenStack Orientation="Orientation.Horizontal"
                      JustifyContent="JustifyContent.End"
