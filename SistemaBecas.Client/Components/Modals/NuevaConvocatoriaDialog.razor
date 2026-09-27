@@ -1,0 +1,135 @@
+﻿@using Radzen
+@using Radzen.Blazor
+
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem">
+
+    <RadzenFormField Text="Nombre"
+                     Style="width: 100%;">
+
+        <RadzenTextBox @bind-Value="Nombre"
+                       Placeholder="Nombre de la convocatoria"
+                       Style="width: 100%;" />
+
+    </RadzenFormField>
+
+
+    <RadzenFormField Text="Descripción"
+                     Style="width: 100%;">
+
+        <RadzenTextArea @bind-Value="Descripcion"
+                        Placeholder="Descripción de la convocatoria"
+                        Rows="4"
+                        Style="width: 100%;" />
+
+    </RadzenFormField>
+
+
+    <RadzenRow Gap="1rem">
+
+        <RadzenColumn Size="12" SizeMD="6">
+
+            <RadzenFormField Text="Fecha inicio"
+                             Style="width: 100%;">
+
+                <RadzenDatePicker @bind-Value="FechaInicio"
+                                  DateFormat="dd/MM/yyyy"
+                                  Style="width: 100%;" />
+
+            </RadzenFormField>
+
+        </RadzenColumn>
+
+
+        <RadzenColumn Size="12" SizeMD="6">
+
+            <RadzenFormField Text="Fecha fin"
+                             Style="width: 100%;">
+
+                <RadzenDatePicker @bind-Value="FechaFin"
+                                  DateFormat="dd/MM/yyyy"
+                                  Style="width: 100%;" />
+
+            </RadzenFormField>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+
+
+    <RadzenFormField Text="Cupos"
+                     Style="width: 100%;">
+
+        <RadzenNumeric @bind-Value="Cupos"
+                       Min="0"
+                       Step="1"
+                       Placeholder="Cantidad de cupos"
+                       Style="width: 100%;" />
+
+    </RadzenFormField>
+
+
+    <RadzenFormField Text="Estado"
+                     Style="width: 100%;">
+
+        <RadzenDropDown @bind-Value="Estado"
+                        Data="@(new[] {
+                                            "Activa",
+                                            "Próxima",
+                                            "Cerrada"
+                                        })"
+                        Placeholder="Seleccione un estado"
+                        Style="width: 100%;" />
+
+    </RadzenFormField>
+
+
+    <RadzenStack Orientation="Orientation.Horizontal"
+                 JustifyContent="JustifyContent.End"
+                 Gap="0.5rem"
+                 Style="margin-top: 10px;">
+
+        <RadzenButton Text="Cancelar"
+                      ButtonStyle="ButtonStyle.Light"
+                      Click="@Cancelar" />
+
+        <RadzenButton Text="Guardar"
+                      Icon="save"
+                      ButtonStyle="ButtonStyle.Primary"
+                      Click="@Guardar" />
+
+    </RadzenStack>
+
+</RadzenStack>
+
+
+@code {
+
+    string Nombre { get; set; }
+
+    string Descripcion { get; set; }
+
+    DateTime? FechaInicio { get; set; }
+
+    DateTime? FechaFin { get; set; }
+
+    int? Cupos { get; set; }
+
+    string Estado { get; set; }
+
+
+    void Cancelar()
+    {
+        DialogService.Close(false);
+    }
+
+
+    void Guardar()
+    {
+        // Aquí posteriormente irá tu llamada al API
+
+        DialogService.Close(true);
+    }
+
+}
