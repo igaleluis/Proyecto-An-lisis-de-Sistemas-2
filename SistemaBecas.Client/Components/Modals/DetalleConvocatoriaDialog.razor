@@ -1,0 +1,79 @@
+﻿@using Radzen
+@using Radzen.Blazor
+
+@inject DialogService DialogService
+
+<RadzenStack Gap="0.7rem">
+
+    <RadzenText Text="Código"
+                Style="font-size:12px;color:#6b7280;" />
+
+    <RadzenText Text="@Id.ToString()"
+                Style="font-weight:600;" />
+
+
+    <RadzenText Text="Nombre"
+                Style="font-size:12px;color:#6b7280;" />
+
+    <RadzenText Text="Beca Nacional Universitaria 2026"
+                Style="font-weight:600;" />
+
+
+    <RadzenText Text="Descripción"
+                Style="font-size:12px;color:#6b7280;" />
+
+    <RadzenText Text="Convocatoria dirigida a estudiantes universitarios que deseen optar a una beca para continuar sus estudios durante el año 2026."
+                Style="color:#374151;" />
+
+
+    <RadzenText Text="Fecha inicio"
+                Style="font-size:12px;color:#6b7280;" />
+
+    <RadzenText Text="01/03/2026" />
+
+
+    <RadzenText Text="Fecha fin"
+                Style="font-size:12px;color:#6b7280;" />
+
+    <RadzenText Text="15/12/2026" />
+
+
+    <RadzenText Text="Cupos"
+                Style="font-size:12px;color:#6b7280;" />
+
+    <RadzenText Text="100"
+                Style="font-weight:700;color:#1565c0;" />
+
+
+    <RadzenText Text="Estado"
+                Style="font-size:12px;color:#6b7280;" />
+
+    <RadzenBadge Text="Activa"
+                 BadgeStyle="BadgeStyle.Primary" />
+
+
+    <RadzenStack Orientation="Orientation.Horizontal"
+                 JustifyContent="JustifyContent.End"
+                 Style="margin-top:15px;">
+
+        <RadzenButton Text="Cerrar"
+                      ButtonStyle="ButtonStyle.Light"
+                      Click="@Cerrar" />
+
+    </RadzenStack>
+
+</RadzenStack>
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+
+    void Cerrar()
+    {
+        DialogService.Close();
+    }
+
+}
