@@ -1,0 +1,51 @@
+﻿@using Radzen
+@using Radzen.Blazor
+
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem">
+
+    <RadzenText Text="¿Desea eliminar la convocatoria?"
+                Style="color:#374151;" />
+
+    <RadzenText Text="Beca Nacional Universitaria 2026"
+                Style="font-weight:600;" />
+
+
+    <RadzenStack Orientation="Orientation.Horizontal"
+                 JustifyContent="JustifyContent.End"
+                 Gap="0.5rem"
+                 Style="margin-top:10px;">
+
+        <RadzenButton Text="Cancelar"
+                      ButtonStyle="ButtonStyle.Light"
+                      Click="@Cancelar" />
+
+        <RadzenButton Text="Eliminar"
+                      Icon="delete"
+                      ButtonStyle="ButtonStyle.Danger"
+                      Click="@Eliminar" />
+
+    </RadzenStack>
+
+</RadzenStack>
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+
+    void Cancelar()
+    {
+        DialogService.Close(false);
+    }
+
+
+    void Eliminar()
+    {
+        DialogService.Close(true);
+    }
+
+}

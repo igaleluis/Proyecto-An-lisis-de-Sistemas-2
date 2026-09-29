@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @using Radzen
+@using Radzen.Blazor
 
 <RadzenDialog />
 
@@ -8,9 +9,12 @@
 <RadzenTooltip />
 
 <RadzenContextMenu />
+
+
 <RadzenLayout>
 
     <RadzenHeader>
+
         <RadzenStack Orientation="Orientation.Horizontal"
                      AlignItems="AlignItems.Center"
                      JustifyContent="JustifyContent.SpaceBetween"
@@ -21,7 +25,7 @@
                          AlignItems="AlignItems.Center"
                          Gap="1rem">
 
-                <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+                <RadzenSidebarToggle Click="@ToggleSidebar" />
 
                 <RadzenLabel Text="Sistema de Becas" />
 
@@ -34,125 +38,79 @@
                         class="login-button" />
 
         </RadzenStack>
+
     </RadzenHeader>
 
 
-    <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+    <RadzenSidebar Expanded="@sidebarExpanded"
+                   ExpandedChanged="@OnSidebarExpandedChanged">
 
-        <RadzenPanelMenu Multiple="false">
+        <RadzenPanelMenu Multiple="false"
+                         Click="@OnMenuItemClick">
 
             <RadzenPanelMenuItem Text="Inicio"
                                  Icon="home"
-                                 Path="/"
-                                 Click="@CloseSidebar" />
+                                 Path="/" />
 
-
-            <!-- CONVOCATORIAS -->
             <RadzenPanelMenuItem Text="Convocatorias"
                                  Icon="add_ad">
 
                 <RadzenPanelMenuItem Text="Administrar Convocatorias"
-
-                                     Path="/adminconvocatorias"
-
-                                     Click="@CloseSidebar" />
+                                     Path="/adminconvocatorias" />
 
             </RadzenPanelMenuItem>
 
-
-            <!-- ESTUDIANTES -->
             <RadzenPanelMenuItem Text="Estudiantes"
                                  Icon="person">
 
                 <RadzenPanelMenuItem Text="Registrar Estudiantes"
-
-                                     Path="/registrar-estudiante"
-
-                                     Click="@CloseSidebar" />
+                                     Path="/registrar-estudiante" />
 
             </RadzenPanelMenuItem>
 
-
-            <!-- SOLICITUDES -->
             <RadzenPanelMenuItem Text="Solicitudes"
-
                                  Icon="description">
 
                 <RadzenPanelMenuItem Text="Gestionar Solicitudes"
-                                     Path="/"
-                                     Click="@CloseSidebar" />
+                                     Path="/gestion-solicitudes" />
 
                 <RadzenPanelMenuItem Text="Cargar Documentación"
-                                     Path="/cargar-documentacion"
-                                     Click="@CloseSidebar" />
+                                     Path="/cargar-documentacion" />
 
                 <RadzenPanelMenuItem Text="Consultar Estado de Becas"
-                                     Path="/consultar-estado-beca"
-                                     Click="@CloseSidebar" />
+                                     Path="/consultar-estado-beca" />
 
             </RadzenPanelMenuItem>
 
-
-            <!-- EVALUACIONES -->
             <RadzenPanelMenuItem Text="Evaluaciones"
                                  Icon="quiz">
 
                 <RadzenPanelMenuItem Text="Administrar Evaluaciones"
-                                     Path="/"
-                                     Click="@CloseSidebar" />
-
-
-
-                <RadzenPanelMenuItem Text="Gestionar Solicitudes"
-                                     Path="/gestion-solicitudes"
-                                     Click="@CloseSidebar" />
-
-                <RadzenPanelMenuItem Text="Cargar Documentación"
-                                     Path="/"
-                                     Click="@CloseSidebar" />
-
-                <RadzenPanelMenuItem Text="Consultar Estado de Becas"
-                                     Path="/"
-                                     Click="@CloseSidebar" />
+                                     Path="/administrar-evaluaciones" />
 
             </RadzenPanelMenuItem>
 
-
-          
-
-
-
-            <!-- COMITÉS -->
             <RadzenPanelMenuItem Text="Comités"
                                  Icon="group">
 
                 <RadzenPanelMenuItem Text="Gestionar Comités Evaluadores"
-
-                                     Path="/gestionar-comites-evaluadores"
-
-                                     Click="@CloseSidebar" />
+                                     Path="/gestionar-comites-evaluadores" />
 
             </RadzenPanelMenuItem>
 
-
-            <!-- RESOLUCIÓN -->
             <RadzenPanelMenuItem Text="Resolución"
                                  Icon="rule">
 
                 <RadzenPanelMenuItem Text="Aprobar o Rechazar Solicitudes"
-                                     Path="/"
-                                     Click="@CloseSidebar" />
+                                     Path="/aprobar-rechazar-solicitudes" />
 
             </RadzenPanelMenuItem>
 
-
-            <!-- REPORTES -->
             <RadzenPanelMenuItem Text="Reportes"
                                  Icon="picture_as_pdf">
 
                 <RadzenPanelMenuItem Text="Generar Reportes Básicos"
-                                     Path="/"
-                                     Click="@CloseSidebar" />
+                                     Path="/generacion-reportes" />
 
             </RadzenPanelMenuItem>
 
@@ -164,27 +122,43 @@
     <RadzenBody>
 
         <div class="rz-p-4">
+
             @Body
+
         </div>
 
     </RadzenBody>
 
-
-    
 
 </RadzenLayout>
 
 
 @code {
 
-    bool sidebarExpanded = true;
+    private bool sidebarExpanded = true;
 
-    
-
-
-    void CloseSidebar()
+    // Botón del header (fuente de verdad externa)
+    private async Task ToggleSidebar()
     {
-        sidebarExpanded = false;
+        sidebarExpanded = !sidebarExpanded;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    // El propio RadzenSidebar notifica cambios de su estado interno
+    private async Task OnSidebarExpandedChanged(bool expanded)
+    {
+        sidebarExpanded = expanded;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    // Cerrar al seleccionar una opción de navegación (item hoja)
+    private async Task OnMenuItemClick(MenuItemEventArgs args)
+    {
+        if (!string.IsNullOrEmpty(args.Path))
+        {
+            sidebarExpanded = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
 }

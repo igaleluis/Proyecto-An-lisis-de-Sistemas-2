@@ -1,0 +1,533 @@
+﻿@page "/aprobar-rechazar-solicitudes"
+
+
+@using Radzen
+@using Radzen.Blazor
+@using Components.Modals
+@inject DialogService DialogService
+
+<PageTitle>Administración de Solicitudes</PageTitle>
+
+<RadzenStack Gap="1.5rem"
+             Style="padding: 2rem; background-color: #f4f7fb; min-height: 100vh;">
+
+    <!-- ====================================================== -->
+    <!-- ENCABEZADO                                             -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        background: linear-gradient(135deg, #1565c0, #1e88e5);
+        color: white;
+        border-radius: 16px;
+        border: none;
+        padding: 2rem;">
+
+        <RadzenRow AlignItems="AlignItems.Center">
+
+            <RadzenColumn Size="12" SizeMD="8">
+
+                <RadzenText Text="Administración de Solicitudes"
+                            TextStyle="TextStyle.H4"
+                            Style="
+                color: white;
+                font-weight: 700;
+                margin-bottom: 6px;" />
+
+                <RadzenText Text="Revise, evalúe y gestione las solicitudes de becas"
+                            Style="
+                color: rgba(255,255,255,0.9);
+                font-size: 15px;" />
+
+            </RadzenColumn>
+
+            <RadzenColumn Size="12"
+                          SizeMD="4"
+                          Style="text-align: right;">
+
+                <RadzenButton Text="Actualizar"
+                              Icon="refresh"
+                              ButtonStyle="ButtonStyle.Light" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- ESTADÍSTICAS                                           -->
+    <!-- ====================================================== -->
+
+    <RadzenRow>
+
+        <!-- PENDIENTES -->
+
+        <RadzenColumn Size="12" SizeMD="3">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Pendientes"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="8"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #1565c0;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="pending_actions"
+                                    Style="
+                        font-size: 38px;
+                        color: #1565c0;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <!-- EN REVISIÓN -->
+
+        <RadzenColumn Size="12" SizeMD="3">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="En revisión"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="4"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #64b5f6;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="search"
+                                    Style="
+                        font-size: 38px;
+                        color: #64b5f6;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <!-- APROBADAS -->
+
+        <RadzenColumn Size="12" SizeMD="3">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Aprobadas"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="6"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #2e7d32;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="check_circle"
+                                    Style="
+                        font-size: 38px;
+                        color: #2e7d32;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <!-- RECHAZADAS -->
+
+        <RadzenColumn Size="12" SizeMD="3">
+
+            <RadzenCard Style="
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;">
+
+                <RadzenRow AlignItems="AlignItems.Center">
+
+                    <RadzenColumn Size="8">
+
+                        <RadzenText Text="Rechazadas"
+                                    Style="
+                        color: #6b7280;
+                        font-size: 13px;" />
+
+                        <RadzenText Text="2"
+                                    TextStyle="TextStyle.H4"
+                                    Style="
+                        color: #c62828;
+                        font-weight: 700;
+                        margin-top: 5px;" />
+
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="4"
+                                  Style="text-align: right;">
+
+                        <RadzenIcon Icon="cancel"
+                                    Style="
+                        font-size: 38px;
+                        color: #c62828;" />
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+
+
+    <!-- ====================================================== -->
+    <!-- FILTROS                                                -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        border-radius: 12px;
+        background-color: #f7fbff;
+        border: 1px solid #e3edf7;">
+
+        <RadzenText Text="Filtros de búsqueda"
+                    TextStyle="TextStyle.H6"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 5px;" />
+
+        <RadzenText Text="Utilice los filtros para encontrar una solicitud."
+                    Style="
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 20px;" />
+
+        <RadzenRow AlignItems="AlignItems.End">
+
+            <!-- CONVOCATORIA -->
+
+            <RadzenColumn Size="12" SizeMD="3">
+
+                <RadzenFormField Text="Convocatoria"
+                                 Style="width: 100%;">
+
+                    <RadzenDropDown TValue="int?"
+                                    Placeholder="Todas"
+                                    AllowClear="true"
+                                    Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- ESTADO -->
+
+            <RadzenColumn Size="12" SizeMD="3">
+
+                <RadzenFormField Text="Estado"
+                                 Style="width: 100%;">
+
+                    <RadzenDropDown TValue="string"
+                                    Data="@(new[] {
+                                                        "Pendiente",
+                                                        "En revisión",
+                                                        "Aprobada",
+                                                        "Rechazada"
+                                                    })"
+                                    Placeholder="Todos"
+                                    AllowClear="true"
+                                    Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- ESTUDIANTE -->
+
+            <RadzenColumn Size="12" SizeMD="4">
+
+                <RadzenFormField Text="Buscar estudiante"
+                                 Style="width: 100%;">
+
+                    <RadzenTextBox TValue="string"
+                                   Placeholder="Nombre, DPI o correo"
+                                   Style="width: 100%;" />
+
+                </RadzenFormField>
+
+            </RadzenColumn>
+
+
+            <!-- BUSCAR -->
+
+            <RadzenColumn Size="12" SizeMD="2">
+
+                <RadzenButton Text="Buscar"
+                              Icon="search"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Style="width: 100%;" />
+
+            </RadzenColumn>
+
+        </RadzenRow>
+
+    </RadzenCard>
+
+
+    <!-- ====================================================== -->
+    <!-- TABLA DE SOLICITUDES                                   -->
+    <!-- ====================================================== -->
+
+    <RadzenCard Style="
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        overflow-x: auto;">
+
+        <RadzenText Text="Solicitudes"
+                    TextStyle="TextStyle.H6"
+                    Style="
+        color: #1565c0;
+        font-weight: 700;
+        margin-bottom: 5px;" />
+
+        <RadzenText Text="Listado de solicitudes de becas"
+                    Style="
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 20px;" />
+
+
+        <RadzenDataGrid TItem="SolicitudDto"
+                        Data="@solicitudes"
+                        AllowPaging="true"
+                        PageSize="10"
+                        AllowSorting="true"
+                        AllowFiltering="true"
+                        Responsive="true"
+                        Style="width: 100%;">
+
+            <Columns>
+
+                <RadzenDataGridColumn TItem="SolicitudDto"
+                                      Property="IdSolicitud"
+                                      Title="Solicitud"
+                                      Width="100px">
+                </RadzenDataGridColumn>
+
+
+                <RadzenDataGridColumn TItem="SolicitudDto"
+                                      Property="Estudiante"
+                                      Title="Estudiante"
+                                      Width="220px">
+                </RadzenDataGridColumn>
+
+
+                <RadzenDataGridColumn TItem="SolicitudDto"
+                                      Property="Convocatoria"
+                                      Title="Convocatoria"
+                                      Width="250px">
+                </RadzenDataGridColumn>
+
+
+                <RadzenDataGridColumn TItem="SolicitudDto"
+                                      Property="FechaSolicitud"
+                                      Title="Fecha"
+                                      Width="130px">
+
+                    <Template Context="solicitud">
+
+                        @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+
+                <RadzenDataGridColumn TItem="SolicitudDto"
+                                      Property="Estado"
+                                      Title="Estado"
+                                      Width="140px">
+
+                    <Template Context="solicitud">
+
+                        @if (solicitud.Estado == "Pendiente")
+                        {
+                            <RadzenBadge Text="Pendiente"
+                                         BadgeStyle="BadgeStyle.Warning" />
+                        }
+                        else if (solicitud.Estado == "En revisión")
+                        {
+                            <RadzenBadge Text="En revisión"
+                                         BadgeStyle="BadgeStyle.Info" />
+                        }
+                        else if (solicitud.Estado == "Aprobada")
+                        {
+                            <RadzenBadge Text="Aprobada"
+                                         BadgeStyle="BadgeStyle.Success" />
+                        }
+                        else
+                        {
+                            <RadzenBadge Text="Rechazada"
+                                         BadgeStyle="BadgeStyle.Danger" />
+                        }
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+
+                <RadzenDataGridColumn TItem="SolicitudDto"
+                                      Title="Acciones"
+                                      Width="150px">
+
+                    <Template Context="solicitud">
+
+                        <RadzenButton Icon="visibility"
+                                      Text="Ver"
+                                      ButtonStyle="ButtonStyle.Light"
+                                      Size="ButtonSize.Small"
+                                      Click="@(() => VerSolicitud(solicitud))" />
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+            </Columns>
+
+        </RadzenDataGrid>
+
+    </RadzenCard>
+
+</RadzenStack>
+
+
+@code {
+
+    public class SolicitudDto
+    {
+        public int IdSolicitud { get; set; }
+
+        public string Estudiante { get; set; } = "";
+
+        public string Convocatoria { get; set; } = "";
+
+        public DateTime FechaSolicitud { get; set; }
+
+        public string Estado { get; set; } = "";
+    }
+
+    private List<SolicitudDto> solicitudes = new()
+    {
+        new SolicitudDto
+        {
+            IdSolicitud = 1,
+            Estudiante = "Juan Pérez López",
+            Convocatoria = "Beca Nacional Universitaria 2026",
+            FechaSolicitud = new DateTime(2026, 9, 10),
+            Estado = "Pendiente"
+        },
+
+        new SolicitudDto
+        {
+            IdSolicitud = 2,
+            Estudiante = "María García López",
+            Convocatoria = "Beca Nacional Universitaria 2026",
+            FechaSolicitud = new DateTime(2026, 9, 12),
+            Estado = "En revisión"
+        },
+
+        new SolicitudDto
+        {
+            IdSolicitud = 3,
+            Estudiante = "Carlos Hernández",
+            Convocatoria = "Beca Internacional Posgrado",
+            FechaSolicitud = new DateTime(2026, 9, 14),
+            Estado = "Aprobada"
+        },
+
+        new SolicitudDto
+        {
+            IdSolicitud = 4,
+            Estudiante = "Ana Martínez",
+            Convocatoria = "Beca Técnica Media",
+            FechaSolicitud = new DateTime(2026, 9, 15),
+            Estado = "Rechazada"
+        }
+    };
+
+    private async Task VerSolicitud(SolicitudDto solicitud)
+    {
+        var resultado = await DialogService.OpenAsync<DetalleSolicitud>(
+            $"Solicitud #{solicitud.IdSolicitud}",
+            new Dictionary<string, object>
+            {
+            { "Solicitud", solicitud }
+            },
+            new DialogOptions
+            {
+                Width = "900px",
+                Height = "800px",
+                Resizable = true,
+                Draggable = true
+            }
+        );
+    }
+
+}
