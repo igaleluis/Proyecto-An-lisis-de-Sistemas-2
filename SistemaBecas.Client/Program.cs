@@ -1,22 +1,39 @@
 using Radzen;
 using SistemaBecas.Client.Components;
+using SistemaBecas.Client.Services.Login;
+using Microsoft.AspNetCore.Components.Authorization;
+using SistemaBecas.Client.Services.Authentication;
+using SistemaBecas.Client.Services.RegistroService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddAuthorizationCore();
+
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+
+builder.Services.AddScoped<AuthenticationStateProvider>(
+    provider =>
+        provider.GetRequiredService<CustomAuthenticationStateProvider>());
+
+
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 
 
-// Servicios de Radzen
-builder.Services.AddScoped<DialogService>();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<TooltipService>();
-builder.Services.AddScoped<ContextMenuService>();
+//Servicios API
+builder.Services.AddHttpClient("Api", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7088/");
+});
+
+builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IRegistroService, RegistroService>();
+
 
 var app = builder.Build();
 
