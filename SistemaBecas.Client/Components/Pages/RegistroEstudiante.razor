@@ -1,0 +1,255 @@
+﻿@page "/registro-estudiante"
+
+@using Radzen
+@using Radzen.Blazor
+@using SistemaBecas.Library.Dtos
+@using SistemaBecas.Client.Services.RegistroService
+
+@inject IRegistroService RegistroService
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+
+<PageTitle>Registro de estudiante - Sistema de Becas</PageTitle>
+
+<RadzenStack JustifyContent="JustifyContent.Center"
+             AlignItems="AlignItems.Center"
+             Style="min-height: 100vh; padding: 2rem; background-color: #f4f7fb;">
+
+    <RadzenCard Variant="Variant.Outlined"
+                Style="width: 100%; max-width: 500px;">
+
+        <RadzenStack Gap="1.5rem">
+
+            <!-- ENCABEZADO -->
+            <RadzenStack Gap="0.5rem"
+                         AlignItems="AlignItems.Center">
+
+                <RadzenIcon Icon="school"
+                            Style="font-size: 48px; color: #1565c0;" />
+
+                <RadzenText Text="Registro de estudiante"
+                            TextStyle="TextStyle.H4"
+                            Style="color: #1565c0; font-weight: 700; margin: 0; text-align: center;" />
+
+                <RadzenText Text="Crea tu cuenta para solicitar y gestionar tus becas."
+                            Style="color: #666; margin: 0; text-align: center;" />
+
+            </RadzenStack>
+
+
+            <!-- AVISO -->
+            <RadzenAlert AlertStyle="AlertStyle.Info"
+                         Variant="Variant.Flat"
+                         AllowClose="false">
+
+                <strong>Registro exclusivo para estudiantes</strong>
+                <br />
+                Esta cuenta te permitirá acceder a las convocatorias,
+                gestionar tus solicitudes y consultar el estado de tus becas.
+
+            </RadzenAlert>
+
+
+            <!-- FORMULARIO -->
+            <RadzenTemplateForm TItem="RegistroEstudianteDto"
+                                Data="@registro"
+                                Submit="@Registrar">
+
+                <!-- NOMBRES -->
+                <RadzenFormField Text="Nombres"
+                                 Variant="Variant.Outlined"
+                                 Style="width: 100%; margin-bottom: 18px;">
+
+                    <RadzenTextBox @bind-Value="@registro.Nombres"
+                                   Name="Nombres"
+                                   Style="width: 100%;"
+                                   Placeholder="Ingresa tus nombres" />
+
+                    <RadzenRequiredValidator Component="Nombres"
+                                             Text="Los nombres son obligatorios."
+                                             Popup="true" />
+
+                </RadzenFormField>
+
+
+                <!-- APELLIDOS -->
+                <RadzenFormField Text="Apellidos"
+                                 Variant="Variant.Outlined"
+                                 Style="width: 100%; margin-bottom: 18px;">
+
+                    <RadzenTextBox @bind-Value="@registro.Apellidos"
+                                   Name="Apellidos"
+                                   Style="width: 100%;"
+                                   Placeholder="Ingresa tus apellidos" />
+
+                    <RadzenRequiredValidator Component="Apellidos"
+                                             Text="Los apellidos son obligatorios."
+                                             Popup="true" />
+
+                </RadzenFormField>
+
+
+                <!-- CORREO -->
+                <RadzenFormField Text="Correo electrónico"
+                                 Variant="Variant.Outlined"
+                                 Style="width: 100%; margin-bottom: 18px;">
+
+                    <RadzenTextBox @bind-Value="@registro.Correo"
+                                   Name="Correo"
+                                   Style="width: 100%;"
+                                   Placeholder="ejemplo@correo.com" />
+
+                    <RadzenRequiredValidator Component="Correo"
+                                             Text="El correo es obligatorio."
+                                             Popup="true" />
+
+                    <RadzenEmailValidator Component="Correo"
+                                          Text="Ingresa un correo válido."
+                                          Popup="true" />
+
+                </RadzenFormField>
+
+
+                <!-- CONTRASEÑA -->
+                <RadzenFormField Text="Contraseña"
+                                 Variant="Variant.Outlined"
+                                 Style="width: 100%; margin-bottom: 18px;">
+
+                    <RadzenPassword @bind-Value="@registro.Password"
+                                    Name="Password"
+                                    Style="width: 100%;"
+                                    Placeholder="Ingresa una contraseña" />
+
+                    <RadzenRequiredValidator Component="Password"
+                                             Text="La contraseña es obligatoria."
+                                             Popup="true" />
+
+                </RadzenFormField>
+
+
+                <!-- CONFIRMAR CONTRASEÑA -->
+                <RadzenFormField Text="Confirmar contraseña"
+                                 Variant="Variant.Outlined"
+                                 Style="width: 100%; margin-bottom: 25px;">
+
+                    <RadzenPassword @bind-Value="@confirmarPassword"
+                                    Name="ConfirmarPassword"
+                                    Style="width: 100%;"
+                                    Placeholder="Repite tu contraseña" />
+
+                    <RadzenRequiredValidator Component="ConfirmarPassword"
+                                             Text="Confirma tu contraseña."
+                                             Popup="true" />
+
+                </RadzenFormField>
+
+
+                <!-- BOTÓN REGISTRAR -->
+                <RadzenButton Text="Crear cuenta de estudiante"
+                              Icon="person_add"
+                              ButtonType="ButtonType.Submit"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Size="ButtonSize.Large"
+                              Style="width: 100%;"
+                              Disabled="@registrando" />
+
+            </RadzenTemplateForm>
+
+
+            <!-- VOLVER AL LOGIN -->
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         JustifyContent="JustifyContent.Center"
+                         AlignItems="AlignItems.Center"
+                         Gap="0.3rem">
+
+                <RadzenText Text="¿Ya tienes una cuenta?"
+                            Style="margin: 0; color: #666;" />
+
+                <RadzenLink Text="Iniciar sesión"
+                            Path="/login" />
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <!-- PIE -->
+    <RadzenText Text="Sistema de Becas"
+                Style="color: #666; margin: 0;" />
+
+</RadzenStack>
+
+
+@code {
+
+    private RegistroEstudianteDto registro = new();
+
+    private string confirmarPassword = string.Empty;
+
+    private bool registrando = false;
+
+
+    private async Task Registrar(RegistroEstudianteDto registro)
+    {
+        if (registro.Password != confirmarPassword)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Contraseñas",
+                "Las contraseñas no coinciden.");
+
+            return;
+        }
+
+        if (registro.Password.Length < 8)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Contraseña",
+                "La contraseña debe tener al menos 8 caracteres.");
+
+            return;
+        }
+
+        try
+        {
+            registrando = true;
+
+            var resultado = await RegistroService.RegistrarEstudiante(
+                registro);
+
+            if (resultado == null)
+            {
+                NotificationService.Notify(
+                    NotificationSeverity.Error,
+                    "Registro",
+                    "No fue posible crear la cuenta. Verifica los datos e inténtalo nuevamente.");
+
+                return;
+            }
+
+            NotificationService.Notify(
+                NotificationSeverity.Success,
+                "Cuenta creada",
+                "Tu cuenta de estudiante fue creada correctamente.");
+
+            await Task.Delay(1200);
+
+            NavigationManager.NavigateTo("/login");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Error,
+                "Error",
+                ex.Message);
+        }
+        finally
+        {
+            registrando = false;
+        }
+    }
+
+}
