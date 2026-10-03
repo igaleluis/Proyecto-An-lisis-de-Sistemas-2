@@ -1,10 +1,18 @@
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
 using SistemaBecas.Api.Repositories;
 using SistemaBecas.Api.Repositories.LoginRepository;
+using SistemaBecas.Api.Repositories.ComiteRepository;
 using SistemaBecas.Api.Services.LoginService;
+using SistemaBecas.Api.Services.ComiteService;
 using SistemaBecas.Api.Services.JwtService;
+using SistemaBecas.Api.Repositories.EstadoBecaRepository;
+using SistemaBecas.Api.Services.EstadoBecaService;
+using SistemaBecas.Api.Repositories.EvaluacionRepository;
+using SistemaBecas.Api.Services.EvaluacionService;
 var builder = WebApplication.CreateBuilder(args);
 //JWT
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -15,11 +23,16 @@ var jwtAudience = builder.Configuration["Jwt:Audience"];
 //Repositorios
 builder.Services.AddScoped<DbConnectionBecas>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
-
+builder.Services.AddScoped<IComiteRepository, ComiteRepository>();
+builder.Services.AddScoped<IEstadoBecaRepository, EstadoBecaRepository>();
+builder.Services.AddScoped<IEvaluacionRepository, EvaluacionRepository>();
 
 //Servicios
 builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IComiteService, ComiteService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IEstadoBecaService, EstadoBecaService>();
+builder.Services.AddScoped<IEvaluacionService, EvaluacionService>();
 
 
 //Swagger
