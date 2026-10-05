@@ -9,22 +9,25 @@ namespace SistemaBecas.Client.Services.Authentication
         : AuthenticationStateProvider
     {
         private readonly IJSRuntime _jsRuntime;
+        private readonly TokenService _tokenService;
 
         private ClaimsPrincipal _usuarioActual =
             new ClaimsPrincipal(new ClaimsIdentity());
 
         public CustomAuthenticationStateProvider(
-            IJSRuntime jsRuntime)
+            IJSRuntime jsRuntime,
+            TokenService tokenService)
         {
             _jsRuntime = jsRuntime;
+            _tokenService = tokenService;
         }
 
-        public override Task<AuthenticationState> GetAuthenticationStateAsync()
+        public override Task<AuthenticationState>
+            GetAuthenticationStateAsync()
         {
             return Task.FromResult(
                 new AuthenticationState(_usuarioActual));
         }
-
 
         public async Task CargarSesionAsync()
         {
@@ -40,17 +43,21 @@ namespace SistemaBecas.Client.Services.Authentication
                         new ClaimsPrincipal(
                             new ClaimsIdentity());
 
+                    _tokenService.EliminarToken();
+
                     NotifyAuthenticationStateChanged(
                         Task.FromResult(
-                            new AuthenticationState(_usuarioActual)));
+                            new AuthenticationState(
+                                _usuarioActual)));
 
                     return;
                 }
 
+                // Guardar el token también en memoria
+                _tokenService.GuardarToken(token);
+
                 var handler = new JwtSecurityTokenHandler();
-
                 var jwtToken = handler.ReadJwtToken(token);
-
                 var claims = jwtToken.Claims.ToList();
 
                 var identity = new ClaimsIdentity(
@@ -64,7 +71,8 @@ namespace SistemaBecas.Client.Services.Authentication
 
                 NotifyAuthenticationStateChanged(
                     Task.FromResult(
-                        new AuthenticationState(_usuarioActual)));
+                        new AuthenticationState(
+                            _usuarioActual)));
             }
             catch
             {
@@ -72,24 +80,28 @@ namespace SistemaBecas.Client.Services.Authentication
                     new ClaimsPrincipal(
                         new ClaimsIdentity());
 
+                _tokenService.EliminarToken();
+
                 NotifyAuthenticationStateChanged(
                     Task.FromResult(
-                        new AuthenticationState(_usuarioActual)));
+                        new AuthenticationState(
+                            _usuarioActual)));
             }
         }
 
-
         public async Task IniciarSesion(string token)
         {
+            // Guardar token en localStorage
             await _jsRuntime.InvokeVoidAsync(
                 "localStorage.setItem",
                 "token",
                 token);
 
+            // Guardar token en memoria
+            _tokenService.GuardarToken(token);
+
             var handler = new JwtSecurityTokenHandler();
-
             var jwtToken = handler.ReadJwtToken(token);
-
             var claims = jwtToken.Claims.ToList();
 
             var identity = new ClaimsIdentity(
@@ -103,9 +115,9 @@ namespace SistemaBecas.Client.Services.Authentication
 
             NotifyAuthenticationStateChanged(
                 Task.FromResult(
-                    new AuthenticationState(_usuarioActual)));
+                    new AuthenticationState(
+                        _usuarioActual)));
         }
-
 
         public async Task CerrarSesion()
         {
@@ -117,13 +129,17 @@ namespace SistemaBecas.Client.Services.Authentication
                 "localStorage.removeItem",
                 "usuario");
 
+            // Eliminar token de memoria
+            _tokenService.EliminarToken();
+
             _usuarioActual =
                 new ClaimsPrincipal(
                     new ClaimsIdentity());
 
             NotifyAuthenticationStateChanged(
                 Task.FromResult(
-                    new AuthenticationState(_usuarioActual)));
+                    new AuthenticationState(
+                        _usuarioActual)));
         }
     }
 }

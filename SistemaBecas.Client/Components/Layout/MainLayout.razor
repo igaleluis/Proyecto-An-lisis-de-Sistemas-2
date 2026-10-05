@@ -100,8 +100,14 @@
                 <RadzenPanelMenuItem Text="Gestionar Solicitudes"
                                      Path="/gestion-solicitudes" />
 
-                <RadzenPanelMenuItem Text="Cargar Documentación"
-                                     Path="/cargar-documentacion" />
+                <AuthorizeView Roles="Estudiante" Context="auth">
+                    <Authorized>
+
+                        <RadzenPanelMenuItem Text="Cargar Documentación"
+                                             Path="/cargar-documentacion" />
+
+                    </Authorized>
+                </AuthorizeView>
 
                 <RadzenPanelMenuItem Text="Consultar Estado de Becas"
                                      Path="/consultar-estado-beca" />

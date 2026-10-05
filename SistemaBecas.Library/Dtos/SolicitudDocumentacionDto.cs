@@ -11,5 +11,7 @@
         public string Estado { get; set; } = string.Empty;
 
         public string? NombreConvocatoria { get; set; }
+        public string TextoSolicitud =>
+           $"Solicitud #{IdSolicitud:D4} - {FechaSolicitud:dd/MM/yyyy} - {Estado}";
     }
 }

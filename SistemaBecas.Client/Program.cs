@@ -1,6 +1,7 @@
 using Radzen;
 using SistemaBecas.Client.Components;
 using SistemaBecas.Client.Services.Login;
+using SistemaBecas.Client.Services.Documentacion;
 using Microsoft.AspNetCore.Components.Authorization;
 using SistemaBecas.Client.Services.Authentication;
 using SistemaBecas.Client.Services.RegistroService;
@@ -18,6 +19,9 @@ builder.Services.AddScoped<AuthenticationStateProvider>(
     provider =>
         provider.GetRequiredService<CustomAuthenticationStateProvider>());
 
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<JwtAuthorizationHandler>();
+
 
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
@@ -26,13 +30,14 @@ builder.Services.AddScoped<ContextMenuService>();
 
 
 //Servicios API
+
 builder.Services.AddHttpClient("Api", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7088/");
 });
-
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IRegistroService, RegistroService>();
+builder.Services.AddScoped<DocumentacionService>();
 
 
 var app = builder.Build();

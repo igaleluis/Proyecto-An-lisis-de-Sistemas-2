@@ -15,6 +15,7 @@
         public bool Obligatorio { get; set; }
 
         public string? RutaArchivo { get; set; }
+        public string? UrlArchivo { get; set; }
 
         public DateTime? FechaCarga { get; set; }
 
