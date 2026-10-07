@@ -2,6 +2,10 @@
 @using Radzen.Blazor
 
 @inject DialogService DialogService
+@using SistemaBecas.Client.Services
+@using SistemaBecas.Library.Dtos
+@inject GestionApiClient Api
+@inject NotificationService Notifications
 
 <RadzenStack Gap="1rem">
 
@@ -106,9 +110,9 @@
 
 @code {
 
-    string Nombre { get; set; }
+    string Nombre { get; set; } = "";
 
-    string Descripcion { get; set; }
+    string Descripcion { get; set; } = "";
 
     DateTime? FechaInicio { get; set; }
 
@@ -116,7 +120,8 @@
 
     int? Cupos { get; set; }
 
-    string Estado { get; set; }
+    string Estado { get; set; } = "Próxima";
+    bool Guardando { get; set; }
 
 
     void Cancelar()
@@ -125,11 +130,35 @@
     }
 
 
-    void Guardar()
+    async Task Guardar()
     {
-        // Aquí posteriormente irá tu llamada al API
-
-        DialogService.Close(true);
+        if (string.IsNullOrWhiteSpace(Nombre) || FechaInicio is null || FechaFin is null || Cupos is null)
+        {
+            Notifications.Notify(NotificationSeverity.Warning, "Datos incompletos", "Completa nombre, fechas y cupos.");
+            return;
+        }
+        Guardando = true;
+        try
+        {
+            await Api.GuardarConvocatoriaAsync(new ConvocatoriaGuardarDto
+            {
+                Nombre = Nombre,
+                Descripcion = Descripcion,
+                FechaInicio = FechaInicio.Value,
+                FechaFin = FechaFin.Value,
+                Cupos = Cupos.Value,
+                Estado = Estado
+            });
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo guardar", ex.Message);
+        }
+        finally
+        {
+            Guardando = false;
+        }
     }
 
 }
