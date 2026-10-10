@@ -2,6 +2,12 @@
 
 @using Radzen
 @using Radzen.Blazor
+@using SistemaBecas.Client.Services
+@using SistemaBecas.Library.Dtos
+@using Components.Modals
+@inject DialogService DialogService
+@inject GestionApiClient Api
+@inject NotificationService Notifications
 
 <PageTitle>Gestión de Solicitudes</PageTitle>
 
@@ -44,7 +50,7 @@
                           SizeMD="4"
                           Style="text-align: right;">
 
-                <RadzenBadge Text="7 solicitudes"
+                <RadzenBadge Text="@($"{solicitudes.Count} solicitudes")"
                              Style="
                 background: rgba(255,255,255,0.2);
                 color: white;
@@ -81,7 +87,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text="3"
+                        <RadzenText Text="@solicitudes.Count(s => s.Estado == "Pendiente").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #64b5f6;
@@ -123,7 +129,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text="2"
+                        <RadzenText Text="@solicitudes.Count(s => s.Estado == "Aprobada").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #1565c0;
@@ -165,7 +171,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text="2"
+                        <RadzenText Text="@solicitudes.Count(s => s.Estado == "Rechazada").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #94a3b8;
@@ -278,6 +284,7 @@
                 <RadzenButton Text="Buscar"
                               Icon="search"
                               ButtonStyle="ButtonStyle.Primary"
+                              Click="@CargarSolicitudesAsync"
                               Style="width: 100%;" />
 
             </RadzenColumn>
@@ -310,8 +317,16 @@
         margin-bottom: 20px;" />
 
 
-        <RadzenDataGrid Data="@solicitudes"
-                        TItem="SolicitudMock"
+        @if (!string.IsNullOrWhiteSpace(errorCarga))
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" Text="@errorCarga" />
+        }
+        @if (cargando)
+        {
+            <RadzenProgressBar Mode="ProgressBarMode.Indeterminate" />
+        }
+        <RadzenDataGrid Data="@SolicitudesFiltradas"
+                        TItem="SolicitudGestionDto"
                         AllowPaging="true"
                         PageSize="7"
                         AllowSorting="true"
@@ -322,27 +337,27 @@
 
                 <!-- Solicitud -->
 
-                <RadzenDataGridColumn TItem="SolicitudMock"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Property="IdSolicitud"
                                       Title="Solicitud"
                                       Width="100px" />
 
                 <!-- Estudiante -->
 
-                <RadzenDataGridColumn TItem="SolicitudMock"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Title="Estudiante"
                                       Width="220px">
 
                     <Template Context="solicitud">
 
                         <strong>
-                            @solicitud.NombreEstudiante
+                            @solicitud.Estudiante
                         </strong>
 
                         <br />
 
                         <small style="color:#6b7280;">
-                            DPI: @solicitud.DPI
+                            DPI: @solicitud.Dpi
                         </small>
 
                     </Template>
@@ -352,12 +367,12 @@
 
                 <!-- Convocatoria -->
 
-                <RadzenDataGridColumn TItem="SolicitudMock"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Title="Convocatoria"
                                       Width="230px">
 
                     <Template Context="solicitud">
-                        @solicitud.NombreConvocatoria
+                        @solicitud.Convocatoria
                     </Template>
 
                 </RadzenDataGridColumn>
@@ -365,7 +380,7 @@
 
                 <!-- Fecha -->
 
-                <RadzenDataGridColumn TItem="SolicitudMock"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Property="FechaSolicitud"
                                       Title="Fecha solicitud"
                                       FormatString="{0:dd/MM/yyyy}"
@@ -374,7 +389,7 @@
 
                 <!-- Evaluación -->
 
-                <RadzenDataGridColumn TItem="SolicitudMock"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Title="Punteo"
                                       Width="100px">
 
@@ -398,7 +413,7 @@
 
                 <!-- Estado -->
 
-                <RadzenDataGridColumn TItem="SolicitudMock"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Title="Estado"
                                       Width="130px">
 
@@ -416,6 +431,12 @@
                                          BadgeStyle="BadgeStyle.Success"
                                          IsPill="true" />
                         }
+                        else if (solicitud.Estado == "En revisión" || solicitud.Estado == "En evaluación")
+                        {
+                            <RadzenBadge Text="@solicitud.Estado"
+                                         BadgeStyle="BadgeStyle.Info"
+                                         IsPill="true" />
+                        }
                         else
                         {
                             <RadzenBadge Text="Rechazada"
@@ -430,7 +451,7 @@
 
                 <!-- Acciones -->
 
-                <RadzenDataGridColumn TItem="SolicitudMock"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Title="Acciones"
                                       Width="180px">
 
@@ -441,17 +462,20 @@
 
                             <RadzenButton Icon="visibility"
                                           ButtonStyle="ButtonStyle.Light"
-                                          Size="ButtonSize.Small" />
+                                          Size="ButtonSize.Small"
+                                          Click="@(() => VerSolicitud(solicitud))" />
 
                             @if (solicitud.Estado == "Pendiente")
                             {
                                 <RadzenButton Icon="check"
                                               ButtonStyle="ButtonStyle.Success"
-                                              Size="ButtonSize.Small" />
+                                              Size="ButtonSize.Small"
+                                              Click="@(() => CambiarEstadoAsync(solicitud, "Aprobada"))" />
 
                                 <RadzenButton Icon="close"
                                               ButtonStyle="ButtonStyle.Danger"
-                                              Size="ButtonSize.Small" />
+                                              Size="ButtonSize.Small"
+                                              Click="@(() => CambiarEstadoAsync(solicitud, "Rechazada"))" />
                             }
 
                         </RadzenStack>
@@ -474,6 +498,7 @@
     private string? estadoSeleccionado;
     private int? convocatoriaSeleccionada;
     private string busqueda = string.Empty;
+    private string? errorCarga;
 
 
     private List<string> estados = new()
@@ -486,161 +511,62 @@
     };
 
 
-    private List<ConvocatoriaMock> convocatorias = new()
+    private List<ConvocatoriaDto> convocatorias = new();
+    private List<SolicitudGestionDto> solicitudes = new();
+    private bool cargando;
+    private IEnumerable<SolicitudGestionDto> SolicitudesFiltradas => solicitudes.Where(s =>
+        (string.IsNullOrWhiteSpace(estadoSeleccionado) || s.Estado.Equals(estadoSeleccionado, StringComparison.OrdinalIgnoreCase)) &&
+        (!convocatoriaSeleccionada.HasValue || s.IdConvocatoria == convocatoriaSeleccionada.Value) &&
+        (string.IsNullOrWhiteSpace(busqueda) || s.Estudiante.Contains(busqueda, StringComparison.OrdinalIgnoreCase) || s.Dpi.Contains(busqueda, StringComparison.OrdinalIgnoreCase)));
+
+    protected override Task OnInitializedAsync() => CargarSolicitudesAsync();
+
+    private async Task CargarSolicitudesAsync()
     {
-        new ConvocatoriaMock
+        cargando = true;
+        errorCarga = null;
+        try
         {
-            IdConvocatoria = 1,
-            Nombre = "Beca Nacional Universitaria 2026"
-        },
-
-        new ConvocatoriaMock
-        {
-            IdConvocatoria = 2,
-            Nombre = "Beca Internacional Posgrado"
-        },
-
-        new ConvocatoriaMock
-        {
-            IdConvocatoria = 3,
-            Nombre = "Beca Técnica Media"
-        },
-
-        new ConvocatoriaMock
-        {
-            IdConvocatoria = 4,
-            Nombre = "Beca Investigación Interna"
+            solicitudes = await Api.ObtenerSolicitudesAsync();
+            convocatorias = await Api.ObtenerConvocatoriasAsync();
         }
-    };
-
-
-    private List<SolicitudMock> solicitudes = new()
-    {
-        new SolicitudMock
+        catch (Exception ex)
         {
-            IdSolicitud = 1,
-            IdConvocatoria = 1,
-            IdEstudiante = 1,
-            NombreEstudiante = "Ana López Martínez",
-            DPI = "123456789012",
-            NombreConvocatoria = "Beca Nacional Universitaria 2026",
-            FechaSolicitud = new DateTime(2026, 4, 12),
-            Punteo = 88,
-            Estado = "Pendiente",
-            Observaciones = "Solicitud pendiente de revisión."
-        },
-
-        new SolicitudMock
-        {
-            IdSolicitud = 2,
-            IdConvocatoria = 1,
-            IdEstudiante = 2,
-            NombreEstudiante = "Carlos Ramírez Pérez",
-            DPI = "987654321098",
-            NombreConvocatoria = "Beca Nacional Universitaria 2026",
-            FechaSolicitud = new DateTime(2026, 4, 10),
-            Punteo = 72,
-            Estado = "Aprobada",
-            Observaciones = "Solicitud aprobada."
-        },
-
-        new SolicitudMock
-        {
-            IdSolicitud = 3,
-            IdConvocatoria = 2,
-            IdEstudiante = 3,
-            NombreEstudiante = "María García Solís",
-            DPI = "432187652109",
-            NombreConvocatoria = "Beca Internacional Posgrado",
-            FechaSolicitud = new DateTime(2026, 4, 8),
-            Punteo = 55,
-            Estado = "Rechazada",
-            Observaciones = "Solicitud rechazada."
-        },
-
-        new SolicitudMock
-        {
-            IdSolicitud = 4,
-            IdConvocatoria = 3,
-            IdEstudiante = 4,
-            NombreEstudiante = "José Hernández Díaz",
-            DPI = "567812343456",
-            NombreConvocatoria = "Beca Técnica Media",
-            FechaSolicitud = new DateTime(2026, 4, 15),
-            Punteo = 91,
-            Estado = "Pendiente",
-            Observaciones = "Pendiente de decisión."
-        },
-
-        new SolicitudMock
-        {
-            IdSolicitud = 5,
-            IdConvocatoria = 4,
-            IdEstudiante = 5,
-            NombreEstudiante = "Laura Martínez Ruiz",
-            DPI = "876543216543",
-            NombreConvocatoria = "Beca Investigación Interna",
-            FechaSolicitud = new DateTime(2026, 4, 14),
-            Punteo = 67,
-            Estado = "Aprobada",
-            Observaciones = "Solicitud aprobada."
-        },
-
-        new SolicitudMock
-        {
-            IdSolicitud = 6,
-            IdConvocatoria = 1,
-            IdEstudiante = 6,
-            NombreEstudiante = "Pedro Sánchez López",
-            DPI = "345678907890",
-            NombreConvocatoria = "Beca Nacional Universitaria 2026",
-            FechaSolicitud = new DateTime(2026, 4, 11),
-            Punteo = 40,
-            Estado = "Rechazada",
-            Observaciones = "No cumple con los criterios."
-        },
-
-        new SolicitudMock
-        {
-            IdSolicitud = 7,
-            IdConvocatoria = 2,
-            IdEstudiante = 7,
-            NombreEstudiante = "Sofía Morales Cruz",
-            DPI = "654321090123",
-            NombreConvocatoria = "Beca Internacional Posgrado",
-            FechaSolicitud = new DateTime(2026, 4, 9),
-            Punteo = 83,
-            Estado = "Pendiente",
-            Observaciones = "Pendiente de evaluación."
+            errorCarga = $"No se pudieron cargar las solicitudes: {ex.Message}";
+            Notifications.Notify(NotificationSeverity.Error, "Error al cargar", ex.Message);
         }
-    };
-
-
-    public class ConvocatoriaMock
-    {
-        public int IdConvocatoria { get; set; }
-        public string Nombre { get; set; } = "";
+        finally
+        {
+            cargando = false;
+        }
     }
 
-
-    public class SolicitudMock
+    private async Task VerSolicitud(SolicitudGestionDto solicitud)
     {
-        // Solicitud
-        public int IdSolicitud { get; set; }
-        public int IdConvocatoria { get; set; }
-        public int IdEstudiante { get; set; }
-        public DateTime FechaSolicitud { get; set; }
-        public string Estado { get; set; } = "";
-        public string Observaciones { get; set; } = "";
-        public DateTime? FechaActualizacion { get; set; }
+        var resultado = await DialogService.OpenAsync<DetalleSolicitud>(
+            $"Solicitud #{solicitud.IdSolicitud}",
+            new Dictionary<string, object?> { { "Solicitud", solicitud } },
+            new DialogOptions { Width = "900px", Height = "800px", Resizable = true, Draggable = true });
+        if (resultado == true)
+            await CargarSolicitudesAsync();
+    }
 
-        // Datos relacionados
-        public string NombreEstudiante { get; set; } = "";
-        public string DPI { get; set; } = "";
-        public string NombreConvocatoria { get; set; } = "";
-
-        // Evaluacion.Punteo
-        public decimal? Punteo { get; set; }
+    private async Task CambiarEstadoAsync(SolicitudGestionDto solicitud, string estado)
+    {
+        try
+        {
+            await Api.ActualizarEstadoSolicitudAsync(solicitud.IdSolicitud, new SolicitudEstadoDto
+            {
+                Estado = estado,
+                Observaciones = solicitud.Observaciones
+            });
+            Notifications.Notify(NotificationSeverity.Success, "Solicitud actualizada", $"Estado: {estado}.");
+            await CargarSolicitudesAsync();
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo actualizar", ex.Message);
+        }
     }
 
 }

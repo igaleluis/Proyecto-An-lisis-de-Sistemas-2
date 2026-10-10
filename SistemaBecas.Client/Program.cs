@@ -1,5 +1,6 @@
 using Radzen;
 using SistemaBecas.Client.Components;
+using SistemaBecas.Client.Services;
 using SistemaBecas.Client.Services.Login;
 using Microsoft.AspNetCore.Components.Authorization;
 using SistemaBecas.Client.Services.Authentication;
@@ -17,6 +18,15 @@ builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(
     provider =>
         provider.GetRequiredService<CustomAuthenticationStateProvider>());
+
+builder.Services.AddHttpClient<GestionApiClient>(client =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+    if (string.IsNullOrWhiteSpace(apiBaseUrl))
+        throw new InvalidOperationException("Debe configurar ApiBaseUrl para conectar el cliente con la API.");
+
+    client.BaseAddress = new Uri(apiBaseUrl);
+});
 
 
 builder.Services.AddScoped<DialogService>();

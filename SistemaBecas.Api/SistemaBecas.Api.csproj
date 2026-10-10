@@ -28,4 +28,9 @@
     <ProjectReference Include="..\SistemaBecas.Library\SistemaBecas.Library.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\GestionController\" />
+    <Folder Include="Services\GestionService\" />
+  </ItemGroup>
+
 </Project>
