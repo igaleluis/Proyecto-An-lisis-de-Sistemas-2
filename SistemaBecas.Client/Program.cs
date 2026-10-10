@@ -5,6 +5,8 @@ using SistemaBecas.Client.Services.Documentacion;
 using Microsoft.AspNetCore.Components.Authorization;
 using SistemaBecas.Client.Services.Authentication;
 using SistemaBecas.Client.Services.RegistroService;
+using SistemaBecas.Client.Services.Reportes;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +40,7 @@ builder.Services.AddHttpClient("Api", client =>
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IRegistroService, RegistroService>();
 builder.Services.AddScoped<DocumentacionService>();
+builder.Services.AddScoped<ReportesService>();
 
 
 var app = builder.Build();

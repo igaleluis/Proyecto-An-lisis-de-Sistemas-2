@@ -74,7 +74,7 @@ namespace SistemaBecas.Api.Controllers
         public async Task<IActionResult> SubirDocumento(
             [FromForm] int idSolicitud,
             [FromForm] int idDocumento,
-            [FromForm] IFormFile archivo,
+                       IFormFile archivo,
             [FromForm] string? observaciones)
         {
             var idUsuarioClaim =

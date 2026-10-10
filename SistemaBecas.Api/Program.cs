@@ -10,14 +10,19 @@ using SistemaBecas.Api.Repositories.EstudianteRepository;
 using SistemaBecas.Api.Repositories.LoginRepository;
 using SistemaBecas.Api.Repositories.RecuperacionPassword;
 using SistemaBecas.Api.Repositories.RegistroRepository;
+using SistemaBecas.Api.Repositories.Reportes;
 using SistemaBecas.Api.Services.Documentacion;
 using SistemaBecas.Api.Services.Email;
 using SistemaBecas.Api.Services.JwtService;
 using SistemaBecas.Api.Services.LoginService;
 using SistemaBecas.Api.Services.RecuperacionPassword;
 using SistemaBecas.Api.Services.RegistroService;
+using SistemaBecas.Api.Services.Reportes;
 using SistemaBecas.Api.Services.SupabaseStorage;
 using System.Text;
+using QuestPDF.Infrastructure;
+
+QuestPDF.Settings.License = LicenseType.Community;
 var builder = WebApplication.CreateBuilder(args);
 
 // Entity Framework Core
@@ -43,6 +48,7 @@ builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<IRegistroRepository, RegistroRepository>();
 builder.Services.AddScoped<IRecuperacionPasswordRepository, RecuperacionPasswordRepository>();
 builder.Services.AddScoped<IDocumentacionRepository, DocumentacionRepository>();
+builder.Services.AddScoped<IReportesRepository, ReportesRepository>();
 
 
 //Servicios
@@ -52,6 +58,7 @@ builder.Services.AddScoped<IRegistroService, RegistroService>();
 builder.Services.AddScoped<IRecuperacionPasswordService, RecuperacionPasswordService>();
 builder.Services.AddScoped<IDocumentacionService, DocumentacionService>();
 builder.Services.AddScoped<IEstudianteRepository, EstudianteRepository>();
+builder.Services.AddScoped<IReportesService, ReportesService>();
 builder.Services.AddHttpClient<
     ISupabaseStorageService,
     SupabaseStorageService>();
