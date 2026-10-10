@@ -2,6 +2,17 @@
 
 @using Radzen
 @using Radzen.Blazor
+@using Microsoft.AspNetCore.Components.Forms
+@using SistemaBecas.Library.Dtos
+@using Microsoft.AspNetCore.Authorization
+@using SistemaBecas.Client.Services.Documentacion
+
+@inject DocumentacionService DocumentacionService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+@attribute [Authorize(Roles = "Estudiante")]
+
 
 <PageTitle>Sistema de Becas - Cargar documentación</PageTitle>
 
@@ -92,9 +103,10 @@
 
                 <RadzenDropDown TValue="int?"
                                 Data="@solicitudes"
-                                TextProperty="Descripcion"
+                                TextProperty="TextoSolicitud"
                                 ValueProperty="IdSolicitud"
                                 @bind-Value="@solicitudSeleccionada"
+                                Change="@SeleccionarSolicitud"
                                 Placeholder="Seleccione una solicitud"
                                 AllowClear="true"
                                 Style="width:100%;" />
@@ -105,65 +117,67 @@
             <!-- ================================================== -->
             <!-- INFORMACIÓN DE SOLICITUD                            -->
             <!-- ================================================== -->
+            @if (solicitudActual != null)
+            {
+                <RadzenCard Variant="Variant.Outlined"
+                            Style="
+                    border-radius:12px;
+                    background-color:#f8fafc;
+                    padding:1.2rem;">
 
-            <RadzenCard Variant="Variant.Outlined"
-                        Style="
-                border-radius:12px;
-                background-color:#f8fafc;
-                padding:1.2rem;">
+                    <RadzenRow>
 
-                <RadzenRow>
+                        <RadzenColumn Size="12"
+                                      SizeMD="4">
 
-                    <RadzenColumn Size="12"
-                                  SizeMD="4">
+                            <RadzenText Text="Solicitud"
+                                        Style="
+                            color:#6b7280;
+                            font-size:12px;" />
 
-                        <RadzenText Text="Solicitud"
-                                    Style="
-                        color:#6b7280;
-                        font-size:12px;" />
+                            <RadzenText Text="@($"#{solicitudActual.IdSolicitud:D4}")"
+                                        Style="
+                            font-weight:700;
+                            margin-top:4px;" />
 
-                        <RadzenText Text="#0001"
-                                    Style="
-                        font-weight:700;
-                        margin-top:4px;" />
-
-                    </RadzenColumn>
-
-
-                    <RadzenColumn Size="12"
-                                  SizeMD="4">
-
-                        <RadzenText Text="Estudiante"
-                                    Style="
-                        color:#6b7280;
-                        font-size:12px;" />
-
-                        <RadzenText Text="Juan Pérez López"
-                                    Style="
-                        font-weight:600;
-                        margin-top:4px;" />
-
-                    </RadzenColumn>
+                        </RadzenColumn>
 
 
-                    <RadzenColumn Size="12"
-                                  SizeMD="4">
+                        <RadzenColumn Size="12"
+                                      SizeMD="4">
 
-                        <RadzenText Text="Convocatoria"
-                                    Style="
-                        color:#6b7280;
-                        font-size:12px;" />
+                            <RadzenText Text="Estado"
+                                        Style="
+                            color:#6b7280;
+                            font-size:12px;" />
 
-                        <RadzenText Text="Beca Nacional Universitaria 2026"
-                                    Style="
-                        font-weight:600;
-                        margin-top:4px;" />
+                            <RadzenText Text="@solicitudActual.Estado"
+                                        Style="
+                            font-weight:600;
+                            margin-top:4px;" />
 
-                    </RadzenColumn>
+                        </RadzenColumn>
 
-                </RadzenRow>
 
-            </RadzenCard>
+                        <RadzenColumn Size="12"
+                                      SizeMD="4">
+
+                            <RadzenText Text="Fecha de solicitud"
+                                        Style="
+                            color:#6b7280;
+                            font-size:12px;" />
+
+                            <RadzenText Text="@solicitudActual.FechaSolicitud.ToString("dd/MM/yyyy")"
+                                        Style="
+                            font-weight:600;
+                            margin-top:4px;" />
+
+                        </RadzenColumn>
+
+                    </RadzenRow>
+
+                </RadzenCard>
+            }
 
 
             <!-- ================================================== -->
@@ -186,211 +200,105 @@
             </RadzenStack>
 
 
-            <!-- ================================================== -->
-            <!-- DPI                                                 -->
-            <!-- ================================================== -->
-
-            <RadzenCard Variant="Variant.Outlined"
-                        Style="
-                border-radius:12px;
-                padding:1.2rem;">
-
-                <RadzenRow AlignItems="AlignItems.Center"
-                           Gap="1rem">
-
-                    <RadzenColumn Size="12"
-                                  SizeMD="7">
-
-                        <RadzenRow AlignItems="AlignItems.Center">
-
-                            <RadzenColumn Size="2">
-
-                                <RadzenIcon Icon="badge"
-                                            Style="
-                                font-size:32px;
-                                color:#1565c0;" />
-
-                            </RadzenColumn>
-
-                            <RadzenColumn Size="10">
-
-                                <RadzenText Text="DPI"
-                                            Style="
-                                font-weight:700;
-                                font-size:16px;" />
-
-                                <RadzenText Text="Documento de identificación"
-                                            Style="
-                                color:#6b7280;
-                                font-size:13px;" />
-
-                                <RadzenBadge Text="Obligatorio"
-                                             BadgeStyle="BadgeStyle.Info"
-                                             Style="margin-top:5px;" />
-
-                            </RadzenColumn>
-
-                        </RadzenRow>
-
-                    </RadzenColumn>
-
-
-                    <RadzenColumn Size="12"
-                                  SizeMD="5">
-
-                        <RadzenStack AlignItems="AlignItems.End"
-                                     Gap="0.5rem">
-
-                            <RadzenBadge Text="Pendiente"
-                                         BadgeStyle="BadgeStyle.Warning" />
-
-                            <InputFile accept=".pdf,.jpg,.jpeg,.png" />
-
-                        </RadzenStack>
-
-                    </RadzenColumn>
-
-                </RadzenRow>
-
-            </RadzenCard>
-
-
-            <!-- ================================================== -->
-            <!-- CONSTANCIA DE ESTUDIOS                             -->
-            <!-- ================================================== -->
-
-            <RadzenCard Variant="Variant.Outlined"
-                        Style="
-                border-radius:12px;
-                padding:1.2rem;">
-
-                <RadzenRow AlignItems="AlignItems.Center"
-                           Gap="1rem">
-
-                    <RadzenColumn Size="12"
-                                  SizeMD="7">
-
-                        <RadzenRow AlignItems="AlignItems.Center">
-
-                            <RadzenColumn Size="2">
-
-                                <RadzenIcon Icon="school"
-                                            Style="
-                                font-size:32px;
-                                color:#1565c0;" />
-
-                            </RadzenColumn>
-
-                            <RadzenColumn Size="10">
-
-                                <RadzenText Text="Constancia de estudios"
-                                            Style="
-                                font-weight:700;
-                                font-size:16px;" />
-
-                                <RadzenText Text="Constancia emitida por la institución educativa"
-                                            Style="
-                                color:#6b7280;
-                                font-size:13px;" />
-
-                                <RadzenBadge Text="Obligatorio"
-                                             BadgeStyle="BadgeStyle.Info"
-                                             Style="margin-top:5px;" />
-
-                            </RadzenColumn>
-
-                        </RadzenRow>
-
-                    </RadzenColumn>
-
-
-                    <RadzenColumn Size="12"
-                                  SizeMD="5">
-
-                        <RadzenStack AlignItems="AlignItems.End"
-                                     Gap="0.5rem">
-
-                            <RadzenBadge Text="Pendiente"
-                                         BadgeStyle="BadgeStyle.Warning" />
-
-                            <InputFile accept=".pdf,.jpg,.jpeg,.png" />
-
-                        </RadzenStack>
-
-                    </RadzenColumn>
-
-                </RadzenRow>
-
-            </RadzenCard>
-
-
-            <!-- ================================================== -->
-            <!-- CERTIFICACIÓN DE NOTAS                             -->
-            <!-- ================================================== -->
-
-            <RadzenCard Variant="Variant.Outlined"
-                        Style="
-                border-radius:12px;
-                padding:1.2rem;">
-
-                <RadzenRow AlignItems="AlignItems.Center"
-                           Gap="1rem">
-
-                    <RadzenColumn Size="12"
-                                  SizeMD="7">
-
-                        <RadzenRow AlignItems="AlignItems.Center">
-
-                            <RadzenColumn Size="2">
-
-                                <RadzenIcon Icon="article"
-                                            Style="
-                                font-size:32px;
-                                color:#1565c0;" />
-
-                            </RadzenColumn>
-
-                            <RadzenColumn Size="10">
-
-                                <RadzenText Text="Certificación de notas"
-                                            Style="
-                                font-weight:700;
-                                font-size:16px;" />
-
-                                <RadzenText Text="Certificación de calificaciones"
-                                            Style="
-                                color:#6b7280;
-                                font-size:13px;" />
-
-                                <RadzenBadge Text="Obligatorio"
-                                             BadgeStyle="BadgeStyle.Info"
-                                             Style="margin-top:5px;" />
-
-                            </RadzenColumn>
-
-                        </RadzenRow>
-
-                    </RadzenColumn>
-
-
-                    <RadzenColumn Size="12"
-                                  SizeMD="5">
-
-                        <RadzenStack AlignItems="AlignItems.End"
-                                     Gap="0.5rem">
-
-                            <RadzenBadge Text="Pendiente"
-                                         BadgeStyle="BadgeStyle.Warning" />
-
-                            <InputFile accept=".pdf,.jpg,.jpeg,.png" />
-
-                        </RadzenStack>
-
-                    </RadzenColumn>
-
-                </RadzenRow>
-
-            </RadzenCard>
+            @if (solicitudSeleccionada != null)
+            {
+                @if (cargandoDocumentos)
+                {
+                    <RadzenStack AlignItems="AlignItems.Center"
+                                 Gap="0.5rem"
+                                 Style="padding:2rem;">
+
+                        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" />
+
+                        <RadzenText Text="Cargando documentos..."
+                                    Style="color:#6b7280;" />
+
+                    </RadzenStack>
+                }
+                else if (documentos.Any())
+                {
+                    
+                    @foreach(var documento in documentos)
+                    {
+                        <div class="mb-4 p-3 border rounded">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <div>
+                                    <h5 class="mb-1">
+                                        @documento.Nombre
+                                    </h5>
+
+                                    @if (!string.IsNullOrWhiteSpace(documento.Descripcion))
+                                    {
+                                        <p class="text-muted mb-2">
+                                            @documento.Descripcion
+                                        </p>
+                                    }
+
+                                    <span class="badge
+                                        @(documento.Estado == "Cargado"
+                                              ? "bg-success"
+                                              : "bg-warning text-dark")">
+
+                                        @documento.Estado
+
+                                    </span>
+                                </div>
+
+                                <div>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        documento.UrlArchivo))
+                                    {
+                                        <RadzenButton Text="Ver documento"
+                                                      Icon="visibility"
+                                                      ButtonStyle="ButtonStyle.Info"
+                                                      Click="@(() =>
+                                                                                  VerDocumento(
+                                                                                      documento.UrlArchivo!))" />
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <div class="mt-3">
+
+                                <InputFile accept=".pdf,.jpg,.jpeg,.png"
+                                           OnChange="@((e) =>
+                                                               SeleccionarArchivo(
+                                                                   documento.IdDocumento,
+                                                                   e))" />
+
+                                @if (archivosSeleccionados
+                                    .ContainsKey(documento.IdDocumento))
+                                {
+                                    <RadzenText Text="@archivosSeleccionados[
+                                                                        documento.IdDocumento].Name"
+                                                Style="display:block;margin-top:8px;" />
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                }
+                else
+                {
+                    <RadzenAlert AlertStyle="AlertStyle.Info">
+                        No hay documentos requeridos para esta solicitud.
+                    </RadzenAlert>
+                }
+            }
+            else
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Info">
+                    Seleccione una solicitud para consultar los documentos requeridos.
+                </RadzenAlert>
+            }
 
 
             <!-- ================================================== -->
@@ -410,7 +318,22 @@
 
 
             <!-- ================================================== -->
-            <!-- BOTONES                                            -->
+            <!-- MENSAJE                                             -->
+            <!-- ================================================== -->
+            @if (!string.IsNullOrWhiteSpace(mensaje))
+            {
+                <RadzenAlert AlertStyle="@(error
+                                                     ? AlertStyle.Danger
+                                                     : AlertStyle.Success)">
+
+                    @mensaje
+
+                </RadzenAlert>
+            }
+
+
+            <!-- ================================================== -->
+            <!-- BOTONES                                             -->
             <!-- ================================================== -->
 
             <RadzenStack Orientation="Orientation.Horizontal"
@@ -420,17 +343,40 @@
                 <RadzenButton Text="Cancelar"
                               Icon="close"
                               ButtonStyle="ButtonStyle.Light"
-                              Variant="Variant.Outlined" />
+                              Variant="Variant.Outlined"
+                              Click="@Cancelar"
+                              Disabled="@subiendoDocumento" />
 
-                <RadzenButton Text="Guardar documentación"
+
+                <RadzenButton Text="@(subiendoDocumento
+                                                      ? "Cargando..."
+                                                      : "Guardar documentación")"
                               Icon="save"
-                              ButtonStyle="ButtonStyle.Primary" />
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@GuardarDocumento"
+                              Disabled="@(solicitudSeleccionada == null
+                                                      || !archivosSeleccionados.Any()
+                                                      || subiendoDocumento)" />
 
             </RadzenStack>
 
 
+            @if (subiendoDocumento)
+            {
+                <RadzenStack AlignItems="AlignItems.Center"
+                             Gap="0.5rem">
+
+                    <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" />
+
+                    <RadzenText Text="Subiendo documentación..."
+                                Style="color:#6b7280;" />
+
+                </RadzenStack>
+            }
+
+
             <!-- ================================================== -->
-            <!-- SEGURIDAD                                          -->
+            <!-- SEGURIDAD                                           -->
             <!-- ================================================== -->
 
             <RadzenStack AlignItems="AlignItems.Center"
@@ -473,27 +419,222 @@
 
     private string observaciones = "";
 
-    private List<SolicitudMock> solicitudes = new()
-    {
-        new SolicitudMock
-        {
-            IdSolicitud = 1,
-            Descripcion = "Solicitud #0001 - Juan Pérez López"
-        },
+    private bool cargandoDocumentos = false;
 
-        new SolicitudMock
+    private bool subiendoDocumento = false;
+
+    private string? mensaje;
+
+    private bool error;
+
+    private Dictionary<int, IBrowserFile> archivosSeleccionados = new();
+
+    private List<SolicitudDocumentacionDto> solicitudes = new();
+
+    private List<DocumentoSolicitudDto> documentos = new();
+
+    private SolicitudDocumentacionDto? solicitudActual;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        solicitudes =
+            await DocumentacionService
+                .ObtenerMisSolicitudes();
+
+        StateHasChanged();
+    }
+
+
+    private async Task SeleccionarSolicitud(object value)
+    {
+        if (value == null)
         {
-            IdSolicitud = 2,
-            Descripcion = "Solicitud #0002 - María García López"
+            solicitudSeleccionada = null;
+            solicitudActual = null;
+
+            documentos.Clear();
+
+            archivosSeleccionados.Clear();
+
+            mensaje = null;
+            error = false;
+
+            return;
         }
-    };
+
+        solicitudSeleccionada =
+            Convert.ToInt32(value);
+
+        solicitudActual =
+            solicitudes.FirstOrDefault(
+                s => s.IdSolicitud ==
+                     solicitudSeleccionada.Value);
+
+        cargandoDocumentos = true;
+
+        mensaje = null;
+        error = false;
+
+        archivosSeleccionados.Clear();
+
+        documentos =
+            await DocumentacionService
+                .ObtenerDocumentosSolicitud(
+                    solicitudSeleccionada.Value);
+
+        cargandoDocumentos = false;
+    }
 
 
-    public class SolicitudMock
+    private string ObtenerIcono(
+        string nombreDocumento)
     {
-        public int IdSolicitud { get; set; }
+        if (nombreDocumento.Contains(
+                "DPI",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return "badge";
+        }
 
-        public string Descripcion { get; set; } = "";
+        if (nombreDocumento.Contains(
+                "estudios",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return "school";
+        }
+
+        if (nombreDocumento.Contains(
+                "notas",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return "article";
+        }
+
+        return "description";
+    }
+
+
+    private void SeleccionarArchivo(
+        int idDocumento,
+        InputFileChangeEventArgs e)
+    {
+        archivosSeleccionados[idDocumento] =
+            e.File;
+
+        mensaje = null;
+        error = false;
+    }
+
+
+    private async Task GuardarDocumento()
+    {
+        if (solicitudSeleccionada == null)
+        {
+            mensaje =
+                "Debe seleccionar una solicitud.";
+
+            error = true;
+
+            return;
+        }
+
+        if (!archivosSeleccionados.Any())
+        {
+            mensaje =
+                "Debe seleccionar al menos un documento.";
+
+            error = true;
+
+            return;
+        }
+
+        subiendoDocumento = true;
+
+        mensaje = null;
+
+        error = false;
+
+        try
+        {
+            foreach (var archivo in archivosSeleccionados)
+            {
+                var idDocumento =
+                    archivo.Key;
+
+                var archivoSeleccionado =
+                    archivo.Value;
+
+                var resultado =
+                    await DocumentacionService
+                        .SubirDocumento(
+                            solicitudSeleccionada.Value,
+                            idDocumento,
+                            archivoSeleccionado,
+                            observaciones);
+
+                if (!resultado)
+                {
+                    mensaje =
+                        $"No fue posible cargar el documento con ID {idDocumento}.";
+
+                    error = true;
+
+                    return;
+                }
+            }
+
+            mensaje =
+                "Los documentos fueron cargados correctamente.";
+
+            archivosSeleccionados.Clear();
+
+            observaciones = "";
+
+            documentos =
+                await DocumentacionService
+                    .ObtenerDocumentosSolicitud(
+                        solicitudSeleccionada.Value);
+        }
+        catch (Exception ex)
+        {
+            mensaje =
+                $"Error al cargar los documentos: {ex.Message}";
+
+            error = true;
+        }
+        finally
+        {
+            subiendoDocumento = false;
+        }
+    }
+
+
+    private void Cancelar()
+    {
+        solicitudSeleccionada = null;
+
+        solicitudActual = null;
+
+        documentos.Clear();
+
+        observaciones = "";
+
+        archivosSeleccionados.Clear();
+
+        mensaje = null;
+
+        error = false;
+    }
+    private async Task VerDocumento(string url)
+    {
+        await JSRuntime.InvokeVoidAsync(
+            "open",
+            url,
+            "_blank");
     }
 
 }

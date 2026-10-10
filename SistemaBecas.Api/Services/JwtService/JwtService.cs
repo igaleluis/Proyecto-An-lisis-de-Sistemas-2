@@ -34,6 +34,8 @@ namespace SistemaBecas.Api.Services.JwtService
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            Console.WriteLine($"ROL JWT: [{loginData.Rol}]");
+            Console.WriteLine($"USUARIO JWT: [{loginData.IdUsuario}]");
 
             var token = new JwtSecurityToken(
                 issuer: issuer,

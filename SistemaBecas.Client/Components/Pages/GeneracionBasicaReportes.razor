@@ -1,230 +1,348 @@
 ﻿@page "/generacion-reportes"
 
-@using Radzen
-@using Radzen.Blazor
+@using SistemaBecas.Client.Services.Reportes
+@using SistemaBecas.Library.Dtos.Reportes
+
+@inject IJSRuntime JS
+@inject ReportesService ReportesService
+@inject NavigationManager Navigation
 
 <PageTitle>Generación de Reportes</PageTitle>
 
-<RadzenStack Gap="1.5rem"
-             Style="padding: 2rem; background-color: #f4f7fb; min-height: 100vh;">
+<!-- ENCABEZADO -->
+<RadzenCard class="w-100 mb-4"
+            Style="background: linear-gradient(135deg, #1976d2, #0d47a1); color: white;">
 
-    <!-- ====================================================== -->
-    <!-- ENCABEZADO                                             -->
-    <!-- ====================================================== -->
+    <div style="padding: 20px;">
 
-    <RadzenCard Style="
-        background: linear-gradient(135deg, #1565c0, #1e88e5);
-        color: white;
-        border-radius: 16px;
-        border: none;
-        padding: 2rem;">
+        <RadzenText Text="Generación de Reportes"
+                    TextStyle="TextStyle.H4"
+                    Style="color: white; font-weight: bold;" />
 
-        <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenText Text="Genera y consulta los diferentes reportes del sistema de becas."
+                    Style="color: white; margin-top: 5px;" />
 
-            <RadzenColumn Size="12" SizeMD="8">
+    </div>
 
-                <RadzenText Text="Generación de Reportes"
-                            TextStyle="TextStyle.H4"
-                            Style="
-                color: white;
-                font-weight: 700;
-                margin-bottom: 6px;" />
-
-                <RadzenText Text="Consulte y genere reportes básicos del sistema de becas"
-                            Style="
-                color: rgba(255,255,255,0.9);
-                font-size: 15px;" />
-
-            </RadzenColumn>
-
-            <RadzenColumn Size="12"
-                          SizeMD="4"
-                          Style="text-align: right;">
-
-                <RadzenIcon Icon="assessment"
-                            Style="
-                font-size: 55px;
-                color: rgba(255,255,255,0.85);" />
-
-            </RadzenColumn>
-
-        </RadzenRow>
-
-    </RadzenCard>
+</RadzenCard>
 
 
-    <!-- ====================================================== -->
-    <!-- ESTADÍSTICAS                                           -->
-    <!-- ====================================================== -->
+<!-- ESTADÍSTICAS -->
+<RadzenRow Gap="16px" class="mb-4">
 
-    <RadzenRow>
+    <!-- SOLICITUDES -->
+    <RadzenColumn Size="12" SizeMD="3">
 
-        <!-- SOLICITUDES -->
+        <RadzenCard class="w-100"
+                    Style="text-align: center; padding: 20px;">
 
+            <RadzenText Text="20"
+                        TextStyle="TextStyle.H3"
+                        Style="font-weight: bold;" />
+
+            <RadzenText Text="Solicitudes"
+                        TextStyle="TextStyle.Body1" />
+
+        </RadzenCard>
+
+    </RadzenColumn>
+
+
+    <!-- APROBADAS -->
+    <RadzenColumn Size="12" SizeMD="3">
+
+        <RadzenCard class="w-100"
+                    Style="text-align: center; padding: 20px;">
+
+            <RadzenText Text="8"
+                        TextStyle="TextStyle.H3"
+                        Style="font-weight: bold;" />
+
+            <RadzenText Text="Aprobadas"
+                        TextStyle="TextStyle.Body1" />
+
+        </RadzenCard>
+
+    </RadzenColumn>
+
+
+    <!-- RECHAZADAS -->
+    <RadzenColumn Size="12" SizeMD="3">
+
+        <RadzenCard class="w-100"
+                    Style="text-align: center; padding: 20px;">
+
+            <RadzenText Text="5"
+                        TextStyle="TextStyle.H3"
+                        Style="font-weight: bold;" />
+
+            <RadzenText Text="Rechazadas"
+                        TextStyle="TextStyle.Body1" />
+
+        </RadzenCard>
+
+    </RadzenColumn>
+
+
+    <!-- BECAS OTORGADAS -->
+    <RadzenColumn Size="12" SizeMD="3">
+
+        <RadzenCard class="w-100"
+                    Style="text-align: center; padding: 20px;">
+
+            <RadzenText Text="7"
+                        TextStyle="TextStyle.H3"
+                        Style="font-weight: bold;" />
+
+            <RadzenText Text="Becas otorgadas"
+                        TextStyle="TextStyle.Body1" />
+
+        </RadzenCard>
+
+    </RadzenColumn>
+
+</RadzenRow>
+
+
+<!-- FILTROS -->
+<RadzenCard class="w-100 mb-4">
+
+    <RadzenText Text="Filtros"
+                TextStyle="TextStyle.H5"
+                class="mb-4" />
+
+    <RadzenRow Gap="16px">
+
+        <!-- FECHA INICIO -->
         <RadzenColumn Size="12" SizeMD="3">
 
-            <RadzenCard Style="
-                border-radius: 12px;
-                border: 1px solid #e5e7eb;">
+            <RadzenFormField Text="Fecha inicio"
+                             class="w-100">
 
-                <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenDatePicker @bind-Value="fechaInicio"
+                                  DateFormat="dd/MM/yyyy"
+                                  class="w-100" />
 
-                    <RadzenColumn Size="8">
+            </RadzenFormField>
 
-                        <RadzenText Text="Solicitudes"
-                                    Style="
-                        color: #6b7280;
-                        font-size: 13px;" />
+        </RadzenColumn>
 
-                        <RadzenText Text="20"
-                                    TextStyle="TextStyle.H4"
-                                    Style="
-                        color: #1565c0;
-                        font-weight: 700;
-                        margin-top: 5px;" />
 
-                    </RadzenColumn>
+        <!-- FECHA FIN -->
+        <RadzenColumn Size="12" SizeMD="3">
 
-                    <RadzenColumn Size="4"
-                                  Style="text-align:right;">
+            <RadzenFormField Text="Fecha fin"
+                             class="w-100">
 
-                        <RadzenIcon Icon="description"
-                                    Style="
-                        font-size: 38px;
-                        color: #1565c0;" />
+                <RadzenDatePicker @bind-Value="fechaFin"
+                                  DateFormat="dd/MM/yyyy"
+                                  class="w-100" />
 
-                    </RadzenColumn>
+            </RadzenFormField>
 
-                </RadzenRow>
+        </RadzenColumn>
+
+
+        <!-- CONVOCATORIA -->
+        <RadzenColumn Size="12" SizeMD="3">
+
+            <RadzenFormField Text="Convocatoria"
+                             class="w-100">
+
+                <RadzenDropDown @bind-Value="convocatoriaSeleccionada"
+                                Data="@convocatorias"
+                                TextProperty="Nombre"
+                                ValueProperty="IdConvocatoria"
+                                Placeholder="Seleccione..."
+                                class="w-100" />
+
+            </RadzenFormField>
+
+        </RadzenColumn>
+
+
+        <!-- ESTADO -->
+        <RadzenColumn Size="12" SizeMD="3">
+
+            <RadzenFormField Text="Estado"
+                             class="w-100">
+
+                <RadzenDropDown @bind-Value="estadoSeleccionado"
+                                Data="@estados"
+                                Placeholder="Seleccione..."
+                                class="w-100" />
+
+            </RadzenFormField>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+
+</RadzenCard>
+
+
+<!-- REPORTES -->
+<RadzenCard class="w-100 mb-4">
+
+    <RadzenText Text="Reportes disponibles"
+                TextStyle="TextStyle.H5"
+                class="mb-4" />
+
+
+    <RadzenRow Gap="16px">
+
+        <!-- REPORTE DE SOLICITUDES -->
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard Style="height: 100%;">
+
+                <RadzenText Text="Reporte de solicitudes"
+                            TextStyle="TextStyle.H6"
+                            Style="font-weight: bold;" />
+
+                <RadzenText Text="Consulta general de las solicitudes registradas."
+                            Style="margin-top: 8px;" />
+
+                <div style="margin-top: 20px;">
+
+                    <RadzenButton Text="Generar"
+                                  Icon="picture_as_pdf"
+                                  ButtonStyle="ButtonStyle.Primary" />
+
+                </div>
 
             </RadzenCard>
 
         </RadzenColumn>
 
 
-        <!-- APROBADAS -->
+        <!-- SOLICITUDES POR ESTADO -->
+        <RadzenColumn Size="12" SizeMD="4">
 
-        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Style="height: 100%;">
 
-            <RadzenCard Style="
-                border-radius: 12px;
-                border: 1px solid #e5e7eb;">
+                <RadzenText Text="Solicitudes por estado"
+                            TextStyle="TextStyle.H6"
+                            Style="font-weight: bold;" />
 
-                <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenText Text="Muestra las solicitudes agrupadas según su estado."
+                            Style="margin-top: 8px;" />
 
-                    <RadzenColumn Size="8">
+                <div style="margin-top: 20px;">
 
-                        <RadzenText Text="Aprobadas"
-                                    Style="
-                        color: #6b7280;
-                        font-size: 13px;" />
+                    <RadzenButton Text="Generar"
+                                  Icon="picture_as_pdf"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Click="@GenerarEstadoSolicitudes"
+                                  Disabled="@cargandoReporte" />
 
-                        <RadzenText Text="8"
-                                    TextStyle="TextStyle.H4"
-                                    Style="
-                        color: #2e7d32;
-                        font-weight: 700;
-                        margin-top: 5px;" />
-
-                    </RadzenColumn>
-
-                    <RadzenColumn Size="4"
-                                  Style="text-align:right;">
-
-                        <RadzenIcon Icon="check_circle"
-                                    Style="
-                        font-size: 38px;
-                        color: #2e7d32;" />
-
-                    </RadzenColumn>
-
-                </RadzenRow>
+                </div>
 
             </RadzenCard>
 
         </RadzenColumn>
 
 
-        <!-- RECHAZADAS -->
+        <!-- SOLICITUDES POR CONVOCATORIA -->
+        <RadzenColumn Size="12" SizeMD="4">
 
-        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Style="height: 100%;">
 
-            <RadzenCard Style="
-                border-radius: 12px;
-                border: 1px solid #e5e7eb;">
+                <RadzenText Text="Solicitudes por convocatoria"
+                            TextStyle="TextStyle.H6"
+                            Style="font-weight: bold;" />
 
-                <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenText Text="Muestra la cantidad de solicitudes recibidas por cada convocatoria."
+                            Style="margin-top: 8px;" />
 
-                    <RadzenColumn Size="8">
+                <div style="margin-top: 20px;">
 
-                        <RadzenText Text="Rechazadas"
-                                    Style="
-                        color: #6b7280;
-                        font-size: 13px;" />
+                    <RadzenButton Text="Generar"
+                                  Icon="picture_as_pdf"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Click="@GenerarSolicitudesPorConvocatoria"
+                                  Disabled="@cargandoReporte" />
 
-                        <RadzenText Text="5"
-                                    TextStyle="TextStyle.H4"
-                                    Style="
-                        color: #c62828;
-                        font-weight: 700;
-                        margin-top: 5px;" />
-
-                    </RadzenColumn>
-
-                    <RadzenColumn Size="4"
-                                  Style="text-align:right;">
-
-                        <RadzenIcon Icon="cancel"
-                                    Style="
-                        font-size: 38px;
-                        color: #c62828;" />
-
-                    </RadzenColumn>
-
-                </RadzenRow>
+                </div>
 
             </RadzenCard>
 
         </RadzenColumn>
 
 
-        <!-- BECAS -->
+        <!-- REPORTE DE EVALUACIONES -->
+        <RadzenColumn Size="12" SizeMD="4">
 
-        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Style="height: 100%;">
 
-            <RadzenCard Style="
-                border-radius: 12px;
-                border: 1px solid #e5e7eb;">
+                <RadzenText Text="Reporte de evaluaciones"
+                            TextStyle="TextStyle.H6"
+                            Style="font-weight: bold;" />
 
-                <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenText Text="Consulta las evaluaciones realizadas a las solicitudes."
+                            Style="margin-top: 8px;" />
 
-                    <RadzenColumn Size="8">
+                <div style="margin-top: 20px;">
 
-                        <RadzenText Text="Becas otorgadas"
-                                    Style="
-                        color: #6b7280;
-                        font-size: 13px;" />
+                    <RadzenButton Text="Generar"
+                                  Icon="picture_as_pdf"
+                                  ButtonStyle="ButtonStyle.Primary" />
 
-                        <RadzenText Text="7"
-                                    TextStyle="TextStyle.H4"
-                                    Style="
-                        color: #7b1fa2;
-                        font-weight: 700;
-                        margin-top: 5px;" />
+                </div>
 
-                    </RadzenColumn>
+            </RadzenCard>
 
-                    <RadzenColumn Size="4"
-                                  Style="text-align:right;">
+        </RadzenColumn>
 
-                        <RadzenIcon Icon="school"
-                                    Style="
-                        font-size: 38px;
-                        color: #7b1fa2;" />
 
-                    </RadzenColumn>
+        <!-- REPORTE DE DECISIONES -->
+        <RadzenColumn Size="12" SizeMD="4">
 
-                </RadzenRow>
+            <RadzenCard Style="height: 100%;">
+
+                <RadzenText Text="Reporte de decisiones"
+                            TextStyle="TextStyle.H6"
+                            Style="font-weight: bold;" />
+
+                <RadzenText Text="Muestra las decisiones tomadas sobre las solicitudes."
+                            Style="margin-top: 8px;" />
+
+                <div style="margin-top: 20px;">
+
+                    <RadzenButton Text="Generar"
+                                  Icon="picture_as_pdf"
+                                  ButtonStyle="ButtonStyle.Primary" />
+
+                </div>
+
+            </RadzenCard>
+
+        </RadzenColumn>
+
+
+        <!-- REPORTE DE BECAS OTORGADAS -->
+        <RadzenColumn Size="12" SizeMD="4">
+
+            <RadzenCard Style="height: 100%;">
+
+                <RadzenText Text="Reporte de becas otorgadas"
+                            TextStyle="TextStyle.H6"
+                            Style="font-weight: bold;" />
+
+                <RadzenText Text="Consulta las becas que han sido otorgadas."
+                            Style="margin-top: 8px;" />
+
+                <div style="margin-top: 20px;">
+
+                    
+                    <RadzenButton Text="Generar"
+                                  Icon="picture_as_pdf"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Click="@GenerarBecasOtorgadas"
+                                  Disabled="@cargandoReporte" />
+
+
+                </div>
 
             </RadzenCard>
 
@@ -232,520 +350,105 @@
 
     </RadzenRow>
 
+</RadzenCard>
 
-    <!-- ====================================================== -->
-    <!-- FILTROS                                                -->
-    <!-- ====================================================== -->
 
-    <RadzenCard Style="
-        border-radius: 12px;
-        background-color: #f7fbff;
-        border: 1px solid #e3edf7;">
+<!-- RESULTADO DEL REPORTE 1 -->
+@if (solicitudesPorConvocatoria.Any())
+{
+    <RadzenCard class="w-100 mb-4">
 
-        <RadzenText Text="Filtros del reporte"
-                    TextStyle="TextStyle.H6"
-                    Style="
-        color: #1565c0;
-        font-weight: 700;
-        margin-bottom: 5px;" />
+        <RadzenText Text="Solicitudes por convocatoria"
+                    TextStyle="TextStyle.H5"
+                    class="mb-4" />
 
-        <RadzenText Text="Seleccione los criterios para generar el reporte."
-                    Style="
-        color: #6b7280;
-        font-size: 13px;
-        margin-bottom: 20px;" />
 
-        <RadzenRow AlignItems="AlignItems.End">
-
-            <!-- FECHA INICIO -->
-
-            <RadzenColumn Size="12" SizeMD="3">
-
-                <RadzenFormField Text="Fecha inicio"
-                                 Variant="Variant.Outlined"
-                                 Style="width:100%;">
-
-                    <RadzenDatePicker TValue="DateTime?"
-                                      @bind-Value="fechaInicio"
-                                      Placeholder="Seleccione fecha"
-                                      Style="width:100%;" />
-
-                </RadzenFormField>
-
-            </RadzenColumn>
-
-
-            <!-- FECHA FIN -->
-
-            <RadzenColumn Size="12" SizeMD="3">
-
-                <RadzenFormField Text="Fecha fin"
-                                 Variant="Variant.Outlined"
-                                 Style="width:100%;">
-
-                    <RadzenDatePicker TValue="DateTime?"
-                                      @bind-Value="fechaFin"
-                                      Placeholder="Seleccione fecha"
-                                      Style="width:100%;" />
-
-                </RadzenFormField>
-
-            </RadzenColumn>
-
-
-            <!-- CONVOCATORIA -->
-
-            <RadzenColumn Size="12" SizeMD="3">
-
-                <RadzenFormField Text="Convocatoria"
-                                 Variant="Variant.Outlined"
-                                 Style="width:100%;">
-
-                    <RadzenDropDown TValue="int?"
-                                    @bind-Value="convocatoriaSeleccionada"
-                                    Data="@convocatorias"
-                                    TextProperty="Nombre"
-                                    ValueProperty="IdConvocatoria"
-                                    Placeholder="Todas"
-                                    AllowClear="true"
-                                    Style="width:100%;" />
-
-                </RadzenFormField>
-
-            </RadzenColumn>
-
-
-            <!-- ESTADO -->
-
-            <RadzenColumn Size="12" SizeMD="3">
-
-                <RadzenFormField Text="Estado"
-                                 Variant="Variant.Outlined"
-                                 Style="width:100%;">
-
-                    <RadzenDropDown TValue="string"
-                                    @bind-Value="estadoSeleccionado"
-                                    Data="@estados"
-                                    Placeholder="Todos"
-                                    AllowClear="true"
-                                    Style="width:100%;" />
-
-                </RadzenFormField>
-
-            </RadzenColumn>
-
-        </RadzenRow>
-
-    </RadzenCard>
-
-
-    <!-- ====================================================== -->
-    <!-- TIPOS DE REPORTES                                      -->
-    <!-- ====================================================== -->
-
-    <RadzenCard Style="
-        border-radius: 12px;
-        border: 1px solid #e5e7eb;">
-
-        <RadzenText Text="Reportes disponibles"
-                    TextStyle="TextStyle.H6"
-                    Style="
-        color:#1565c0;
-        font-weight:700;
-        margin-bottom:5px;" />
-
-        <RadzenText Text="Seleccione el reporte que desea generar."
-                    Style="
-        color:#6b7280;
-        font-size:13px;
-        margin-bottom:20px;" />
-
-
-        <RadzenRow>
-
-            <!-- REPORTE DE SOLICITUDES -->
-
-            <RadzenColumn Size="12" SizeMD="6">
-
-                <RadzenCard Style="
-                    border:1px solid #e5e7eb;
-                    border-radius:12px;
-                    height:100%;">
-
-                    <RadzenRow AlignItems="AlignItems.Center">
-
-                        <RadzenColumn Size="2">
-
-                            <RadzenIcon Icon="description"
-                                        Style="
-                            font-size:42px;
-                            color:#1565c0;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="7">
-
-                            <RadzenText Text="Reporte de solicitudes"
-                                        TextStyle="TextStyle.H6"
-                                        Style="font-weight:700;" />
-
-                            <RadzenText Text="Listado general de solicitudes registradas."
-                                        Style="
-                            color:#6b7280;
-                            font-size:13px;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="3"
-                                      Style="text-align:right;">
-
-                            <RadzenButton Text="Generar"
-                                          Icon="picture_as_pdf"
-                                          ButtonStyle="ButtonStyle.Primary" />
-
-                        </RadzenColumn>
-
-                    </RadzenRow>
-
-                </RadzenCard>
-
-            </RadzenColumn>
-
-
-            <!-- REPORTE POR ESTADO -->
-
-            <RadzenColumn Size="12" SizeMD="6">
-
-                <RadzenCard Style="
-                    border:1px solid #e5e7eb;
-                    border-radius:12px;
-                    height:100%;">
-
-                    <RadzenRow AlignItems="AlignItems.Center">
-
-                        <RadzenColumn Size="2">
-
-                            <RadzenIcon Icon="filter_alt"
-                                        Style="
-                            font-size:42px;
-                            color:#1565c0;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="7">
-
-                            <RadzenText Text="Solicitudes por estado"
-                                        TextStyle="TextStyle.H6"
-                                        Style="font-weight:700;" />
-
-                            <RadzenText Text="Resumen de solicitudes según su estado."
-                                        Style="
-                            color:#6b7280;
-                            font-size:13px;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="3"
-                                      Style="text-align:right;">
-
-                            <RadzenButton Text="Generar"
-                                          Icon="picture_as_pdf"
-                                          ButtonStyle="ButtonStyle.Primary" />
-
-                        </RadzenColumn>
-
-                    </RadzenRow>
-
-                </RadzenCard>
-
-            </RadzenColumn>
-
-
-            <!-- REPORTE POR CONVOCATORIA -->
-
-            <RadzenColumn Size="12" SizeMD="6">
-
-                <RadzenCard Style="
-                    border:1px solid #e5e7eb;
-                    border-radius:12px;
-                    height:100%;">
-
-                    <RadzenRow AlignItems="AlignItems.Center">
-
-                        <RadzenColumn Size="2">
-
-                            <RadzenIcon Icon="campaign"
-                                        Style="
-                            font-size:42px;
-                            color:#1565c0;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="7">
-
-                            <RadzenText Text="Solicitudes por convocatoria"
-                                        TextStyle="TextStyle.H6"
-                                        Style="font-weight:700;" />
-
-                            <RadzenText Text="Cantidad de solicitudes por convocatoria."
-                                        Style="
-                            color:#6b7280;
-                            font-size:13px;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="3"
-                                      Style="text-align:right;">
-
-                            <RadzenButton Text="Generar"
-                                          Icon="picture_as_pdf"
-                                          ButtonStyle="ButtonStyle.Primary" />
-
-                        </RadzenColumn>
-
-                    </RadzenRow>
-
-                </RadzenCard>
-
-            </RadzenColumn>
-
-
-            <!-- REPORTE DE EVALUACIONES -->
-
-            <RadzenColumn Size="12" SizeMD="6">
-
-                <RadzenCard Style="
-                    border:1px solid #e5e7eb;
-                    border-radius:12px;
-                    height:100%;">
-
-                    <RadzenRow AlignItems="AlignItems.Center">
-
-                        <RadzenColumn Size="2">
-
-                            <RadzenIcon Icon="fact_check"
-                                        Style="
-                            font-size:42px;
-                            color:#1565c0;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="7">
-
-                            <RadzenText Text="Reporte de evaluaciones"
-                                        TextStyle="TextStyle.H6"
-                                        Style="font-weight:700;" />
-
-                            <RadzenText Text="Evaluaciones realizadas a las solicitudes."
-                                        Style="
-                            color:#6b7280;
-                            font-size:13px;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="3"
-                                      Style="text-align:right;">
-
-                            <RadzenButton Text="Generar"
-                                          Icon="picture_as_pdf"
-                                          ButtonStyle="ButtonStyle.Primary" />
-
-                        </RadzenColumn>
-
-                    </RadzenRow>
-
-                </RadzenCard>
-
-            </RadzenColumn>
-
-
-            <!-- REPORTE DE DECISIONES -->
-
-            <RadzenColumn Size="12" SizeMD="6">
-
-                <RadzenCard Style="
-                    border:1px solid #e5e7eb;
-                    border-radius:12px;
-                    height:100%;">
-
-                    <RadzenRow AlignItems="AlignItems.Center">
-
-                        <RadzenColumn Size="2">
-
-                            <RadzenIcon Icon="gavel"
-                                        Style="
-                            font-size:42px;
-                            color:#1565c0;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="7">
-
-                            <RadzenText Text="Reporte de decisiones"
-                                        TextStyle="TextStyle.H6"
-                                        Style="font-weight:700;" />
-
-                            <RadzenText Text="Decisiones tomadas por el comité."
-                                        Style="
-                            color:#6b7280;
-                            font-size:13px;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="3"
-                                      Style="text-align:right;">
-
-                            <RadzenButton Text="Generar"
-                                          Icon="picture_as_pdf"
-                                          ButtonStyle="ButtonStyle.Primary" />
-
-                        </RadzenColumn>
-
-                    </RadzenRow>
-
-                </RadzenCard>
-
-            </RadzenColumn>
-
-
-            <!-- REPORTE DE BECAS -->
-
-            <RadzenColumn Size="12" SizeMD="6">
-
-                <RadzenCard Style="
-                    border:1px solid #e5e7eb;
-                    border-radius:12px;
-                    height:100%;">
-
-                    <RadzenRow AlignItems="AlignItems.Center">
-
-                        <RadzenColumn Size="2">
-
-                            <RadzenIcon Icon="school"
-                                        Style="
-                            font-size:42px;
-                            color:#1565c0;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="7">
-
-                            <RadzenText Text="Reporte de becas otorgadas"
-                                        TextStyle="TextStyle.H6"
-                                        Style="font-weight:700;" />
-
-                            <RadzenText Text="Listado de estudiantes beneficiados."
-                                        Style="
-                            color:#6b7280;
-                            font-size:13px;" />
-
-                        </RadzenColumn>
-
-                        <RadzenColumn Size="3"
-                                      Style="text-align:right;">
-
-                            <RadzenButton Text="Generar"
-                                          Icon="picture_as_pdf"
-                                          ButtonStyle="ButtonStyle.Primary" />
-
-                        </RadzenColumn>
-
-                    </RadzenRow>
-
-                </RadzenCard>
-
-            </RadzenColumn>
-
-        </RadzenRow>
-
-    </RadzenCard>
-
-
-    <!-- ====================================================== -->
-    <!-- ÚLTIMOS REPORTES                                       -->
-    <!-- ====================================================== -->
-
-    <RadzenCard Style="
-        border-radius:12px;
-        border:1px solid #e5e7eb;">
-
-        <RadzenRow AlignItems="AlignItems.Center"
-                   Style="margin-bottom:15px;">
-
-            <RadzenColumn Size="8">
-
-                <RadzenText Text="Reportes generados recientemente"
-                            TextStyle="TextStyle.H6"
-                            Style="
-                color:#1565c0;
-                font-weight:700;" />
-
-            </RadzenColumn>
-
-            <RadzenColumn Size="4"
-                          Style="text-align:right;">
-
-                <RadzenButton Text="Actualizar"
-                              Icon="refresh"
-                              ButtonStyle="ButtonStyle.Light" />
-
-            </RadzenColumn>
-
-        </RadzenRow>
-
-
-        <RadzenDataGrid TItem="ReporteDto"
-                        Data="@reportes"
+        <RadzenDataGrid Data="@solicitudesPorConvocatoria"
+                        TItem="SolicitudesPorConvocatoriaDto"
                         AllowPaging="true"
-                        PageSize="5"
+                        PageSize="10"
                         AllowSorting="true"
                         Responsive="true">
 
             <Columns>
 
-                <RadzenDataGridColumn TItem="ReporteDto"
-                                      Property="Nombre"
-                                      Title="Reporte" />
+                <!-- CONVOCATORIA -->
+                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
+                                      Property="Convocatoria"
+                                      Title="Convocatoria" />
 
-                <RadzenDataGridColumn TItem="ReporteDto"
-                                      Property="Fecha"
-                                      Title="Fecha"
-                                      Width="150px">
+                <!-- TOTAL -->
+                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
+                                      Property="TotalSolicitudes"
+                                      Title="Total solicitudes"
+                                      TextAlign="TextAlign.Center" />
 
-                    <Template Context="reporte">
+                <!-- EN EVALUACIÓN -->
+                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
+                                      Property="EnEvaluacion"
+                                      Title="En evaluación"
+                                      TextAlign="TextAlign.Center" />
 
-                        @reporte.Fecha.ToString("dd/MM/yyyy HH:mm")
+                <!-- APROBADAS -->
+                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
+                                      Property="Aprobadas"
+                                      Title="Aprobadas"
+                                      TextAlign="TextAlign.Center" />
 
-                    </Template>
-
-                </RadzenDataGridColumn>
-
-                <RadzenDataGridColumn TItem="ReporteDto"
-                                      Property="Usuario"
-                                      Title="Generado por" />
-
-                <RadzenDataGridColumn TItem="ReporteDto"
-                                      Title="Acciones"
-                                      Width="130px">
-
-                    <Template Context="reporte">
-
-                        <RadzenButton Icon="download"
-                                      Text="Descargar"
-                                      Size="ButtonSize.Small"
-                                      ButtonStyle="ButtonStyle.Light" />
-
-                    </Template>
-
-                </RadzenDataGridColumn>
+                <!-- RECHAZADAS -->
+                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
+                                      Property="Rechazadas"
+                                      Title="Rechazadas"
+                                      TextAlign="TextAlign.Center" />
 
             </Columns>
 
         </RadzenDataGrid>
 
     </RadzenCard>
+}
 
-</RadzenStack>
+
+<!-- REPORTES GENERADOS RECIENTEMENTE -->
+<RadzenCard class="w-100 mb-4">
+
+    <RadzenText Text="Reportes generados recientemente"
+                TextStyle="TextStyle.H5"
+                class="mb-4" />
+
+    <RadzenDataGrid Data="@reportesGenerados"
+                    TItem="ReporteDto"
+                    AllowPaging="true"
+                    PageSize="10"
+                    Responsive="true">
+
+        <Columns>
+
+            <RadzenDataGridColumn TItem="ReporteDto"
+                                  Property="Nombre"
+                                  Title="Reporte" />
+
+            <RadzenDataGridColumn TItem="ReporteDto"
+                                  Property="Fecha"
+                                  Title="Fecha">
+
+                <Template Context="reporte">
+
+                    @reporte.Fecha.ToString("dd/MM/yyyy HH:mm")
+
+                </Template>
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="ReporteDto"
+                                  Property="Usuario"
+                                  Title="Usuario" />
+
+        </Columns>
+
+    </RadzenDataGrid>
+
+</RadzenCard>
 
 
 @code {
@@ -764,22 +467,7 @@
 
 
     // ============================================================
-    // ESTADOS
-    // ============================================================
-
-    private List<string> estados = new()
-    {
-        "Pendiente",
-        "En revisión",
-        "En evaluación",
-        "Aprobada",
-        "Rechazada"
-    };
-
-
-    // ============================================================
     // CONVOCATORIAS MOCK
-    // Corresponden a la tabla Convocatoria
     // ============================================================
 
     private List<ConvocatoriaMock> convocatorias = new()
@@ -793,48 +481,108 @@
         new ConvocatoriaMock
         {
             IdConvocatoria = 2,
-            Nombre = "Beca Internacional Posgrado"
+            Nombre = "Beca Excelencia Académica 2026"
         },
 
         new ConvocatoriaMock
         {
             IdConvocatoria = 3,
-            Nombre = "Beca Técnica Media"
+            Nombre = "Beca Talento 2026"
         }
     };
 
 
     // ============================================================
+    // ESTADOS MOCK
+    // ============================================================
+
+    private List<string> estados = new()
+    {
+        "Pendiente",
+        "En revisión",
+        "En evaluación",
+        "Aprobada",
+        "Rechazada"
+    };
+
+
+    // ============================================================
+    // REPORTE 1
+    // SOLICITUDES POR CONVOCATORIA
+    // ============================================================
+
+    private List<SolicitudesPorConvocatoriaDto>
+        solicitudesPorConvocatoria = new();
+
+    private bool cargandoReporte = false;
+
+
+    // ============================================================
+    // OBTENER REPORTE
+    // ============================================================
+
+    private void GenerarSolicitudesPorConvocatoria()
+    {
+        var url =
+            "https://localhost:7088/api/Reportes/solicitudes-por-convocatoria/pdf";
+
+        Navigation.NavigateTo(url, forceLoad: true);
+    }
+    
+    // ============================================================
+    // REPORTE 2
+    // ESTADO DE SOLICITUDES
+    // ============================================================
+
+    private void GenerarEstadoSolicitudes()
+    {
+        var url =
+            "https://localhost:7088/api/Reportes/estado-solicitudes/pdf";
+
+        Navigation.NavigateTo(url, forceLoad: true);
+    }
+
+    //REPORTE 3
+
+    private void GenerarBecasOtorgadas()
+    {
+        var url =
+            "https://localhost:7088/api/Reportes/becas-otorgadas/pdf";
+
+        Navigation.NavigateTo(url, forceLoad: true);
+    }
+
+    // ============================================================
     // REPORTES GENERADOS
     // ============================================================
 
-    private List<ReporteDto> reportes = new()
+    private List<ReporteDto> reportesGenerados = new()
     {
         new ReporteDto
         {
             Nombre = "Reporte de solicitudes",
-            Fecha = new DateTime(2026, 9, 26, 10, 30, 0),
+            Fecha = DateTime.Now.AddMinutes(-30),
             Usuario = "Administrador"
         },
 
         new ReporteDto
         {
-            Nombre = "Reporte de becas otorgadas",
-            Fecha = new DateTime(2026, 9, 25, 15, 20, 0),
+            Nombre = "Solicitudes por estado",
+            Fecha = DateTime.Now.AddHours(-2),
             Usuario = "Administrador"
         },
 
         new ReporteDto
         {
             Nombre = "Reporte de evaluaciones",
-            Fecha = new DateTime(2026, 9, 24, 9, 45, 0),
-            Usuario = "Comité de Becas"
+            Fecha = DateTime.Now.AddDays(-1),
+            Usuario = "Administrador"
         }
     };
 
 
     // ============================================================
-    // MOCK CONVOCATORIA
+    // CLASE CONVOCATORIA MOCK
     // ============================================================
 
     public class ConvocatoriaMock
@@ -846,7 +594,7 @@
 
 
     // ============================================================
-    // REPORTE
+    // CLASE REPORTE
     // ============================================================
 
     public class ReporteDto
@@ -857,5 +605,4 @@
 
         public string Usuario { get; set; } = "";
     }
-
 }

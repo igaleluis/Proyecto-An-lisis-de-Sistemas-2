@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SistemaBecas.Api.Data;
+using SistemaBecas.Api.Entities;
 using SistemaBecas.Api.Repositories.DocumentacionRepository;
 using SistemaBecas.Library.Dtos;
 
@@ -33,33 +34,70 @@ namespace SistemaBecas.Api.Repositories.Documentacion
         public async Task<List<DocumentoSolicitudDto>>
             ObtenerDocumentosSolicitud(int idSolicitud)
         {
-            return await _context.Solicituddocumentos
-                .Where(sd => sd.Idsolicitud == idSolicitud)
-                .Include(sd => sd.IddocumentoNavigation)
-                .OrderBy(sd => sd.Iddocumento)
-                .Select(sd => new DocumentoSolicitudDto
+            return await _context.Documentos
+                .Where(d => d.Estado == "Activo")
+                .Select(d => new DocumentoSolicitudDto
                 {
-                    IdSolicitudDocumento = sd.Idsolicituddocumento,
-                    IdSolicitud = sd.Idsolicitud,
-                    IdDocumento = sd.Iddocumento,
+                    IdSolicitudDocumento = d.Solicituddocumentos
+                        .Where(sd => sd.Idsolicitud == idSolicitud)
+                        .Select(sd => sd.Idsolicituddocumento)
+                        .FirstOrDefault(),
 
-                    Nombre = sd.IddocumentoNavigation.Nombre,
+                    IdSolicitud = idSolicitud,
 
-                    Descripcion =
-                        sd.IddocumentoNavigation.Descripcion,
+                    IdDocumento = d.Iddocumento,
 
-                    Obligatorio =
-                        sd.IddocumentoNavigation.Obligatorio,
+                    Nombre = d.Nombre,
 
-                    RutaArchivo = sd.Rutaarchivo,
+                    Descripcion = d.Descripcion,
 
-                    FechaCarga = sd.Fechacarga,
+                    Obligatorio = d.Obligatorio,
 
-                    Estado = sd.Estado,
+                    RutaArchivo = d.Solicituddocumentos
+                        .Where(sd => sd.Idsolicitud == idSolicitud)
+                        .Select(sd => sd.Rutaarchivo)
+                        .FirstOrDefault(),
 
-                    Observaciones = sd.Observaciones
+                    FechaCarga = d.Solicituddocumentos
+                        .Where(sd => sd.Idsolicitud == idSolicitud)
+                        .Select(sd => sd.Fechacarga)
+                        .FirstOrDefault(),
+
+                    Estado = d.Solicituddocumentos
+                        .Where(sd => sd.Idsolicitud == idSolicitud)
+                        .Select(sd => sd.Estado)
+                        .FirstOrDefault() ?? "Pendiente",
+
+                    Observaciones = d.Solicituddocumentos
+                        .Where(sd => sd.Idsolicitud == idSolicitud)
+                        .Select(sd => sd.Observaciones)
+                        .FirstOrDefault()
                 })
+                .OrderBy(d => d.IdDocumento)
                 .ToListAsync();
         }
+        public async Task<int> GuardarDocumentoSolicitud(
+                int idSolicitud,
+                int idDocumento,
+                string rutaArchivo,
+                string? observaciones)
+        {
+            var documento = new Solicituddocumento
+            {
+                Idsolicitud = idSolicitud,
+                Iddocumento = idDocumento,
+                Rutaarchivo = rutaArchivo,
+                Fechacarga = DateTime.Now,
+                Estado = "Cargado",
+                Observaciones = observaciones
+            };
+
+            _context.Solicituddocumentos.Add(documento);
+
+            await _context.SaveChangesAsync();
+
+            return documento.Idsolicituddocumento;
+        }
     }
+
 }

@@ -9,5 +9,10 @@ namespace SistemaBecas.Api.Repositories.DocumentacionRepository
 
         Task<List<DocumentoSolicitudDto>>
             ObtenerDocumentosSolicitud(int idSolicitud);
+        Task<int> GuardarDocumentoSolicitud(
+            int idSolicitud,
+            int idDocumento,
+            string rutaArchivo,
+            string? observaciones);
     }
 }
