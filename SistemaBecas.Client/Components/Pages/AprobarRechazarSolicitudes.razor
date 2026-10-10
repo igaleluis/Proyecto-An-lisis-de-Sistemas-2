@@ -1,10 +1,14 @@
-﻿@page "/aprobar-rechazar-solicitudes"
+@page "/aprobar-rechazar-solicitudes"
 
 
 @using Radzen
 @using Radzen.Blazor
 @using Components.Modals
+@using SistemaBecas.Client.Services
+@using SistemaBecas.Library.Dtos
 @inject DialogService DialogService
+@inject GestionApiClient Api
+@inject NotificationService Notifications
 
 <PageTitle>Administración de Solicitudes</PageTitle>
 
@@ -46,7 +50,8 @@
 
                 <RadzenButton Text="Actualizar"
                               Icon="refresh"
-                              ButtonStyle="ButtonStyle.Light" />
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="@CargarSolicitudesAsync" />
 
             </RadzenColumn>
 
@@ -78,7 +83,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text="8"
+                        <RadzenText Text="@solicitudes.Count(s => s.Estado == "Pendiente").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #1565c0;
@@ -121,7 +126,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text="4"
+                        <RadzenText Text="@solicitudes.Count(s => s.Estado == "En revisión").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #64b5f6;
@@ -164,7 +169,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text="6"
+                        <RadzenText Text="@solicitudes.Count(s => s.Estado == "Aprobada").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #2e7d32;
@@ -207,7 +212,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text="2"
+                        <RadzenText Text="@solicitudes.Count(s => s.Estado == "Rechazada").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #c62828;
@@ -267,6 +272,10 @@
                                  Style="width: 100%;">
 
                     <RadzenDropDown TValue="int?"
+                                    @bind-Value="convocatoriaSeleccionada"
+                                    Data="@convocatorias"
+                                    TextProperty="Nombre"
+                                    ValueProperty="IdConvocatoria"
                                     Placeholder="Todas"
                                     AllowClear="true"
                                     Style="width: 100%;" />
@@ -284,9 +293,11 @@
                                  Style="width: 100%;">
 
                     <RadzenDropDown TValue="string"
+                                    @bind-Value="estadoSeleccionado"
                                     Data="@(new[] {
                                                         "Pendiente",
                                                         "En revisión",
+                                                        "En evaluación",
                                                         "Aprobada",
                                                         "Rechazada"
                                                     })"
@@ -307,6 +318,7 @@
                                  Style="width: 100%;">
 
                     <RadzenTextBox TValue="string"
+                                   @bind-Value="busqueda"
                                    Placeholder="Nombre, DPI o correo"
                                    Style="width: 100%;" />
 
@@ -322,6 +334,7 @@
                 <RadzenButton Text="Buscar"
                               Icon="search"
                               ButtonStyle="ButtonStyle.Primary"
+                              Click="@CargarSolicitudesAsync"
                               Style="width: 100%;" />
 
             </RadzenColumn>
@@ -354,8 +367,16 @@
         margin-bottom: 20px;" />
 
 
-        <RadzenDataGrid TItem="SolicitudDto"
-                        Data="@solicitudes"
+        @if (!string.IsNullOrWhiteSpace(errorCarga))
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" Text="@errorCarga" />
+        }
+        @if (cargando)
+        {
+            <RadzenProgressBar Mode="ProgressBarMode.Indeterminate" />
+        }
+        <RadzenDataGrid TItem="SolicitudGestionDto"
+                        Data="@SolicitudesFiltradas"
                         AllowPaging="true"
                         PageSize="10"
                         AllowSorting="true"
@@ -365,28 +386,28 @@
 
             <Columns>
 
-                <RadzenDataGridColumn TItem="SolicitudDto"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Property="IdSolicitud"
                                       Title="Solicitud"
                                       Width="100px">
                 </RadzenDataGridColumn>
 
 
-                <RadzenDataGridColumn TItem="SolicitudDto"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Property="Estudiante"
                                       Title="Estudiante"
                                       Width="220px">
                 </RadzenDataGridColumn>
 
 
-                <RadzenDataGridColumn TItem="SolicitudDto"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Property="Convocatoria"
                                       Title="Convocatoria"
                                       Width="250px">
                 </RadzenDataGridColumn>
 
 
-                <RadzenDataGridColumn TItem="SolicitudDto"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Property="FechaSolicitud"
                                       Title="Fecha"
                                       Width="130px">
@@ -400,7 +421,7 @@
                 </RadzenDataGridColumn>
 
 
-                <RadzenDataGridColumn TItem="SolicitudDto"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Property="Estado"
                                       Title="Estado"
                                       Width="140px">
@@ -422,6 +443,11 @@
                             <RadzenBadge Text="Aprobada"
                                          BadgeStyle="BadgeStyle.Success" />
                         }
+                        else if (solicitud.Estado == "En evaluación")
+                        {
+                            <RadzenBadge Text="En evaluación"
+                                         BadgeStyle="BadgeStyle.Info" />
+                        }
                         else
                         {
                             <RadzenBadge Text="Rechazada"
@@ -433,7 +459,7 @@
                 </RadzenDataGridColumn>
 
 
-                <RadzenDataGridColumn TItem="SolicitudDto"
+                <RadzenDataGridColumn TItem="SolicitudGestionDto"
                                       Title="Acciones"
                                       Width="150px">
 
@@ -459,75 +485,46 @@
 
 
 @code {
+    private List<SolicitudGestionDto> solicitudes = new();
+    private List<ConvocatoriaDto> convocatorias = new();
+    private int? convocatoriaSeleccionada;
+    private string? estadoSeleccionado;
+    private string busqueda = string.Empty;
+    private string? errorCarga;
+    private bool cargando;
+    private IEnumerable<SolicitudGestionDto> SolicitudesFiltradas => solicitudes.Where(s =>
+        (string.IsNullOrWhiteSpace(estadoSeleccionado) || s.Estado.Equals(estadoSeleccionado, StringComparison.OrdinalIgnoreCase)) &&
+        (!convocatoriaSeleccionada.HasValue || s.IdConvocatoria == convocatoriaSeleccionada.Value) &&
+        (string.IsNullOrWhiteSpace(busqueda) || s.Estudiante.Contains(busqueda, StringComparison.OrdinalIgnoreCase) || s.Dpi.Contains(busqueda, StringComparison.OrdinalIgnoreCase) || s.Correo.Contains(busqueda, StringComparison.OrdinalIgnoreCase)));
 
-    public class SolicitudDto
+    protected override Task OnInitializedAsync() => CargarSolicitudesAsync();
+
+    private async Task CargarSolicitudesAsync()
     {
-        public int IdSolicitud { get; set; }
-
-        public string Estudiante { get; set; } = "";
-
-        public string Convocatoria { get; set; } = "";
-
-        public DateTime FechaSolicitud { get; set; }
-
-        public string Estado { get; set; } = "";
+        cargando = true;
+        errorCarga = null;
+        try
+        {
+            solicitudes = await Api.ObtenerSolicitudesAsync();
+            convocatorias = await Api.ObtenerConvocatoriasAsync();
+        }
+        catch (Exception ex)
+        {
+            errorCarga = $"No se pudieron cargar las solicitudes: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
     }
 
-    private List<SolicitudDto> solicitudes = new()
-    {
-        new SolicitudDto
-        {
-            IdSolicitud = 1,
-            Estudiante = "Juan Pérez López",
-            Convocatoria = "Beca Nacional Universitaria 2026",
-            FechaSolicitud = new DateTime(2026, 9, 10),
-            Estado = "Pendiente"
-        },
-
-        new SolicitudDto
-        {
-            IdSolicitud = 2,
-            Estudiante = "María García López",
-            Convocatoria = "Beca Nacional Universitaria 2026",
-            FechaSolicitud = new DateTime(2026, 9, 12),
-            Estado = "En revisión"
-        },
-
-        new SolicitudDto
-        {
-            IdSolicitud = 3,
-            Estudiante = "Carlos Hernández",
-            Convocatoria = "Beca Internacional Posgrado",
-            FechaSolicitud = new DateTime(2026, 9, 14),
-            Estado = "Aprobada"
-        },
-
-        new SolicitudDto
-        {
-            IdSolicitud = 4,
-            Estudiante = "Ana Martínez",
-            Convocatoria = "Beca Técnica Media",
-            FechaSolicitud = new DateTime(2026, 9, 15),
-            Estado = "Rechazada"
-        }
-    };
-
-    private async Task VerSolicitud(SolicitudDto solicitud)
+    private async Task VerSolicitud(SolicitudGestionDto solicitud)
     {
         var resultado = await DialogService.OpenAsync<DetalleSolicitud>(
             $"Solicitud #{solicitud.IdSolicitud}",
-            new Dictionary<string, object>
-            {
-            { "Solicitud", solicitud }
-            },
-            new DialogOptions
-            {
-                Width = "900px",
-                Height = "800px",
-                Resizable = true,
-                Draggable = true
-            }
-        );
+            new Dictionary<string, object?> { { "Solicitud", solicitud } },
+            new DialogOptions { Width = "900px", Height = "800px", Resizable = true, Draggable = true });
+        if (resultado == true)
+            await CargarSolicitudesAsync();
     }
-
 }

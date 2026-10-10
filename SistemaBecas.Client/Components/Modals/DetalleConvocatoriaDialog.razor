@@ -2,6 +2,10 @@
 @using Radzen.Blazor
 
 @inject DialogService DialogService
+@using SistemaBecas.Client.Services
+@using SistemaBecas.Library.Dtos
+@inject GestionApiClient Api
+@inject NotificationService Notifications
 
 <RadzenStack Gap="0.7rem">
 
@@ -15,40 +19,40 @@
     <RadzenText Text="Nombre"
                 Style="font-size:12px;color:#6b7280;" />
 
-    <RadzenText Text="Beca Nacional Universitaria 2026"
+    <RadzenText Text="@convocatoria?.Nombre"
                 Style="font-weight:600;" />
 
 
     <RadzenText Text="Descripción"
                 Style="font-size:12px;color:#6b7280;" />
 
-    <RadzenText Text="Convocatoria dirigida a estudiantes universitarios que deseen optar a una beca para continuar sus estudios durante el año 2026."
+    <RadzenText Text="@convocatoria?.Descripcion"
                 Style="color:#374151;" />
 
 
     <RadzenText Text="Fecha inicio"
                 Style="font-size:12px;color:#6b7280;" />
 
-    <RadzenText Text="01/03/2026" />
+    <RadzenText Text="@(convocatoria?.FechaInicio.ToString("dd/MM/yyyy") ?? "")" />
 
 
     <RadzenText Text="Fecha fin"
                 Style="font-size:12px;color:#6b7280;" />
 
-    <RadzenText Text="15/12/2026" />
+    <RadzenText Text="@(convocatoria?.FechaFin.ToString("dd/MM/yyyy") ?? "")" />
 
 
     <RadzenText Text="Cupos"
                 Style="font-size:12px;color:#6b7280;" />
 
-    <RadzenText Text="100"
+    <RadzenText Text="@(convocatoria?.Cupos.ToString() ?? "")"
                 Style="font-weight:700;color:#1565c0;" />
 
 
     <RadzenText Text="Estado"
                 Style="font-size:12px;color:#6b7280;" />
 
-    <RadzenBadge Text="Activa"
+    <RadzenBadge Text="@convocatoria?.Estado"
                  BadgeStyle="BadgeStyle.Primary" />
 
 
@@ -69,6 +73,20 @@
 
     [Parameter]
     public int Id { get; set; }
+
+    private ConvocatoriaDto? convocatoria;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            convocatoria = await Api.ObtenerConvocatoriaAsync(Id);
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo cargar", ex.Message);
+        }
+    }
 
 
     void Cerrar()

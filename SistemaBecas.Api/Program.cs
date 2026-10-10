@@ -1,6 +1,8 @@
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using SistemaBecas.Api.Configuration;
 using SistemaBecas.Api.Data;
 using SistemaBecas.Api.Repositories;
@@ -8,13 +10,21 @@ using SistemaBecas.Api.Repositories.Documentacion;
 using SistemaBecas.Api.Repositories.DocumentacionRepository;
 using SistemaBecas.Api.Repositories.EstudianteRepository;
 using SistemaBecas.Api.Repositories.LoginRepository;
+using SistemaBecas.Api.Repositories.ComiteRepository;
+using SistemaBecas.Api.Services.LoginService;
+using SistemaBecas.Api.Services.ComiteService;
+using SistemaBecas.Api.Services.JwtService;
+using SistemaBecas.Api.Repositories.EstadoBecaRepository;
+using SistemaBecas.Api.Services.EstadoBecaService;
+using SistemaBecas.Api.Repositories.EvaluacionRepository;
+using SistemaBecas.Api.Services.EvaluacionService;
 using SistemaBecas.Api.Repositories.RecuperacionPassword;
 using SistemaBecas.Api.Repositories.RegistroRepository;
 using SistemaBecas.Api.Repositories.Reportes;
 using SistemaBecas.Api.Services.Documentacion;
 using SistemaBecas.Api.Services.Email;
-using SistemaBecas.Api.Services.JwtService;
-using SistemaBecas.Api.Services.LoginService;
+//using SistemaBecas.Api.Services.JwtService;
+//using SistemaBecas.Api.Services.LoginService;
 using SistemaBecas.Api.Services.RecuperacionPassword;
 using SistemaBecas.Api.Services.RegistroService;
 using SistemaBecas.Api.Services.Reportes;
@@ -23,6 +33,7 @@ using System.Text;
 using QuestPDF.Infrastructure;
 
 QuestPDF.Settings.License = LicenseType.Community;
+//using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Entity Framework Core
@@ -45,6 +56,9 @@ Console.WriteLine("==============================");
 //Repositorios
 builder.Services.AddScoped<DbConnectionBecas>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
+builder.Services.AddScoped<IComiteRepository, ComiteRepository>();
+builder.Services.AddScoped<IEstadoBecaRepository, EstadoBecaRepository>();
+builder.Services.AddScoped<IEvaluacionRepository, EvaluacionRepository>();
 builder.Services.AddScoped<IRegistroRepository, RegistroRepository>();
 builder.Services.AddScoped<IRecuperacionPasswordRepository, RecuperacionPasswordRepository>();
 builder.Services.AddScoped<IDocumentacionRepository, DocumentacionRepository>();
@@ -53,7 +67,10 @@ builder.Services.AddScoped<IReportesRepository, ReportesRepository>();
 
 //Servicios
 builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IComiteService, ComiteService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IEstadoBecaService, EstadoBecaService>();
+builder.Services.AddScoped<IEvaluacionService, EvaluacionService>();
 builder.Services.AddScoped<IRegistroService, RegistroService>();
 builder.Services.AddScoped<IRecuperacionPasswordService, RecuperacionPasswordService>();
 builder.Services.AddScoped<IDocumentacionService, DocumentacionService>();
