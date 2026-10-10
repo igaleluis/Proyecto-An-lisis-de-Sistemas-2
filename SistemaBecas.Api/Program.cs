@@ -1,9 +1,13 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
+using SistemaBecas.Api.Configuration;
+using SistemaBecas.Api.Data;
 using SistemaBecas.Api.Repositories;
+using SistemaBecas.Api.Repositories.Documentacion;
+using SistemaBecas.Api.Repositories.DocumentacionRepository;
 using SistemaBecas.Api.Repositories.LoginRepository;
 using SistemaBecas.Api.Repositories.ComiteRepository;
 using SistemaBecas.Api.Services.LoginService;
@@ -13,7 +17,23 @@ using SistemaBecas.Api.Repositories.EstadoBecaRepository;
 using SistemaBecas.Api.Services.EstadoBecaService;
 using SistemaBecas.Api.Repositories.EvaluacionRepository;
 using SistemaBecas.Api.Services.EvaluacionService;
+using SistemaBecas.Api.Repositories.RecuperacionPassword;
+using SistemaBecas.Api.Repositories.RegistroRepository;
+using SistemaBecas.Api.Services.Documentacion;
+using SistemaBecas.Api.Services.DocumentacionService;
+using SistemaBecas.Api.Services.Email;
+//using SistemaBecas.Api.Services.JwtService;
+//using SistemaBecas.Api.Services.LoginService;
+using SistemaBecas.Api.Services.RecuperacionPassword;
+using SistemaBecas.Api.Services.RegistroService;
+//using System.Text;
 var builder = WebApplication.CreateBuilder(args);
+
+// Entity Framework Core
+builder.Services.AddDbContext<BecasDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString(
+            "DefaultConnection")));
 //JWT
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
@@ -26,6 +46,10 @@ builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<IComiteRepository, ComiteRepository>();
 builder.Services.AddScoped<IEstadoBecaRepository, EstadoBecaRepository>();
 builder.Services.AddScoped<IEvaluacionRepository, EvaluacionRepository>();
+builder.Services.AddScoped<IRegistroRepository, RegistroRepository>();
+builder.Services.AddScoped<IRecuperacionPasswordRepository, RecuperacionPasswordRepository>();
+builder.Services.AddScoped<IDocumentacionRepository, DocumentacionRepository>();
+
 
 //Servicios
 builder.Services.AddScoped<ILoginService, LoginService>();
@@ -33,6 +57,14 @@ builder.Services.AddScoped<IComiteService, ComiteService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IEstadoBecaService, EstadoBecaService>();
 builder.Services.AddScoped<IEvaluacionService, EvaluacionService>();
+builder.Services.AddScoped<IRegistroService, RegistroService>();
+builder.Services.AddScoped<IRecuperacionPasswordService, RecuperacionPasswordService>();
+builder.Services.AddScoped<IDocumentacionService, DocumentacionService>();
+
+//Configuracion Email
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 //Swagger
@@ -68,6 +100,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+
 
 var app = builder.Build();
 
