@@ -1,5 +1,5 @@
-﻿using Npgsql;
-using SistemaBecas.Api.Repositories.Reportes;
+﻿
+using Npgsql;
 using SistemaBecas.Library.Dtos.Reportes;
 
 namespace SistemaBecas.Api.Repositories.Reportes
@@ -13,19 +13,55 @@ namespace SistemaBecas.Api.Repositories.Reportes
             _configuration = configuration;
         }
 
-        public async Task<List<SolicitudesPorConvocatoriaDto>> ObtenerSolicitudesPorConvocatoria()
+        private async Task<NpgsqlConnection> CrearConexion()
+        {
+            var connectionString =
+                _configuration.GetConnectionString("DefaultConnection");
+
+            var connection = new NpgsqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            return connection;
+        }
+
+        private static void AgregarFechas(
+            NpgsqlCommand command,
+            DateTime? fechaInicio,
+            DateTime? fechaFin)
+        {
+            command.Parameters.AddWithValue(
+                "p_fecha_inicio",
+                NpgsqlTypes.NpgsqlDbType.Date,
+                fechaInicio.HasValue
+                    ? fechaInicio.Value.Date
+                    : DBNull.Value);
+
+            command.Parameters.AddWithValue(
+                "p_fecha_fin",
+                NpgsqlTypes.NpgsqlDbType.Date,
+                fechaFin.HasValue
+                    ? fechaFin.Value.Date
+                    : DBNull.Value);
+        }
+
+        public async Task<List<SolicitudesPorConvocatoriaDto>>
+            ObtenerSolicitudesPorConvocatoria(
+                DateTime? fechaInicio,
+                DateTime? fechaFin)
         {
             var resultado = new List<SolicitudesPorConvocatoriaDto>();
 
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-            await using var connection = new NpgsqlConnection(connectionString);
-
-            await connection.OpenAsync();
+            await using var connection = await CrearConexion();
 
             await using var command = new NpgsqlCommand(
-                "SELECT * FROM sp_reporte_solicitudes_por_convocatoria();",
+                @"SELECT *
+                  FROM sp_reporte_solicitudes_por_convocatoria(
+                      @p_fecha_inicio,
+                      @p_fecha_fin
+                  );",
                 connection);
+
+            AgregarFechas(command, fechaInicio, fechaFin);
 
             await using var reader = await command.ExecuteReaderAsync();
 
@@ -55,25 +91,27 @@ namespace SistemaBecas.Api.Repositories.Reportes
 
             return resultado;
         }
+
         public async Task<List<EstadoSolicitudesDto>>
-        ObtenerEstadoSolicitudes()
+            ObtenerEstadoSolicitudes(
+                DateTime? fechaInicio,
+                DateTime? fechaFin)
         {
             var resultado = new List<EstadoSolicitudesDto>();
 
-            var connectionString =
-                _configuration.GetConnectionString("DefaultConnection");
-
-            await using var connection =
-                new NpgsqlConnection(connectionString);
-
-            await connection.OpenAsync();
+            await using var connection = await CrearConexion();
 
             await using var command = new NpgsqlCommand(
-                "SELECT * FROM sp_reporte_estado_solicitudes();",
+                @"SELECT *
+                  FROM sp_reporte_estado_solicitudes(
+                      @p_fecha_inicio,
+                      @p_fecha_fin
+                  );",
                 connection);
 
-            await using var reader =
-                await command.ExecuteReaderAsync();
+            AgregarFechas(command, fechaInicio, fechaFin);
+
+            await using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
@@ -105,24 +143,26 @@ namespace SistemaBecas.Api.Repositories.Reportes
             return resultado;
         }
 
-        public async Task<List<BecasOtorgadasDto>> ObtenerBecasOtorgadas()
+        public async Task<List<BecasOtorgadasDto>>
+            ObtenerBecasOtorgadas(
+                DateTime? fechaInicio,
+                DateTime? fechaFin)
         {
             var resultado = new List<BecasOtorgadasDto>();
 
-            var connectionString =
-                _configuration.GetConnectionString("DefaultConnection");
-
-            await using var connection =
-                new NpgsqlConnection(connectionString);
-
-            await connection.OpenAsync();
+            await using var connection = await CrearConexion();
 
             await using var command = new NpgsqlCommand(
-                "SELECT * FROM sp_reporte_becas_otorgadas();",
+                @"SELECT *
+                  FROM sp_reporte_becas_otorgadas(
+                      @p_fecha_inicio,
+                      @p_fecha_fin
+                  );",
                 connection);
 
-            await using var reader =
-                await command.ExecuteReaderAsync();
+            AgregarFechas(command, fechaInicio, fechaFin);
+
+            await using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
@@ -175,5 +215,100 @@ namespace SistemaBecas.Api.Repositories.Reportes
             return resultado;
         }
 
+        public async Task<List<ConvocatoriasReporteDto>>
+            ObtenerConvocatorias(
+                DateTime? fechaInicio,
+                DateTime? fechaFin)
+        {
+            var resultado = new List<ConvocatoriasReporteDto>();
+
+            await using var connection = await CrearConexion();
+
+            await using var command = new NpgsqlCommand(
+                @"SELECT *
+                  FROM sp_reporte_convocatorias(
+                      @p_fecha_inicio,
+                      @p_fecha_fin
+                  );",
+                connection);
+
+            AgregarFechas(command, fechaInicio, fechaFin);
+
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                resultado.Add(new ConvocatoriasReporteDto
+                {
+                    IdConvocatoria = reader.GetInt32(
+                        reader.GetOrdinal("idconvocatoria")),
+
+                    Nombre = reader.GetString(
+                        reader.GetOrdinal("nombre")),
+
+                    Descripcion = reader.IsDBNull(
+                        reader.GetOrdinal("descripcion"))
+                        ? null
+                        : reader.GetString(
+                            reader.GetOrdinal("descripcion")),
+
+                    FechaInicio = reader.GetDateTime(
+                        reader.GetOrdinal("fechainicio")),
+
+                    FechaFin = reader.GetDateTime(
+                        reader.GetOrdinal("fechafin")),
+
+                    Cupos = reader.GetInt32(
+                        reader.GetOrdinal("cupos")),
+
+                    Estado = reader.GetString(
+                        reader.GetOrdinal("estado")),
+
+                    FechaCreacion = reader.GetDateTime(
+                        reader.GetOrdinal("fechacreacion"))
+                });
+            }
+
+            return resultado;
+        }
+
+        public async Task<EstadisticasReportesDto> ObtenerEstadisticas(
+            DateTime? fechaInicio,
+            DateTime? fechaFin)
+        {
+            await using var connection = await CrearConexion();
+
+            await using var command = new NpgsqlCommand(
+                @"SELECT *
+                  FROM sp_reporte_estadisticas(
+                      @p_fecha_inicio,
+                      @p_fecha_fin
+                  );",
+                connection);
+
+            AgregarFechas(command, fechaInicio, fechaFin);
+
+            await using var reader = await command.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                return new EstadisticasReportesDto
+                {
+                    TotalSolicitudes = reader.GetInt64(
+                        reader.GetOrdinal("total_solicitudes")),
+
+                    Aprobadas = reader.GetInt64(
+                        reader.GetOrdinal("aprobadas")),
+
+                    Rechazadas = reader.GetInt64(
+                        reader.GetOrdinal("rechazadas")),
+
+                    BecasOtorgadas = reader.GetInt64(
+                        reader.GetOrdinal("becas_otorgadas"))
+                };
+            }
+
+            return new EstadisticasReportesDto();
+        }
     }
 }

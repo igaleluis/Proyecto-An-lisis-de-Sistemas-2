@@ -1,44 +1,74 @@
-﻿using Npgsql;
+﻿
+using Npgsql;
+using NpgsqlTypes;
 using SistemaBecas.Library.Dtos;
+using System;
 
 namespace SistemaBecas.Api.Repositories.RegistroRepository
 {
-    public class RegistroRepository:IRegistroRepository
+    public class RegistroRepository : IRegistroRepository
     {
         private readonly IConfiguration _configuration;
+
         public RegistroRepository(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-        public async Task<UsuarioDto?> RegistrarEstudiante(string nombre, string apellidos, string correo, string passwordHash)
+        public async Task<UsuarioDto?> RegistrarEstudiante(
+            string nombre,
+            string apellidos,
+            string correo,
+            string passwordHash,
+            string dpi,
+            DateTime fechaNacimiento,
+            string? telefono,
+            string? direccion)
         {
             var connectionString =
                 _configuration.GetConnectionString("DefaultConnection");
 
-            await using var connection = new NpgsqlConnection(connectionString);
+            await using var connection =
+                new NpgsqlConnection(connectionString);
 
             await connection.OpenAsync();
 
-            await using var command = new NpgsqlCommand(
-                "SELECT * FROM public.registrar_estudiante(@p_nombres, @p_apellidos, @p_correo, @p_passwordhash)",
-                connection);
+            const string sql = """
+                SELECT *
+                FROM public.registrar_estudiante(
+                    @p_nombres,
+                    @p_apellidos,
+                    @p_correo,
+                    @p_passwordhash,
+                    @p_dpi,
+                    @p_fechanacimiento,
+                    @p_telefono,
+                    @p_direccion
+                );
+                """;
+
+            await using var command = new NpgsqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("p_nombres", nombre);
+            command.Parameters.AddWithValue("p_apellidos", apellidos);
+            command.Parameters.AddWithValue("p_correo", correo);
+            command.Parameters.AddWithValue("p_passwordhash", passwordHash);
+            command.Parameters.AddWithValue("p_dpi", dpi);
 
             command.Parameters.AddWithValue(
-                "p_nombres",
-                nombre);
+                "p_fechanacimiento",
+                NpgsqlDbType.Date,
+                fechaNacimiento.Date);
 
             command.Parameters.AddWithValue(
-                "p_apellidos",
-                apellidos);
+                "p_telefono",
+                NpgsqlDbType.Varchar,
+                (object?)telefono ?? DBNull.Value);
 
             command.Parameters.AddWithValue(
-                "p_correo",
-                correo);
-
-            command.Parameters.AddWithValue(
-                "p_passwordhash",
-                passwordHash);
+                "p_direccion",
+                NpgsqlDbType.Varchar,
+                (object?)direccion ?? DBNull.Value);
 
             await using var reader = await command.ExecuteReaderAsync();
 

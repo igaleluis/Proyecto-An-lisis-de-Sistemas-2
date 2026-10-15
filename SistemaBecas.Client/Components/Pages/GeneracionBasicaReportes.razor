@@ -1,608 +1,472 @@
 ﻿@page "/generacion-reportes"
 
+@using Radzen
+@using Radzen.Blazor
 @using SistemaBecas.Client.Services.Reportes
 @using SistemaBecas.Library.Dtos.Reportes
 
 @inject IJSRuntime JS
 @inject ReportesService ReportesService
-@inject NavigationManager Navigation
+@inject NotificationService NotificationService
 
 <PageTitle>Generación de Reportes</PageTitle>
 
 <!-- ENCABEZADO -->
 <RadzenCard class="w-100 mb-4"
             Style="background: linear-gradient(135deg, #1976d2, #0d47a1); color: white;">
-
     <div style="padding: 20px;">
-
         <RadzenText Text="Generación de Reportes"
                     TextStyle="TextStyle.H4"
                     Style="color: white; font-weight: bold;" />
 
         <RadzenText Text="Genera y consulta los diferentes reportes del sistema de becas."
                     Style="color: white; margin-top: 5px;" />
-
     </div>
-
 </RadzenCard>
-
 
 <!-- ESTADÍSTICAS -->
 <RadzenRow Gap="16px" class="mb-4">
 
-    <!-- SOLICITUDES -->
     <RadzenColumn Size="12" SizeMD="3">
-
         <RadzenCard class="w-100"
                     Style="text-align: center; padding: 20px;">
-
-            <RadzenText Text="20"
+            <RadzenText Text="@estadisticas.TotalSolicitudes.ToString()"
                         TextStyle="TextStyle.H3"
                         Style="font-weight: bold;" />
 
             <RadzenText Text="Solicitudes"
                         TextStyle="TextStyle.Body1" />
-
         </RadzenCard>
-
     </RadzenColumn>
 
-
-    <!-- APROBADAS -->
     <RadzenColumn Size="12" SizeMD="3">
-
         <RadzenCard class="w-100"
                     Style="text-align: center; padding: 20px;">
-
-            <RadzenText Text="8"
+            <RadzenText Text="@estadisticas.Aprobadas.ToString()"
                         TextStyle="TextStyle.H3"
-                        Style="font-weight: bold;" />
+                        Style="font-weight: bold; color: #2e7d32;" />
 
             <RadzenText Text="Aprobadas"
                         TextStyle="TextStyle.Body1" />
-
         </RadzenCard>
-
     </RadzenColumn>
 
-
-    <!-- RECHAZADAS -->
     <RadzenColumn Size="12" SizeMD="3">
-
         <RadzenCard class="w-100"
                     Style="text-align: center; padding: 20px;">
-
-            <RadzenText Text="5"
+            <RadzenText Text="@estadisticas.Rechazadas.ToString()"
                         TextStyle="TextStyle.H3"
-                        Style="font-weight: bold;" />
+                        Style="font-weight: bold; color: #c62828;" />
 
             <RadzenText Text="Rechazadas"
                         TextStyle="TextStyle.Body1" />
-
         </RadzenCard>
-
     </RadzenColumn>
 
-
-    <!-- BECAS OTORGADAS -->
     <RadzenColumn Size="12" SizeMD="3">
-
         <RadzenCard class="w-100"
                     Style="text-align: center; padding: 20px;">
-
-            <RadzenText Text="7"
+            <RadzenText Text="@estadisticas.BecasOtorgadas.ToString()"
                         TextStyle="TextStyle.H3"
-                        Style="font-weight: bold;" />
+                        Style="font-weight: bold; color: #1565c0;" />
 
             <RadzenText Text="Becas otorgadas"
                         TextStyle="TextStyle.Body1" />
-
         </RadzenCard>
-
     </RadzenColumn>
 
 </RadzenRow>
 
-
 <!-- FILTROS -->
-<RadzenCard class="w-100 mb-4">
+<RadzenCard class="w-100 mb-4"
+            Style="padding: 16px;">
 
-    <RadzenText Text="Filtros"
+    <RadzenText Text="Filtros por fecha"
                 TextStyle="TextStyle.H5"
-                class="mb-4" />
+                class="mb-3" />
 
-    <RadzenRow Gap="16px">
+    <RadzenRow Gap="12px" AlignItems="AlignItems.End">
 
         <!-- FECHA INICIO -->
-        <RadzenColumn Size="12" SizeMD="3">
-
+        <RadzenColumn Size="12" SizeMD="4">
             <RadzenFormField Text="Fecha inicio"
                              class="w-100">
-
                 <RadzenDatePicker @bind-Value="fechaInicio"
                                   DateFormat="dd/MM/yyyy"
+                                  Max="fechaFin"
                                   class="w-100" />
-
             </RadzenFormField>
-
         </RadzenColumn>
-
 
         <!-- FECHA FIN -->
-        <RadzenColumn Size="12" SizeMD="3">
-
+        <RadzenColumn Size="12" SizeMD="4">
             <RadzenFormField Text="Fecha fin"
                              class="w-100">
-
                 <RadzenDatePicker @bind-Value="fechaFin"
                                   DateFormat="dd/MM/yyyy"
+                                  Min="fechaInicio"
                                   class="w-100" />
-
             </RadzenFormField>
-
         </RadzenColumn>
 
-
-        <!-- CONVOCATORIA -->
-        <RadzenColumn Size="12" SizeMD="3">
-
-            <RadzenFormField Text="Convocatoria"
-                             class="w-100">
-
-                <RadzenDropDown @bind-Value="convocatoriaSeleccionada"
-                                Data="@convocatorias"
-                                TextProperty="Nombre"
-                                ValueProperty="IdConvocatoria"
-                                Placeholder="Seleccione..."
-                                class="w-100" />
-
-            </RadzenFormField>
-
+        <!-- APLICAR FILTROS -->
+        <RadzenColumn Size="6" SizeMD="2">
+            <RadzenButton Text="Aplicar"
+                          Icon="filter_alt"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Click="@AplicarFiltros"
+                          Disabled="@cargandoReporte"
+                          Style="width: 100%;" />
         </RadzenColumn>
 
-
-        <!-- ESTADO -->
-        <RadzenColumn Size="12" SizeMD="3">
-
-            <RadzenFormField Text="Estado"
-                             class="w-100">
-
-                <RadzenDropDown @bind-Value="estadoSeleccionado"
-                                Data="@estados"
-                                Placeholder="Seleccione..."
-                                class="w-100" />
-
-            </RadzenFormField>
-
+        <!-- LIMPIAR FILTROS -->
+        <RadzenColumn Size="6" SizeMD="2">
+            <RadzenButton Text="Limpiar"
+                          Icon="filter_alt_off"
+                          ButtonStyle="ButtonStyle.Light"
+                          Click="@LimpiarFiltros"
+                          Disabled="@cargandoReporte"
+                          Style="width: 100%;" />
         </RadzenColumn>
 
     </RadzenRow>
-
 </RadzenCard>
 
-
-<!-- REPORTES -->
+<!-- REPORTES DISPONIBLES -->
 <RadzenCard class="w-100 mb-4">
 
     <RadzenText Text="Reportes disponibles"
                 TextStyle="TextStyle.H5"
                 class="mb-4" />
 
-
     <RadzenRow Gap="16px">
 
-        <!-- REPORTE DE SOLICITUDES -->
+        <!-- ESTADO DE SOLICITUDES -->
         <RadzenColumn Size="12" SizeMD="4">
-
-            <RadzenCard Style="height: 100%;">
-
-                <RadzenText Text="Reporte de solicitudes"
-                            TextStyle="TextStyle.H6"
-                            Style="font-weight: bold;" />
-
-                <RadzenText Text="Consulta general de las solicitudes registradas."
-                            Style="margin-top: 8px;" />
-
-                <div style="margin-top: 20px;">
-
-                    <RadzenButton Text="Generar"
-                                  Icon="picture_as_pdf"
-                                  ButtonStyle="ButtonStyle.Primary" />
-
-                </div>
-
-            </RadzenCard>
-
-        </RadzenColumn>
-
-
-        <!-- SOLICITUDES POR ESTADO -->
-        <RadzenColumn Size="12" SizeMD="4">
-
             <RadzenCard Style="height: 100%;">
 
                 <RadzenText Text="Solicitudes por estado"
                             TextStyle="TextStyle.H6"
                             Style="font-weight: bold;" />
 
-                <RadzenText Text="Muestra las solicitudes agrupadas según su estado."
+                <RadzenText Text="Muestra las solicitudes y su estado actual."
                             Style="margin-top: 8px;" />
 
                 <div style="margin-top: 20px;">
-
-                    <RadzenButton Text="Generar"
+                    <RadzenButton Text="Generar PDF"
                                   Icon="picture_as_pdf"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Click="@GenerarEstadoSolicitudes"
                                   Disabled="@cargandoReporte" />
-
                 </div>
 
             </RadzenCard>
-
         </RadzenColumn>
-
 
         <!-- SOLICITUDES POR CONVOCATORIA -->
         <RadzenColumn Size="12" SizeMD="4">
-
             <RadzenCard Style="height: 100%;">
 
                 <RadzenText Text="Solicitudes por convocatoria"
                             TextStyle="TextStyle.H6"
                             Style="font-weight: bold;" />
 
-                <RadzenText Text="Muestra la cantidad de solicitudes recibidas por cada convocatoria."
+                <RadzenText Text="Consulta el total recibido, en evaluación, aprobado y rechazado."
                             Style="margin-top: 8px;" />
 
                 <div style="margin-top: 20px;">
-
-                    <RadzenButton Text="Generar"
+                    <RadzenButton Text="Generar PDF"
                                   Icon="picture_as_pdf"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Click="@GenerarSolicitudesPorConvocatoria"
                                   Disabled="@cargandoReporte" />
-
                 </div>
 
             </RadzenCard>
-
         </RadzenColumn>
 
-
-        <!-- REPORTE DE EVALUACIONES -->
+        <!-- BECAS OTORGADAS -->
         <RadzenColumn Size="12" SizeMD="4">
-
-            <RadzenCard Style="height: 100%;">
-
-                <RadzenText Text="Reporte de evaluaciones"
-                            TextStyle="TextStyle.H6"
-                            Style="font-weight: bold;" />
-
-                <RadzenText Text="Consulta las evaluaciones realizadas a las solicitudes."
-                            Style="margin-top: 8px;" />
-
-                <div style="margin-top: 20px;">
-
-                    <RadzenButton Text="Generar"
-                                  Icon="picture_as_pdf"
-                                  ButtonStyle="ButtonStyle.Primary" />
-
-                </div>
-
-            </RadzenCard>
-
-        </RadzenColumn>
-
-
-        <!-- REPORTE DE DECISIONES -->
-        <RadzenColumn Size="12" SizeMD="4">
-
-            <RadzenCard Style="height: 100%;">
-
-                <RadzenText Text="Reporte de decisiones"
-                            TextStyle="TextStyle.H6"
-                            Style="font-weight: bold;" />
-
-                <RadzenText Text="Muestra las decisiones tomadas sobre las solicitudes."
-                            Style="margin-top: 8px;" />
-
-                <div style="margin-top: 20px;">
-
-                    <RadzenButton Text="Generar"
-                                  Icon="picture_as_pdf"
-                                  ButtonStyle="ButtonStyle.Primary" />
-
-                </div>
-
-            </RadzenCard>
-
-        </RadzenColumn>
-
-
-        <!-- REPORTE DE BECAS OTORGADAS -->
-        <RadzenColumn Size="12" SizeMD="4">
-
             <RadzenCard Style="height: 100%;">
 
                 <RadzenText Text="Reporte de becas otorgadas"
                             TextStyle="TextStyle.H6"
                             Style="font-weight: bold;" />
 
-                <RadzenText Text="Consulta las becas que han sido otorgadas."
+                <RadzenText Text="Consulta las becas otorgadas y sus beneficiarios."
                             Style="margin-top: 8px;" />
 
                 <div style="margin-top: 20px;">
-
-                    
-                    <RadzenButton Text="Generar"
+                    <RadzenButton Text="Generar PDF"
                                   Icon="picture_as_pdf"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Click="@GenerarBecasOtorgadas"
                                   Disabled="@cargandoReporte" />
-
-
                 </div>
 
             </RadzenCard>
+        </RadzenColumn>
 
+        <!-- CONVOCATORIAS -->
+        <RadzenColumn Size="12" SizeMD="4">
+            <RadzenCard Style="height: 100%;">
+
+                <RadzenText Text="Reporte de convocatorias"
+                            TextStyle="TextStyle.H6"
+                            Style="font-weight: bold;" />
+
+                <RadzenText Text="Consulta las convocatorias, sus fechas, cupos y estado."
+                            Style="margin-top: 8px;" />
+
+                <div style="margin-top: 20px;">
+                    <RadzenButton Text="Generar PDF"
+                                  Icon="picture_as_pdf"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Click="@GenerarConvocatorias"
+                                  Disabled="@cargandoReporte" />
+                </div>
+
+            </RadzenCard>
         </RadzenColumn>
 
     </RadzenRow>
-
 </RadzenCard>
-
-
-<!-- RESULTADO DEL REPORTE 1 -->
-@if (solicitudesPorConvocatoria.Any())
-{
-    <RadzenCard class="w-100 mb-4">
-
-        <RadzenText Text="Solicitudes por convocatoria"
-                    TextStyle="TextStyle.H5"
-                    class="mb-4" />
-
-
-        <RadzenDataGrid Data="@solicitudesPorConvocatoria"
-                        TItem="SolicitudesPorConvocatoriaDto"
-                        AllowPaging="true"
-                        PageSize="10"
-                        AllowSorting="true"
-                        Responsive="true">
-
-            <Columns>
-
-                <!-- CONVOCATORIA -->
-                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
-                                      Property="Convocatoria"
-                                      Title="Convocatoria" />
-
-                <!-- TOTAL -->
-                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
-                                      Property="TotalSolicitudes"
-                                      Title="Total solicitudes"
-                                      TextAlign="TextAlign.Center" />
-
-                <!-- EN EVALUACIÓN -->
-                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
-                                      Property="EnEvaluacion"
-                                      Title="En evaluación"
-                                      TextAlign="TextAlign.Center" />
-
-                <!-- APROBADAS -->
-                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
-                                      Property="Aprobadas"
-                                      Title="Aprobadas"
-                                      TextAlign="TextAlign.Center" />
-
-                <!-- RECHAZADAS -->
-                <RadzenDataGridColumn TItem="SolicitudesPorConvocatoriaDto"
-                                      Property="Rechazadas"
-                                      Title="Rechazadas"
-                                      TextAlign="TextAlign.Center" />
-
-            </Columns>
-
-        </RadzenDataGrid>
-
-    </RadzenCard>
-}
-
-
-<!-- REPORTES GENERADOS RECIENTEMENTE -->
-<RadzenCard class="w-100 mb-4">
-
-    <RadzenText Text="Reportes generados recientemente"
-                TextStyle="TextStyle.H5"
-                class="mb-4" />
-
-    <RadzenDataGrid Data="@reportesGenerados"
-                    TItem="ReporteDto"
-                    AllowPaging="true"
-                    PageSize="10"
-                    Responsive="true">
-
-        <Columns>
-
-            <RadzenDataGridColumn TItem="ReporteDto"
-                                  Property="Nombre"
-                                  Title="Reporte" />
-
-            <RadzenDataGridColumn TItem="ReporteDto"
-                                  Property="Fecha"
-                                  Title="Fecha">
-
-                <Template Context="reporte">
-
-                    @reporte.Fecha.ToString("dd/MM/yyyy HH:mm")
-
-                </Template>
-
-            </RadzenDataGridColumn>
-
-            <RadzenDataGridColumn TItem="ReporteDto"
-                                  Property="Usuario"
-                                  Title="Usuario" />
-
-        </Columns>
-
-    </RadzenDataGrid>
-
-</RadzenCard>
-
 
 @code {
-
     // ============================================================
     // FILTROS
     // ============================================================
 
     private DateTime? fechaInicio;
-
     private DateTime? fechaFin;
 
-    private int? convocatoriaSeleccionada;
-
-    private string? estadoSeleccionado;
-
-
     // ============================================================
-    // CONVOCATORIAS MOCK
+    // ESTADÍSTICAS
     // ============================================================
 
-    private List<ConvocatoriaMock> convocatorias = new()
+    private EstadisticasReportesDto estadisticas = new();
+
+    // ============================================================
+    // ESTADO DE LA PÁGINA
+    // ============================================================
+
+    private bool cargandoReporte;
+
+    protected override async Task OnInitializedAsync()
     {
-        new ConvocatoriaMock
-        {
-            IdConvocatoria = 1,
-            Nombre = "Beca Nacional Universitaria 2026"
-        },
+        await CargarEstadisticas();
+    }
 
-        new ConvocatoriaMock
-        {
-            IdConvocatoria = 2,
-            Nombre = "Beca Excelencia Académica 2026"
-        },
+    // ============================================================
+    // CARGAR ESTADÍSTICAS
+    // ============================================================
 
-        new ConvocatoriaMock
+    private async Task<bool> CargarEstadisticas()
+    {
+        try
         {
-            IdConvocatoria = 3,
-            Nombre = "Beca Talento 2026"
+            estadisticas = await ReportesService.ObtenerEstadisticas(
+                fechaInicio,
+                fechaFin);
+
+            return true;
         }
-    };
-
-
-    // ============================================================
-    // ESTADOS MOCK
-    // ============================================================
-
-    private List<string> estados = new()
-    {
-        "Pendiente",
-        "En revisión",
-        "En evaluación",
-        "Aprobada",
-        "Rechazada"
-    };
-
-
-    // ============================================================
-    // REPORTE 1
-    // SOLICITUDES POR CONVOCATORIA
-    // ============================================================
-
-    private List<SolicitudesPorConvocatoriaDto>
-        solicitudesPorConvocatoria = new();
-
-    private bool cargandoReporte = false;
-
-
-    // ============================================================
-    // OBTENER REPORTE
-    // ============================================================
-
-    private void GenerarSolicitudesPorConvocatoria()
-    {
-        var url =
-            "https://localhost:7088/api/Reportes/solicitudes-por-convocatoria/pdf";
-
-        Navigation.NavigateTo(url, forceLoad: true);
-    }
-    
-    // ============================================================
-    // REPORTE 2
-    // ESTADO DE SOLICITUDES
-    // ============================================================
-
-    private void GenerarEstadoSolicitudes()
-    {
-        var url =
-            "https://localhost:7088/api/Reportes/estado-solicitudes/pdf";
-
-        Navigation.NavigateTo(url, forceLoad: true);
-    }
-
-    //REPORTE 3
-
-    private void GenerarBecasOtorgadas()
-    {
-        var url =
-            "https://localhost:7088/api/Reportes/becas-otorgadas/pdf";
-
-        Navigation.NavigateTo(url, forceLoad: true);
-    }
-
-    // ============================================================
-    // REPORTES GENERADOS
-    // ============================================================
-
-    private List<ReporteDto> reportesGenerados = new()
-    {
-        new ReporteDto
+        catch (Exception ex)
         {
-            Nombre = "Reporte de solicitudes",
-            Fecha = DateTime.Now.AddMinutes(-30),
-            Usuario = "Administrador"
-        },
+            NotificationService.Notify(
+                NotificationSeverity.Error,
+                "Error al cargar estadísticas",
+                $"No fue posible cargar las estadísticas: {ex.Message}");
 
-        new ReporteDto
-        {
-            Nombre = "Solicitudes por estado",
-            Fecha = DateTime.Now.AddHours(-2),
-            Usuario = "Administrador"
-        },
-
-        new ReporteDto
-        {
-            Nombre = "Reporte de evaluaciones",
-            Fecha = DateTime.Now.AddDays(-1),
-            Usuario = "Administrador"
+            return false;
         }
-    };
-
-
-    // ============================================================
-    // CLASE CONVOCATORIA MOCK
-    // ============================================================
-
-    public class ConvocatoriaMock
-    {
-        public int IdConvocatoria { get; set; }
-
-        public string Nombre { get; set; } = "";
     }
 
-
     // ============================================================
-    // CLASE REPORTE
+    // APLICAR FILTROS
     // ============================================================
 
-    public class ReporteDto
+    private async Task AplicarFiltros()
     {
-        public string Nombre { get; set; } = "";
+        if (fechaInicio.HasValue &&
+            fechaFin.HasValue &&
+            fechaInicio.Value.Date > fechaFin.Value.Date)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Fechas inválidas",
+                "La fecha inicial no puede ser posterior a la fecha final.");
 
-        public DateTime Fecha { get; set; }
+            return;
+        }
 
-        public string Usuario { get; set; } = "";
+        var resultado = await CargarEstadisticas();
+
+        if (resultado)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Success,
+                "Filtros aplicados",
+                "Las estadísticas se actualizaron correctamente.");
+        }
+    }
+
+    // ============================================================
+    // LIMPIAR FILTROS
+    // ============================================================
+
+    private async Task LimpiarFiltros()
+    {
+        fechaInicio = null;
+        fechaFin = null;
+
+        var resultado = await CargarEstadisticas();
+
+        if (resultado)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Info,
+                "Filtros limpiados",
+                "Se eliminaron los filtros de fecha.");
+        }
+    }
+
+    // ============================================================
+    // GENERAR PDF DE SOLICITUDES POR CONVOCATORIA
+    // ============================================================
+
+    private async Task GenerarSolicitudesPorConvocatoria()
+    {
+        await EjecutarReporte(async () =>
+        {
+            var pdf = await ReportesService
+                .GenerarSolicitudesPorConvocatoriaPdf(
+                    fechaInicio,
+                    fechaFin);
+
+            await AbrirPdf(
+                pdf,
+                $"Reporte_Solicitudes_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+        });
+    }
+
+    // ============================================================
+    // GENERAR PDF DE ESTADO DE SOLICITUDES
+    // ============================================================
+
+    private async Task GenerarEstadoSolicitudes()
+    {
+        await EjecutarReporte(async () =>
+        {
+            var pdf = await ReportesService.GenerarEstadoSolicitudesPdf(
+                fechaInicio,
+                fechaFin);
+
+            await AbrirPdf(
+                pdf,
+                $"Reporte_Estado_Solicitudes_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+        });
+    }
+
+    // ============================================================
+    // GENERAR PDF DE BECAS OTORGADAS
+    // ============================================================
+
+    private async Task GenerarBecasOtorgadas()
+    {
+        await EjecutarReporte(async () =>
+        {
+            var pdf = await ReportesService.GenerarBecasOtorgadasPdf(
+                fechaInicio,
+                fechaFin);
+
+            await AbrirPdf(
+                pdf,
+                $"Reporte_Becas_Otorgadas_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+        });
+    }
+
+    // ============================================================
+    // GENERAR PDF DE CONVOCATORIAS
+    // ============================================================
+
+    private async Task GenerarConvocatorias()
+    {
+        await EjecutarReporte(async () =>
+        {
+            var pdf = await ReportesService.GenerarConvocatoriasPdf(
+                fechaInicio,
+                fechaFin);
+
+            await AbrirPdf(
+                pdf,
+                $"Reporte_Convocatorias_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+        });
+    }
+
+    // ============================================================
+    // EJECUTAR REPORTE CON MANEJO DE ERRORES
+    // ============================================================
+
+    private async Task EjecutarReporte(Func<Task> accion)
+    {
+        if (fechaInicio.HasValue &&
+            fechaFin.HasValue &&
+            fechaInicio.Value.Date > fechaFin.Value.Date)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Fechas inválidas",
+                "La fecha inicial no puede ser posterior a la fecha final.");
+
+            return;
+        }
+
+        try
+        {
+            cargandoReporte = true;
+
+            await accion();
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Error,
+                "Error al generar el reporte",
+                $"No fue posible generar el reporte: {ex.Message}");
+        }
+        finally
+        {
+            cargandoReporte = false;
+        }
+    }
+
+    // ============================================================
+    // DESCARGAR PDF RECIBIDO DESDE LA API
+    // ============================================================
+
+    private async Task AbrirPdf(byte[] pdf, string nombreArchivo)
+    {
+        if (pdf == null || pdf.Length == 0)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "PDF no disponible",
+                "La API no devolvió un archivo PDF.");
+
+            return;
+        }
+
+        var base64 = Convert.ToBase64String(pdf);
+
+        await JS.InvokeVoidAsync(
+            "descargarPdf",
+            nombreArchivo,
+            base64);
+
+        NotificationService.Notify(
+            NotificationSeverity.Success,
+            "Reporte generado",
+            $"El archivo {nombreArchivo} se descargó correctamente.");
     }
 }
