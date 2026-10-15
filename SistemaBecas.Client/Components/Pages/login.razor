@@ -2,6 +2,17 @@
 
 @using Radzen
 @using Radzen.Blazor
+@using SistemaBecas.Client.Services.Login
+@using SistemaBecas.Library.Dtos
+@using SistemaBecas.Client.Services.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider
+@inject NotificationService NotificationService
+@inject ILoginService loginservice
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
 
 <PageTitle>Sistema de Becas - Login</PageTitle>
 
@@ -81,10 +92,23 @@
 
 
             <!-- RECUPERAR CONTRASEÑA -->
-            <RadzenStack AlignItems="AlignItems.Center">
+            <RadzenStack AlignItems="AlignItems.Center"
+                         Gap="0.5rem">
 
                 <RadzenLink Text="¿Olvidaste tu contraseña?"
-                            Path="#" />
+                            Path="/recuperar-password" />
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             AlignItems="AlignItems.Center"
+                             Gap="0.3rem">
+
+                    <RadzenText Text="¿No tienes una cuenta?"
+                                Style="margin: 0; color: #666;" />
+
+                    <RadzenLink Text="Regístrate"
+                                Path="/registro-estudiante" />
+
+                </RadzenStack>
 
             </RadzenStack>
 
@@ -106,12 +130,67 @@
 
     private string password = "";
 
+    private bool cargando = false;
 
-    private void IniciarSesion()
+    private async Task IniciarSesion()
     {
-        // Por ahora solamente es el prototipo.
-        // La validación con la base de datos
-        // se conectará posteriormente.
+        if (string.IsNullOrWhiteSpace(correo) ||
+            string.IsNullOrWhiteSpace(password))
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Campos requeridos",
+                "Ingrese su correo y contraseña.");
+
+            return;
+        }
+
+        try
+        {
+            cargando = true;
+
+            var loginDto = new LoginPeticiónDto
+            {
+                Correo = correo,
+                Password = password
+            };
+
+            var resultado = await loginservice.LoginAsync(loginDto);
+
+
+            if (resultado == null)
+            {
+                NotificationService.Notify(
+                    NotificationSeverity.Error,
+                    "Error de inicio de sesión",
+                    "Correo o contraseña incorrectos.");
+
+                return;
+            }
+            await AuthenticationStateProvider.IniciarSesion(
+                            resultado.Token);
+
+
+            NotificationService.Notify(
+                NotificationSeverity.Success,
+                "Bienvenido",
+                $"Hola {resultado.Usuario.Nombres}");
+
+
+            NavigationManager.NavigateTo("/");
+
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Error,
+                "Error",
+                $"No fue posible iniciar sesión: {ex.Message}");
+        }
+        finally
+        {
+            cargando = false;
+        }
     }
 
 }

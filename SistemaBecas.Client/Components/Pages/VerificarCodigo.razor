@@ -1,0 +1,191 @@
+﻿@page "/verificar-codigo"
+
+@using Radzen
+@using Radzen.Blazor
+@using SistemaBecas.Library.Dtos
+
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject IHttpClientFactory HttpClientFactory
+
+<PageTitle>Sistema de Becas - Verificar código</PageTitle>
+
+<RadzenStack JustifyContent="JustifyContent.Center"
+             AlignItems="AlignItems.Center"
+             Style="min-height: 100vh; padding: 2rem; background-color: #f4f7fb;">
+
+    <RadzenCard Variant="Variant.Outlined"
+                Style="width: 100%; max-width: 450px;">
+
+        <RadzenStack Gap="1.5rem">
+
+            <!-- ENCABEZADO -->
+
+            <RadzenStack Gap="0.5rem"
+                         AlignItems="AlignItems.Center">
+
+                <RadzenIcon Icon="verified"
+                            Style="font-size: 48px; color: #1565c0;" />
+
+                <RadzenText Text="Verificar código"
+                            TextStyle="TextStyle.H4"
+                            Style="color: #1565c0; font-weight: 700; margin: 0;" />
+
+                <RadzenText Text="Ingrese el código que recibió en su correo"
+                            Style="color: #666; margin: 0; text-align: center;" />
+
+            </RadzenStack>
+
+
+            <!-- CORREO -->
+
+            <RadzenFormField Text="Correo electrónico"
+                             Variant="Variant.Outlined"
+                             Style="width: 100%;">
+
+                <RadzenTextBox @bind-Value="correo"
+                               Disabled="true"
+                               Style="width: 100%;" />
+
+            </RadzenFormField>
+
+
+            <!-- CÓDIGO -->
+
+            <RadzenFormField Text="Código de recuperación"
+                             Variant="Variant.Outlined"
+                             Style="width: 100%;">
+
+                <RadzenTextBox @bind-Value="codigo"
+                               Placeholder="Ingrese el código de 6 dígitos"
+                               MaxLength="6"
+                               Style="width: 100%;" />
+
+            </RadzenFormField>
+
+
+            <!-- BOTÓN -->
+
+            <RadzenButton Text="Verificar código"
+                          Icon="check_circle"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Size="ButtonSize.Large"
+                          Click="@ComprobarCodigo"
+                          Disabled="@cargando"
+                          Style="width: 100%;" />
+
+
+            <!-- REGRESAR -->
+
+            <RadzenStack AlignItems="AlignItems.Center">
+
+                <RadzenLink Text="← Regresar"
+                            Path="/recuperar-password" />
+
+            </RadzenStack>
+
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+    <RadzenText Text="Sistema de Becas"
+                Style="color: #666; margin: 0;" />
+
+</RadzenStack>
+
+
+@code {
+
+    private string correo = "";
+    private string codigo = "";
+
+    private bool cargando = false;
+
+    protected override void OnInitialized()
+    {
+        var uri =
+            NavigationManager.ToAbsoluteUri(
+                NavigationManager.Uri);
+
+        var query =
+            Microsoft.AspNetCore.WebUtilities.QueryHelpers
+                .ParseQuery(uri.Query);
+
+        if (query.TryGetValue("correo", out var correoParametro))
+        {
+            correo = correoParametro.ToString();
+        }
+    }
+
+    private async Task ComprobarCodigo()
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Campo requerido",
+                "Ingrese el código de recuperación.");
+
+            return;
+        }
+
+        if (codigo.Length != 6)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Código inválido",
+                "El código debe tener 6 dígitos.");
+
+            return;
+        }
+
+        try
+        {
+            cargando = true;
+
+            var httpClient =
+                HttpClientFactory.CreateClient("Api");
+
+            var dto = new VerificarCodigoDto
+            {
+                Correo = correo,
+                Codigo = codigo
+            };
+
+            var response =
+                await httpClient.PostAsJsonAsync(
+                    "api/Password/verificar",
+                    dto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                NotificationService.Notify(
+                    NotificationSeverity.Error,
+                    "Código inválido",
+                    "El código no es válido o ha expirado.");
+
+                return;
+            }
+
+            NotificationService.Notify(
+                NotificationSeverity.Success,
+                "Código válido",
+                "El código fue verificado correctamente.");
+
+            NavigationManager.NavigateTo(
+                $"/cambiar-password?correo={Uri.EscapeDataString(correo)}&codigo={Uri.EscapeDataString(codigo)}");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Error,
+                "Error",
+                $"No fue posible verificar el código: {ex.Message}");
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+}

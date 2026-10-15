@@ -473,7 +473,7 @@
                                 <RadzenButton Icon="close"
                                               ButtonStyle="ButtonStyle.Danger"
                                               Size="ButtonSize.Small"
-                                              Click="@(() => CambiarEstadoAsync(solicitud, "Rechazada"))" />
+                                              Click="@(() => IniciarRechazo(solicitud))" />
                             }
 
                         </RadzenStack>
@@ -516,6 +516,21 @@
         </RadzenCard>
     }
 
+    @if (solicitudParaRechazar is not null)
+    {
+        <RadzenCard>
+            <RadzenText Text="@($"Rechazar solicitud #{solicitudParaRechazar.IdSolicitud}")" TextStyle="TextStyle.H6" />
+            <RadzenText Text="Escribe el motivo del rechazo. Este campo es obligatorio." />
+            <RadzenTextArea @bind-Value="motivoRechazo" Rows="4" Style="width:100%; margin-top:0.75rem" />
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Style="margin-top:1rem">
+                <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="@CancelarRechazo" Disabled="@guardandoDecision" />
+                <RadzenButton Text="Confirmar rechazo" Icon="close" ButtonStyle="ButtonStyle.Danger"
+                              Click="@(() => CambiarEstadoAsync(solicitudParaRechazar, "Rechazada", motivoRechazo))"
+                              Disabled="@guardandoDecision" />
+            </RadzenStack>
+        </RadzenCard>
+    }
+
 </RadzenStack>
 
 
@@ -526,6 +541,9 @@
     private string busqueda = string.Empty;
     private string? errorCarga;
     private SolicitudGestionDto? solicitudDetalle;
+    private SolicitudGestionDto? solicitudParaRechazar;
+    private string motivoRechazo = string.Empty;
+    private bool guardandoDecision;
 
 
     private List<string> estados = new()
@@ -573,21 +591,46 @@
         solicitudDetalle = solicitud;
     }
 
-    private async Task CambiarEstadoAsync(SolicitudGestionDto solicitud, string estado)
+    private void IniciarRechazo(SolicitudGestionDto solicitud)
     {
+        solicitudDetalle = null;
+        solicitudParaRechazar = solicitud;
+        motivoRechazo = string.Empty;
+    }
+
+    private void CancelarRechazo()
+    {
+        solicitudParaRechazar = null;
+        motivoRechazo = string.Empty;
+    }
+
+    private async Task CambiarEstadoAsync(SolicitudGestionDto solicitud, string estado, string? observacionesNuevas = null)
+    {
+        if (estado == "Rechazada" && string.IsNullOrWhiteSpace(observacionesNuevas))
+        {
+            Notifications.Notify(NotificationSeverity.Warning, "Falta el motivo", "Escribe el motivo del rechazo antes de continuar.");
+            return;
+        }
+
+        guardandoDecision = true;
         try
         {
             await Api.ActualizarEstadoSolicitudAsync(solicitud.IdSolicitud, new SolicitudEstadoDto
             {
                 Estado = estado,
-                Observaciones = solicitud.Observaciones
+                Observaciones = estado == "Rechazada" ? observacionesNuevas!.Trim() : solicitud.Observaciones
             });
             Notifications.Notify(NotificationSeverity.Success, "Solicitud actualizada", $"Estado: {estado}.");
+            if (estado == "Rechazada") CancelarRechazo();
             await CargarSolicitudesAsync();
         }
         catch (Exception ex)
         {
             Notifications.Notify(NotificationSeverity.Error, "No se pudo actualizar", ex.Message);
+        }
+        finally
+        {
+            guardandoDecision = false;
         }
     }
 

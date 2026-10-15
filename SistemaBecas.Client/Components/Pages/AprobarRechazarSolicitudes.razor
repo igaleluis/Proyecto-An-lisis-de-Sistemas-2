@@ -498,13 +498,14 @@
                 <RadzenColumn Size="12"><RadzenText Text="@($"Dirección: {solicitudSeleccionada.Direccion}")" /></RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Convocatoria: {solicitudSeleccionada.Convocatoria}")" /></RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Fecha: {solicitudSeleccionada.FechaSolicitud:dd/MM/yyyy} · Estado: {solicitudSeleccionada.Estado}")" /></RadzenColumn>
+                <RadzenColumn Size="12"><RadzenText Text="@($"Observaciones anteriores: {solicitudSeleccionada.Observaciones}")" /></RadzenColumn>
                 @if (solicitudSeleccionada.Punteo.HasValue)
                 {
                     <RadzenColumn Size="12"><RadzenText Text="@($"Punteo: {solicitudSeleccionada.Punteo:0.##}")" /></RadzenColumn>
                 }
                 <RadzenColumn Size="12">
-                    <RadzenFormField Text="Justificación / observaciones" Style="width:100%">
-                        <RadzenTextArea @bind-Value="justificacion" Rows="3" Style="width:100%" />
+                    <RadzenFormField Text="Motivo del rechazo (obligatorio para rechazar)" Style="width:100%">
+                        <RadzenTextArea @bind-Value="motivoRechazo" Rows="3" Style="width:100%" />
                     </RadzenFormField>
                 </RadzenColumn>
             </RadzenRow>
@@ -532,7 +533,7 @@
     private string? errorCarga;
     private bool cargando;
     private bool guardandoDecision;
-    private string justificacion = string.Empty;
+    private string motivoRechazo = string.Empty;
     private SolicitudGestionDto? solicitudSeleccionada;
     private IEnumerable<SolicitudGestionDto> SolicitudesFiltradas => solicitudes.Where(s =>
         (string.IsNullOrWhiteSpace(estadoSeleccionado) || s.Estado.Equals(estadoSeleccionado, StringComparison.OrdinalIgnoreCase)) &&
@@ -564,19 +565,19 @@
     private async Task VerSolicitud(SolicitudGestionDto solicitud)
     {
         solicitudSeleccionada = solicitud;
-        justificacion = solicitud.Observaciones;
+        motivoRechazo = string.Empty;
     }
 
     private void CerrarDetalle()
     {
         solicitudSeleccionada = null;
-        justificacion = string.Empty;
+        motivoRechazo = string.Empty;
     }
 
     private async Task GuardarDecisionAsync(string estado)
     {
         if (solicitudSeleccionada is null) return;
-        if (estado == "Rechazada" && string.IsNullOrWhiteSpace(justificacion))
+        if (estado == "Rechazada" && string.IsNullOrWhiteSpace(motivoRechazo))
         {
             Notifications.Notify(NotificationSeverity.Warning, "Falta la justificación", "Escribe el motivo del rechazo.");
             return;
@@ -588,7 +589,7 @@
             await Api.ActualizarEstadoSolicitudAsync(solicitudSeleccionada.IdSolicitud, new SolicitudEstadoDto
             {
                 Estado = estado,
-                Observaciones = justificacion.Trim()
+                Observaciones = estado == "Rechazada" ? motivoRechazo.Trim() : solicitudSeleccionada.Observaciones
             });
             Notifications.Notify(NotificationSeverity.Success, $"Solicitud {estado.ToLowerInvariant()}", "La decisión se guardó correctamente.");
             CerrarDetalle();

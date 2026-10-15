@@ -507,7 +507,9 @@
     private ConvocatoriaGuardarDto formConvocatoria = new() { Estado = "Próxima", FechaInicio = DateTime.Today, FechaFin = DateTime.Today.AddMonths(1) };
     private IEnumerable<ConvocatoriaDto> ConvocatoriasFiltradas => convocatorias.Where(c =>
         (string.IsNullOrWhiteSpace(estadoSeleccionado) || c.Estado.Equals(estadoSeleccionado, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(busqueda) || c.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase)));
+        (string.IsNullOrWhiteSpace(busqueda) ||
+         c.Nombre.Contains(busqueda.Trim(), StringComparison.OrdinalIgnoreCase) ||
+         c.IdConvocatoria.ToString().Contains(busqueda.Trim(), StringComparison.OrdinalIgnoreCase)));
 
     protected override Task OnInitializedAsync() => CargarConvocatoriasAsync();
 

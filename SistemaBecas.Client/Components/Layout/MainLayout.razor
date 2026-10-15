@@ -1,6 +1,13 @@
 ﻿@inherits LayoutComponentBase
+
 @using Radzen
 @using Radzen.Blazor
+@using Microsoft.AspNetCore.Components.Authorization
+@using SistemaBecas.Client.Services.Authentication
+
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
 
 <RadzenDialog />
 
@@ -32,10 +39,27 @@
             </RadzenStack>
 
 
-            <RadzenLink Path="/Login"
-                        Text="Iniciar Sesión"
-                        Icon="login"
-                        class="login-button" />
+            <AuthorizeView>
+
+                <Authorized>
+
+                    <RadzenButton Text="Cerrar sesión"
+                                  Icon="logout"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Click="@CerrarSesion" />
+
+                </Authorized>
+
+                <NotAuthorized>
+
+                    <RadzenButton Text="Iniciar sesión"
+                                  Icon="login"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Click="@IrALogin" />
+
+                </NotAuthorized>
+
+            </AuthorizeView>
 
         </RadzenStack>
 
@@ -60,6 +84,7 @@
 
             </RadzenPanelMenuItem>
 
+
             <RadzenPanelMenuItem Text="Estudiantes"
                                  Icon="person">
 
@@ -67,6 +92,7 @@
                                      Path="/registrar-estudiante" />
 
             </RadzenPanelMenuItem>
+
 
             <RadzenPanelMenuItem Text="Solicitudes"
                                  Icon="description">
@@ -82,6 +108,7 @@
 
             </RadzenPanelMenuItem>
 
+
             <RadzenPanelMenuItem Text="Evaluaciones"
                                  Icon="quiz">
 
@@ -89,6 +116,7 @@
                                      Path="/administrar-evaluaciones" />
 
             </RadzenPanelMenuItem>
+
 
             <RadzenPanelMenuItem Text="Comités"
                                  Icon="group">
@@ -98,6 +126,7 @@
 
             </RadzenPanelMenuItem>
 
+
             <RadzenPanelMenuItem Text="Resolución"
                                  Icon="rule">
 
@@ -105,6 +134,7 @@
                                      Path="/aprobar-rechazar-solicitudes" />
 
             </RadzenPanelMenuItem>
+
 
             <RadzenPanelMenuItem Text="Reportes"
                                  Icon="picture_as_pdf">
@@ -137,28 +167,52 @@
 
     private bool sidebarExpanded = true;
 
-    // Botón del header (fuente de verdad externa)
+
     private async Task ToggleSidebar()
     {
         sidebarExpanded = !sidebarExpanded;
+
         await InvokeAsync(StateHasChanged);
     }
 
-    // El propio RadzenSidebar notifica cambios de su estado interno
+
     private async Task OnSidebarExpandedChanged(bool expanded)
     {
         sidebarExpanded = expanded;
+
         await InvokeAsync(StateHasChanged);
     }
 
-    // Cerrar al seleccionar una opción de navegación (item hoja)
+
     private async Task OnMenuItemClick(MenuItemEventArgs args)
     {
         if (!string.IsNullOrEmpty(args.Path))
         {
             sidebarExpanded = false;
+
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+
+    private void IrALogin()
+    {
+        sidebarExpanded = false;
+
+        NavigationManager.NavigateTo("/login");
+    }
+
+
+    private async Task CerrarSesion()
+    {
+        await AuthenticationStateProvider.CerrarSesion();
+
+        NotificationService.Notify(
+            NotificationSeverity.Info,
+            "Sesión cerrada",
+            "Has cerrado sesión correctamente.");
+
+        NavigationManager.NavigateTo("/login");
     }
 
 }
