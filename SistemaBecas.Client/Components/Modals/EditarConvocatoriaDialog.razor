@@ -2,6 +2,10 @@
 @using Radzen.Blazor
 
 @inject DialogService DialogService
+@using SistemaBecas.Client.Services
+@using SistemaBecas.Library.Dtos
+@inject GestionApiClient Api
+@inject NotificationService Notifications
 
 <RadzenStack Gap="1rem">
 
@@ -117,25 +121,38 @@
     int? Cupos { get; set; }
 
     string Estado { get; set; } = "";
+    bool Guardando { get; set; }
+    bool Cargando { get; set; }
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Temporalmente cargamos datos de ejemplo
-        // posteriormente vendrán del API según Id
-
-        Nombre = "Beca Nacional Universitaria 2026";
-
-        Descripcion =
-            "Convocatoria dirigida a estudiantes universitarios que deseen optar a una beca para continuar sus estudios durante el año 2026.";
-
-        FechaInicio = new DateTime(2026, 3, 1);
-
-        FechaFin = new DateTime(2026, 12, 15);
-
-        Cupos = 100;
-
-        Estado = "Activa";
+        Cargando = true;
+        try
+        {
+            var convocatoria = await Api.ObtenerConvocatoriaAsync(Id);
+            if (convocatoria is null)
+            {
+                Notifications.Notify(NotificationSeverity.Warning, "No encontrada", "La convocatoria ya no existe.");
+                DialogService.Close(false);
+                return;
+            }
+            Nombre = convocatoria.Nombre;
+            Descripcion = convocatoria.Descripcion;
+            FechaInicio = convocatoria.FechaInicio;
+            FechaFin = convocatoria.FechaFin;
+            Cupos = convocatoria.Cupos;
+            Estado = convocatoria.Estado;
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo cargar", ex.Message);
+            DialogService.Close(false);
+        }
+        finally
+        {
+            Cargando = false;
+        }
     }
 
 
@@ -145,11 +162,35 @@
     }
 
 
-    void GuardarCambios()
+    async Task GuardarCambios()
     {
-        // Posteriormente aquí irá el PUT/PATCH al API
-
-        DialogService.Close(true);
+        if (string.IsNullOrWhiteSpace(Nombre) || FechaInicio is null || FechaFin is null || Cupos is null)
+        {
+            Notifications.Notify(NotificationSeverity.Warning, "Datos incompletos", "Completa nombre, fechas y cupos.");
+            return;
+        }
+        Guardando = true;
+        try
+        {
+            await Api.ActualizarConvocatoriaAsync(Id, new ConvocatoriaGuardarDto
+            {
+                Nombre = Nombre,
+                Descripcion = Descripcion,
+                FechaInicio = FechaInicio.Value,
+                FechaFin = FechaFin.Value,
+                Cupos = Cupos.Value,
+                Estado = Estado
+            });
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo actualizar", ex.Message);
+        }
+        finally
+        {
+            Guardando = false;
+        }
     }
 
 }

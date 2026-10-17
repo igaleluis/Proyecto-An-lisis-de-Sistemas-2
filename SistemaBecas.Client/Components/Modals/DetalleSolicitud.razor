@@ -1,6 +1,10 @@
-﻿@using Radzen
+@using Radzen
 @using Radzen.Blazor
+@using SistemaBecas.Client.Services
+@using SistemaBecas.Library.Dtos
 @inject DialogService DialogService
+@inject GestionApiClient Api
+@inject NotificationService Notifications
 
 <RadzenStack Gap="1rem">
 
@@ -63,7 +67,7 @@
                     TextStyle="TextStyle.H6"
                     Style="color:#1565c0;font-weight:700;" />
 
-        <RadzenDivider />
+        <hr />
 
         <RadzenRow Gap="1rem">
 
@@ -83,7 +87,7 @@
                 <RadzenText Text="DPI"
                             Style="font-size:12px;color:#6b7280;" />
 
-                <RadzenText Text="@Solicitud.DPI"
+                <RadzenText Text="@Solicitud.Dpi"
                             Style="font-weight:600;" />
 
             </RadzenColumn>
@@ -131,7 +135,7 @@
                     TextStyle="TextStyle.H6"
                     Style="color:#1565c0;font-weight:700;" />
 
-        <RadzenDivider />
+        <hr />
 
         <RadzenText Text="@Solicitud.Convocatoria"
                     Style="font-size:16px;font-weight:600;" />
@@ -142,84 +146,13 @@
     </RadzenCard>
 
 
-    <!-- DOCUMENTOS -->
-
-    <RadzenCard>
-
-        <RadzenText Text="Documentos entregados"
-                    TextStyle="TextStyle.H6"
-                    Style="color:#1565c0;font-weight:700;" />
-
-        <RadzenDivider />
-
-        @foreach (var documento in Solicitud.Documentos)
-        {
-            <RadzenRow AlignItems="AlignItems.Center"
-                       Style="padding:10px 0;border-bottom:1px solid #e5e7eb;">
-
-                <RadzenColumn Size="7">
-
-                    <RadzenText Text="@documento.Nombre"
-                                Style="font-weight:600;" />
-
-                </RadzenColumn>
-
-                <RadzenColumn Size="3">
-
-                    <RadzenBadge Text="@documento.Estado"
-                                 BadgeStyle="BadgeStyle.Success" />
-
-                </RadzenColumn>
-
-                <RadzenColumn Size="2"
-                              Style="text-align:right;">
-
-                    <RadzenButton Icon="visibility"
-                                  Text="Ver"
-                                  Size="ButtonSize.Small"
-                                  ButtonStyle="ButtonStyle.Light" />
-
-                </RadzenColumn>
-
-            </RadzenRow>
-        }
-
-    </RadzenCard>
-
-
-    <!-- EVALUACIONES -->
-
-    <RadzenCard>
-
-        <RadzenText Text="Evaluaciones"
-                    TextStyle="TextStyle.H6"
-                    Style="color:#1565c0;font-weight:700;" />
-
-        <RadzenDivider />
-
-        <RadzenDataGrid TItem="EvaluacionDto"
-                        Data="@Solicitud.Evaluaciones"
-                        AllowPaging="false">
-
-            <Columns>
-
-                <RadzenDataGridColumn TItem="EvaluacionDto"
-                                      Property="Evaluador"
-                                      Title="Evaluador" />
-
-                <RadzenDataGridColumn TItem="EvaluacionDto"
-                                      Property="Punteo"
-                                      Title="Punteo" />
-
-                <RadzenDataGridColumn TItem="EvaluacionDto"
-                                      Property="Observaciones"
-                                      Title="Observaciones" />
-
-            </Columns>
-
-        </RadzenDataGrid>
-
-    </RadzenCard>
+    @if (Solicitud.Punteo.HasValue)
+    {
+        <RadzenCard>
+            <RadzenText Text="Punteo de evaluación" TextStyle="TextStyle.H6" Style="color:#1565c0;font-weight:700;" />
+            <RadzenText Text="@Solicitud.Punteo.Value.ToString("0.##")" />
+        </RadzenCard>
+    }
 
 
     <!-- DECISIÓN -->
@@ -269,79 +202,44 @@
 @code {
 
     [Parameter]
-    public SolicitudDetalleDto Solicitud { get; set; } = new();
+    public SolicitudGestionDto Solicitud { get; set; } = new();
 
     private string justificacion = "";
 
 
-    private void Aprobar()
+    private async Task Aprobar()
     {
-        Solicitud.Estado = "Aprobada";
-
-        DialogService.Close(true);
+        await GuardarDecisionAsync("Aprobada");
     }
 
 
-    private void Rechazar()
+    private async Task Rechazar()
     {
         if (string.IsNullOrWhiteSpace(justificacion))
+        {
+            Notifications.Notify(NotificationSeverity.Warning, "Justificación requerida", "Escribe el motivo del rechazo.");
             return;
-
-        Solicitud.Estado = "Rechazada";
-
-        DialogService.Close(true);
+        }
+        await GuardarDecisionAsync("Rechazada");
     }
 
-
-    public class SolicitudDetalleDto
+    private async Task GuardarDecisionAsync(string estado)
     {
-        public int IdSolicitud { get; set; }
-
-        public string Estudiante { get; set; } = "";
-
-        public string DPI { get; set; } = "";
-
-        public string Correo { get; set; } = "";
-
-        public string Telefono { get; set; } = "";
-
-        public string Direccion { get; set; } = "";
-
-        public string Convocatoria { get; set; } = "";
-
-        public DateTime FechaSolicitud { get; set; }
-
-        public string Estado { get; set; } = "";
-
-        public List<SolicitudDocumentoDto> Documentos { get; set; }
-            = new();
-
-        public List<EvaluacionDto> Evaluaciones { get; set; }
-            = new();
-    }
-
-
-    public class SolicitudDocumentoDto
-    {
-        public string Nombre { get; set; } = "";
-
-        public bool Obligatorio { get; set; }
-
-        public string RutaArchivo { get; set; } = "";
-
-        public string Estado { get; set; } = "";
-    }
-
-
-    public class EvaluacionDto
-    {
-        public string Evaluador { get; set; } = "";
-
-        public decimal Punteo { get; set; }
-
-        public DateTime FechaEvaluacion { get; set; }
-
-        public string Observaciones { get; set; } = "";
+        try
+        {
+            await Api.ActualizarEstadoSolicitudAsync(Solicitud.IdSolicitud, new SolicitudEstadoDto
+            {
+                Estado = estado,
+                Observaciones = string.IsNullOrWhiteSpace(justificacion) ? Solicitud.Observaciones : justificacion.Trim()
+            });
+            Solicitud.Estado = estado;
+            Solicitud.Observaciones = string.IsNullOrWhiteSpace(justificacion) ? Solicitud.Observaciones : justificacion.Trim();
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo guardar la decisión", ex.Message);
+        }
     }
 
 }

@@ -11,6 +11,7 @@
 @inject NotificationService NotificationService
 @inject ILoginService loginservice
 @inject NavigationManager NavigationManager
+@inject TokenService TokenService
 @inject IJSRuntime JSRuntime
 
 
@@ -168,7 +169,15 @@
                 return;
             }
             await AuthenticationStateProvider.IniciarSesion(
-                            resultado.Token);
+    resultado.Token);
+
+            TokenService.GuardarToken(resultado.Token);
+
+            Console.WriteLine("================================");
+            Console.WriteLine("TOKEN GUARDADO DESDE LOGIN");
+            Console.WriteLine(
+                $"TOKEN EN TOKEN SERVICE: {!string.IsNullOrWhiteSpace(TokenService.ObtenerToken())}");
+            Console.WriteLine("================================");
 
 
             NotificationService.Notify(

@@ -3,7 +3,11 @@
 @using Radzen
 @using Radzen.Blazor
 @using Modals
+@using SistemaBecas.Client.Services
+@using SistemaBecas.Library.Dtos
 @inject DialogService DialogService
+@inject GestionApiClient Api
+@inject NotificationService Notifications
 
 <PageTitle>Administración de Convocatorias</PageTitle>
 
@@ -78,7 +82,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text=""
+                        <RadzenText Text="@convocatorias.Count(c => c.Estado == "Activa").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #1565c0;
@@ -121,7 +125,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text=""
+                        <RadzenText Text="@convocatorias.Count(c => c.Estado == "Próxima").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #64b5f6;
@@ -164,7 +168,7 @@
                         color: #6b7280;
                         font-size: 13px;" />
 
-                        <RadzenText Text=""
+                        <RadzenText Text="@convocatorias.Count(c => c.Estado == "Cerrada").ToString()"
                                     TextStyle="TextStyle.H4"
                                     Style="
                         color: #94a3b8;
@@ -224,6 +228,7 @@
                                  Style="width: 100%;">
 
                     <RadzenDropDown TValue="string"
+                                    @bind-Value="estadoSeleccionado"
                                     Data="@(new[] { "Activa", "Próxima", "Cerrada" })"
                                     Placeholder="Todos"
                                     AllowClear="true"
@@ -242,6 +247,7 @@
                                  Style="width: 100%;">
 
                     <RadzenTextBox TValue="string"
+                                   @bind-Value="busqueda"
                                    Placeholder="Nombre o código"
                                    Style="width: 100%;" />
 
@@ -257,6 +263,7 @@
                 <RadzenButton Text="Buscar"
                               Icon="search"
                               ButtonStyle="ButtonStyle.Primary"
+                              Click="@CargarConvocatoriasAsync"
                               Style="width: 100%;" />
 
             </RadzenColumn>
@@ -289,8 +296,16 @@
         margin-bottom: 20px;" />
 
 
-        <RadzenDataGrid TItem="object"
-                        Data="@convocatorias"
+        @if (!string.IsNullOrWhiteSpace(errorCarga))
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" Text="@errorCarga" />
+        }
+        @if (cargando)
+        {
+            <RadzenProgressBar Mode="ProgressBarMode.Indeterminate" />
+        }
+        <RadzenDataGrid TItem="ConvocatoriaDto"
+                        Data="ConvocatoriasFiltradas"
                         AllowPaging="true"
                         PageSize="10"
                         AllowSorting="true"
@@ -302,7 +317,8 @@
 
                 <!-- CÓDIGO -->
 
-                <RadzenDataGridColumn TItem="object"
+                <RadzenDataGridColumn TItem="ConvocatoriaDto"
+                                      Property="IdConvocatoria"
                                       Title="Código"
                                       Width="100px">
                 </RadzenDataGridColumn>
@@ -310,7 +326,8 @@
 
                 <!-- NOMBRE -->
 
-                <RadzenDataGridColumn TItem="object"
+                <RadzenDataGridColumn TItem="ConvocatoriaDto"
+                                      Property="Nombre"
                                       Title="Nombre"
                                       Width="250px">
                 </RadzenDataGridColumn>
@@ -318,23 +335,28 @@
 
                 <!-- FECHA INICIO -->
 
-                <RadzenDataGridColumn TItem="object"
+                <RadzenDataGridColumn TItem="ConvocatoriaDto"
+                                      Property="FechaInicio"
                                       Title="Fecha inicio"
                                       Width="140px">
+                    <Template Context="item">@item.FechaInicio.ToString("dd/MM/yyyy")</Template>
                 </RadzenDataGridColumn>
 
 
                 <!-- FECHA FIN -->
 
-                <RadzenDataGridColumn TItem="object"
+                <RadzenDataGridColumn TItem="ConvocatoriaDto"
+                                      Property="FechaFin"
                                       Title="Fecha fin"
                                       Width="140px">
+                    <Template Context="item">@item.FechaFin.ToString("dd/MM/yyyy")</Template>
                 </RadzenDataGridColumn>
 
 
                 <!-- CUPOS -->
 
-                <RadzenDataGridColumn TItem="object"
+                <RadzenDataGridColumn TItem="ConvocatoriaDto"
+                                      Property="Cupos"
                                       Title="Cupos"
                                       Width="100px">
                 </RadzenDataGridColumn>
@@ -342,13 +364,13 @@
 
                 <!-- ESTADO -->
 
-                <RadzenDataGridColumn TItem="object"
+                <RadzenDataGridColumn TItem="ConvocatoriaDto"
                                       Title="Estado"
                                       Width="130px">
 
                     <Template Context="convocatoria">
 
-                        <RadzenBadge Text=""
+                        <RadzenBadge Text="@convocatoria.Estado"
                                      BadgeStyle="BadgeStyle.Primary" />
 
                     </Template>
@@ -358,7 +380,7 @@
 
                 <!-- ACCIONES -->
 
-                <RadzenDataGridColumn TItem="object"
+                <RadzenDataGridColumn TItem="ConvocatoriaDto"
                                       Title="Acciones"
                                       Width="170px">
 
@@ -369,15 +391,18 @@
 
                             <RadzenButton Icon="edit"
                                           ButtonStyle="ButtonStyle.Light"
-                                          Size="ButtonSize.Small" />
+                                          Size="ButtonSize.Small"
+                                          Click="@(() => EditarConvocatoria(convocatoria.IdConvocatoria))" />
 
                             <RadzenButton Icon="visibility"
                                           ButtonStyle="ButtonStyle.Light"
-                                          Size="ButtonSize.Small" />
+                                          Size="ButtonSize.Small"
+                                          Click="@(() => VerConvocatoria(convocatoria.IdConvocatoria))" />
 
                             <RadzenButton Icon="delete"
                                           ButtonStyle="ButtonStyle.Danger"
-                                          Size="ButtonSize.Small" />
+                                          Size="ButtonSize.Small"
+                                          Click="@(() => ConfirmarEliminacion(convocatoria.IdConvocatoria))" />
 
                         </RadzenStack>
 
@@ -396,7 +421,34 @@
 
 @code {
 
-    private List<object> convocatorias = new();
+    private List<ConvocatoriaDto> convocatorias = new();
+    private string? estadoSeleccionado;
+    private string busqueda = string.Empty;
+    private string? errorCarga;
+    private bool cargando;
+    private IEnumerable<ConvocatoriaDto> ConvocatoriasFiltradas => convocatorias.Where(c =>
+        (string.IsNullOrWhiteSpace(estadoSeleccionado) || c.Estado.Equals(estadoSeleccionado, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrWhiteSpace(busqueda) || c.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase)));
+
+    protected override Task OnInitializedAsync() => CargarConvocatoriasAsync();
+
+    private async Task CargarConvocatoriasAsync()
+    {
+        cargando = true;
+        errorCarga = null;
+        try
+        {
+            convocatorias = await Api.ObtenerConvocatoriasAsync();
+        }
+        catch (Exception ex)
+        {
+            errorCarga = $"No se pudieron cargar las convocatorias: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
 
 
     async Task AbrirNuevaConvocatoria()
@@ -413,7 +465,7 @@
 
         if (result == true)
         {
-            // Aquí después puedes recargar las convocatorias
+            await CargarConvocatoriasAsync();
         }
     }
 
@@ -422,7 +474,7 @@
     {
         await DialogService.OpenAsync<DetalleConvocatoriaDialog>(
             "Detalle de Convocatoria",
-            new Dictionary<string, object>
+            new Dictionary<string, object?>
             {
                 { "Id", id }
             },
@@ -438,9 +490,10 @@
     {
         var result = await DialogService.OpenAsync<ConfirmarEliminacionDialog>(
             "Confirmar eliminación",
-            new Dictionary<string, object>
+            new Dictionary<string, object?>
             {
-                { "Id", id }
+                { "Id", id },
+                { "NombreConvocatoria", convocatorias.FirstOrDefault(c => c.IdConvocatoria == id)?.Nombre ?? "esta convocatoria" }
             },
             new DialogOptions
             {
@@ -450,7 +503,16 @@
 
         if (result == true)
         {
-            // Aquí posteriormente llamas al API para eliminar
+            try
+            {
+                await Api.EliminarConvocatoriaAsync(id);
+                Notifications.Notify(NotificationSeverity.Success, "Convocatoria eliminada", "El cambio se guardó en la API.");
+                await CargarConvocatoriasAsync();
+            }
+            catch (Exception ex)
+            {
+                Notifications.Notify(NotificationSeverity.Error, "No se pudo eliminar", ex.Message);
+            }
         }
     }
 
@@ -459,7 +521,7 @@
     {
         var result = await DialogService.OpenAsync<EditarConvocatoriaDialog>(
             "Editar Convocatoria",
-            new Dictionary<string, object>
+            new Dictionary<string, object?>
             {
                 { "Id", id }
             },
@@ -472,7 +534,7 @@
 
         if (result == true)
         {
-            // Aquí posteriormente recargas la tabla
+            await CargarConvocatoriasAsync();
         }
     }
 
