@@ -10,18 +10,14 @@
 @inject NotificationService NotificationService
 
 <RadzenDialog />
-
 <RadzenNotification />
-
 <RadzenTooltip />
-
 <RadzenContextMenu />
-
 
 <RadzenLayout>
 
+    @* ENCABEZADO *@
     <RadzenHeader>
-
         <RadzenStack Orientation="Orientation.Horizontal"
                      AlignItems="AlignItems.Center"
                      JustifyContent="JustifyContent.SpaceBetween"
@@ -38,176 +34,202 @@
 
             </RadzenStack>
 
-
+            @* BOTONES DE SESIÓN *@
             <AuthorizeView>
-
                 <Authorized>
-
                     <RadzenButton Text="Cerrar sesión"
                                   Icon="logout"
                                   ButtonStyle="ButtonStyle.Light"
                                   Click="@CerrarSesion" />
-
                 </Authorized>
 
                 <NotAuthorized>
-
                     <RadzenButton Text="Iniciar sesión"
                                   Icon="login"
                                   ButtonStyle="ButtonStyle.Light"
                                   Click="@IrALogin" />
-
                 </NotAuthorized>
-
             </AuthorizeView>
 
         </RadzenStack>
-
     </RadzenHeader>
 
-
+    @* MENÚ LATERAL *@
     <RadzenSidebar Expanded="@sidebarExpanded"
                    ExpandedChanged="@OnSidebarExpandedChanged">
 
         <RadzenPanelMenu Multiple="false"
                          Click="@OnMenuItemClick">
 
-            <RadzenPanelMenuItem Text="Inicio"
-                                 Icon="home"
-                                 Path="/" />
+            @* INICIO: USUARIOS AUTENTICADOS *@
+            <AuthorizeView>
+                <Authorized>
+                    <RadzenPanelMenuItem Text="Inicio"
+                                         Icon="home"
+                                         Path="/" />
+                </Authorized>
+            </AuthorizeView>
 
-            <RadzenPanelMenuItem Text="Convocatorias"
-                                 Icon="add_ad">
+            @* OPCIONES DEL ESTUDIANTE *@
+            <AuthorizeView Roles="Estudiante">
+                <Authorized>
 
-                <RadzenPanelMenuItem Text="Administrar Convocatorias"
-                                     Path="/adminconvocatorias" />
+                    <RadzenPanelMenuItem Text="Convocatorias"
+                                         Icon="campaign"
+                                         Path="/convocatorias" />
 
-            </RadzenPanelMenuItem>
-
-
-            <RadzenPanelMenuItem Text="Estudiantes"
-                                 Icon="person">
-
-                <RadzenPanelMenuItem Text="Registrar Estudiantes"
-                                     Path="/registrar-estudiante" />
-
-            </RadzenPanelMenuItem>
-
-
-            <RadzenPanelMenuItem Text="Solicitudes"
-                                 Icon="description">
-
-                <RadzenPanelMenuItem Text="Gestionar Solicitudes"
-                                     Path="/gestion-solicitudes" />
-
-                <AuthorizeView Roles="Estudiante" Context="auth">
-                    <Authorized>
+                    <RadzenPanelMenuItem Text="Mis Becas"
+                                         Icon="school">
 
                         <RadzenPanelMenuItem Text="Cargar Documentación"
+                                             Icon="upload_file"
                                              Path="/cargar-documentacion" />
 
-                    </Authorized>
-                </AuthorizeView>
+                        <RadzenPanelMenuItem Text="Consultar Estado de Becas"
+                                             Icon="fact_check"
+                                             Path="/consultar-estado-beca" />
 
-                <RadzenPanelMenuItem Text="Consultar Estado de Becas"
-                                     Path="/consultar-estado-beca" />
+                    </RadzenPanelMenuItem>
 
-            </RadzenPanelMenuItem>
+                </Authorized>
+            </AuthorizeView>
 
+            @* OPCIONES DEL ADMINISTRADOR *@
+            <AuthorizeView Roles="Administrador">
+                <Authorized>
 
-            <RadzenPanelMenuItem Text="Evaluaciones"
-                                 Icon="quiz">
+                    <RadzenPanelMenuItem Text="Convocatorias"
+                                         Icon="campaign">
 
-                <RadzenPanelMenuItem Text="Administrar Evaluaciones"
-                                     Path="/administrar-evaluaciones" />
+                        <RadzenPanelMenuItem Text="Administrar Convocatorias"
+                                             Path="/adminconvocatorias" />
 
-            </RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
 
+                    <RadzenPanelMenuItem Text="Solicitudes"
+                                         Icon="description">
 
-            <RadzenPanelMenuItem Text="Comités"
-                                 Icon="group">
+                        <RadzenPanelMenuItem Text="Gestionar Solicitudes"
+                                             Path="/gestion-solicitudes" />
 
-                <RadzenPanelMenuItem Text="Gestionar Comités Evaluadores"
-                                     Path="/gestionar-comites-evaluadores" />
+                    </RadzenPanelMenuItem>
 
-            </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Evaluaciones"
+                                         Icon="quiz">
 
+                        <RadzenPanelMenuItem Text="Administrar Evaluaciones"
+                                             Path="/administrar-evaluaciones" />
 
-            <RadzenPanelMenuItem Text="Resolución"
-                                 Icon="rule">
+                    </RadzenPanelMenuItem>
 
-                <RadzenPanelMenuItem Text="Aprobar o Rechazar Solicitudes"
-                                     Path="/aprobar-rechazar-solicitudes" />
+                    <RadzenPanelMenuItem Text="Comités"
+                                         Icon="groups">
 
-            </RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Gestionar Comités Evaluadores"
+                                             Path="/gestionar-comites-evaluadores" />
 
+                    </RadzenPanelMenuItem>
 
-            <RadzenPanelMenuItem Text="Reportes"
-                                 Icon="picture_as_pdf">
+                    <RadzenPanelMenuItem Text="Resolución"
+                                         Icon="gavel">
 
-                <RadzenPanelMenuItem Text="Generar Reportes Básicos"
-                                     Path="/generacion-reportes" />
+                        <RadzenPanelMenuItem Text="Aprobar o Rechazar Solicitudes"
+                                             Path="/aprobar-rechazar-solicitudes" />
 
-            </RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
+
+                    <RadzenPanelMenuItem Text="Reportes"
+                                         Icon="assessment">
+
+                        <RadzenPanelMenuItem Text="Generar Reportes Básicos"
+                                             Path="/generacion-reportes" />
+
+                    </RadzenPanelMenuItem>
+
+                </Authorized>
+            </AuthorizeView>
+
+            @* OPCIONES DEL EVALUADOR *@
+            <AuthorizeView Roles="Evaluador">
+                <Authorized>
+
+                    <RadzenPanelMenuItem Text="Solicitudes"
+                                         Icon="description">
+
+                        <RadzenPanelMenuItem Text="Consultar Solicitudes"
+                                             Path="/gestion-solicitudes" />
+
+                    </RadzenPanelMenuItem>
+
+                    <RadzenPanelMenuItem Text="Evaluaciones"
+                                         Icon="quiz">
+
+                        <RadzenPanelMenuItem Text="Administrar Evaluaciones"
+                                             Path="/administrar-evaluaciones" />
+
+                    </RadzenPanelMenuItem>
+
+                    <RadzenPanelMenuItem Text="Comités"
+                                         Icon="groups">
+
+                        <RadzenPanelMenuItem Text="Gestionar Comités Evaluadores"
+                                             Path="/gestionar-comites-evaluadores" />
+
+                    </RadzenPanelMenuItem>
+
+                    <RadzenPanelMenuItem Text="Resolución"
+                                         Icon="gavel">
+
+                        <RadzenPanelMenuItem Text="Aprobar o Rechazar Solicitudes"
+                                             Path="/aprobar-rechazar-solicitudes" />
+
+                    </RadzenPanelMenuItem>
+
+                </Authorized>
+            </AuthorizeView>
 
         </RadzenPanelMenu>
 
     </RadzenSidebar>
 
-
+    @* CONTENIDO PRINCIPAL *@
     <RadzenBody>
-
         <div class="rz-p-4">
-
             @Body
-
         </div>
-
     </RadzenBody>
-
 
 </RadzenLayout>
 
-
 @code {
-
     private bool sidebarExpanded = true;
-
 
     private async Task ToggleSidebar()
     {
         sidebarExpanded = !sidebarExpanded;
-
         await InvokeAsync(StateHasChanged);
     }
-
 
     private async Task OnSidebarExpandedChanged(bool expanded)
     {
         sidebarExpanded = expanded;
-
         await InvokeAsync(StateHasChanged);
     }
-
 
     private async Task OnMenuItemClick(MenuItemEventArgs args)
     {
         if (!string.IsNullOrEmpty(args.Path))
         {
             sidebarExpanded = false;
-
             await InvokeAsync(StateHasChanged);
         }
     }
 
-
     private void IrALogin()
     {
         sidebarExpanded = false;
-
         NavigationManager.NavigateTo("/login");
     }
-
 
     private async Task CerrarSesion()
     {
@@ -220,5 +242,4 @@
 
         NavigationManager.NavigateTo("/login");
     }
-
 }
