@@ -14,6 +14,8 @@
 @attribute [Authorize(Roles = "Estudiante")]
 
 
+@inject NotificationService NotificationService
+
 <PageTitle>Sistema de Becas - Cargar documentación</PageTitle>
 
 <RadzenStack Gap="1.5rem"
@@ -552,6 +554,10 @@
             return;
         }
 
+                <RadzenButton Text="Guardar documentación"
+                              Icon="save"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@GuardarDocumentacion" />
         subiendoDocumento = true;
 
         mensaje = null;
@@ -637,4 +643,21 @@
             "_blank");
     }
 
+    private void GuardarDocumentacion()
+    {
+        if (solicitudSeleccionada is null)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Solicitud requerida",
+                "Seleccione una solicitud antes de continuar.");
+
+            return;
+        }
+
+        NotificationService.Notify(
+    NotificationSeverity.Info,
+    "Funcionalidad pendiente",
+    "La carga de archivos estará disponible cuando se complete su implementación.");
+    }
 }

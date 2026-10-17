@@ -2,6 +2,7 @@
 
 @using Radzen
 @using Radzen.Blazor
+@inject NotificationService NotificationService
 
 <PageTitle>Registro de estudiante</PageTitle>
 
@@ -186,15 +187,18 @@
                          JustifyContent="JustifyContent.End"
                          Gap="0.75rem">
 
+                
                 <RadzenButton Text="Cancelar"
-                              ButtonStyle="ButtonStyle.Light"
-                              Variant="Variant.Outlined"
-                              Icon="close" />
+                              Icon="close"
+                              ButtonStyle="ButtonStyle.Secondary"
+                              Variant="Variant.Filled"
+                              Click="@Cancelar" />
+
 
                 <RadzenButton Text="Registrar estudiante"
                               ButtonStyle="ButtonStyle.Primary"
-                              Icon="save" />
-
+                              Icon="save"
+                              Click="@RegistrarEstudiante" />
             </RadzenStack>
 
 
@@ -253,4 +257,71 @@
         "Inactivo"
     };
 
+    
+    private void RegistrarEstudiante()
+    {
+        if (string.IsNullOrWhiteSpace(nombres) ||
+            string.IsNullOrWhiteSpace(apellidos) ||
+            string.IsNullOrWhiteSpace(dpi) ||
+            fechaNacimiento == null ||
+            string.IsNullOrWhiteSpace(correo) ||
+            string.IsNullOrWhiteSpace(telefono) ||
+            string.IsNullOrWhiteSpace(direccion) ||
+            string.IsNullOrWhiteSpace(estadoSeleccionado))
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Campos obligatorios",
+                "Complete todos los campos antes de continuar.");
+
+            return;
+        }
+
+        try
+        {
+            var correoValidado =
+                new System.Net.Mail.MailAddress(correo.Trim());
+
+            if (correoValidado.Address != correo.Trim())
+            {
+                NotificationService.Notify(
+                    NotificationSeverity.Warning,
+                    "Correo inválido",
+                    "Ingrese un correo electrónico válido.");
+
+                return;
+            }
+        }
+        catch
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Correo inválido",
+                "Ingrese un correo electrónico válido.");
+
+            return;
+        }
+
+        NotificationService.Notify(
+            NotificationSeverity.Info,
+            "Formulario validado",
+            "Los datos son válidos, pero el guardado del estudiante aún está pendiente de implementación.");
+    }
+
+    private void Cancelar()
+    {
+        nombres = string.Empty;
+        apellidos = string.Empty;
+        dpi = string.Empty;
+        fechaNacimiento = null;
+        correo = string.Empty;
+        telefono = string.Empty;
+        direccion = string.Empty;
+        estadoSeleccionado = null;
+
+        NotificationService.Notify(
+            NotificationSeverity.Info,
+            "Formulario limpiado",
+            "Se limpiaron los datos del estudiante.");
+    }
 }

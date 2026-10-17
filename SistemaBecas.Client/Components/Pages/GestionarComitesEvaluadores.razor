@@ -2,6 +2,7 @@
 
 @using Radzen
 @using Radzen.Blazor
+@inject NotificationService NotificationService
 
 <PageTitle>Gestionar Comités Evaluadores</PageTitle>
 
@@ -403,36 +404,55 @@
     // GUARDAR
     // ============================================================
 
+   
     private void GuardarComite()
     {
         if (string.IsNullOrWhiteSpace(nombreComite))
-            return;
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Campo requerido",
+                "Ingrese el nombre del comité evaluador.");
 
+            return;
+        }
 
         var evaluadoresSeleccionados = evaluadores
             .Where(e => e.Seleccionado)
             .Select(e => e.IdEvaluador)
             .ToList();
 
+        if (evaluadoresSeleccionados.Count == 0)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Evaluadores requeridos",
+                "Seleccione al menos un evaluador para el comité.");
+
+            return;
+        }
 
         comites.Add(new ComiteMock
         {
-            IdComite = comites.Count + 1,
+            IdComite = comites.Count == 0
+                ? 1
+                : comites.Max(c => c.IdComite) + 1,
 
-            Nombre = nombreComite,
-
+            Nombre = nombreComite.Trim(),
             Fecha = fechaComite ?? DateTime.Today,
-
             Descripcion = descripcionComite,
-
             Estado = "Activo",
-
             Evaluadores = evaluadoresSeleccionados
         });
 
+        NotificationService.Notify(
+            NotificationSeverity.Success,
+            "Comité registrado",
+            "El comité evaluador se registró correctamente.");
 
         LimpiarFormulario();
     }
+
 
 
     // ============================================================
@@ -442,8 +462,12 @@
     private void Cancelar()
     {
         LimpiarFormulario();
-    }
 
+        NotificationService.Notify(
+            NotificationSeverity.Info,
+            "Formulario limpiado",
+            "Se limpiaron los datos del formulario.");
+    }
 
     // ============================================================
     // LIMPIAR
@@ -491,9 +515,14 @@
 
     private void VerComite(ComiteMock comite)
     {
-        // Próximamente se mostrará el detalle del comité.
+        NotificationService.Notify(
+            NotificationSeverity.Info,
+            "Detalle del comité",
+            $"Nombre: {comite.Nombre} | " +
+            $"Fecha: {comite.Fecha:dd/MM/yyyy} | " +
+            $"Evaluadores: {comite.Evaluadores.Count} | " +
+            $"Estado: {comite.Estado}");
     }
-
 
     // ============================================================
     // BADGE ESTADO
