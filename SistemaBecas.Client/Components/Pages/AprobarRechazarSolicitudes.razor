@@ -3,10 +3,8 @@
 
 @using Radzen
 @using Radzen.Blazor
-@using Components.Modals
 @using SistemaBecas.Client.Services
 @using SistemaBecas.Library.Dtos
-@inject DialogService DialogService
 @inject GestionApiClient Api
 @inject NotificationService Notifications
 
@@ -481,6 +479,48 @@
 
     </RadzenCard>
 
+    @if (solicitudSeleccionada is not null)
+    {
+        <RadzenCard>
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn Size="10">
+                    <RadzenText Text="@($"Revisión de solicitud #{solicitudSeleccionada.IdSolicitud}")" TextStyle="TextStyle.H6" />
+                </RadzenColumn>
+                <RadzenColumn Size="2" Style="text-align:right">
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Click="@CerrarDetalle" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Estudiante: {solicitudSeleccionada.Estudiante}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"DPI: {solicitudSeleccionada.Dpi}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Correo: {solicitudSeleccionada.Correo}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Teléfono: {solicitudSeleccionada.Telefono}")" /></RadzenColumn>
+                <RadzenColumn Size="12"><RadzenText Text="@($"Dirección: {solicitudSeleccionada.Direccion}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Convocatoria: {solicitudSeleccionada.Convocatoria}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Fecha: {solicitudSeleccionada.FechaSolicitud:dd/MM/yyyy} · Estado: {solicitudSeleccionada.Estado}")" /></RadzenColumn>
+                <RadzenColumn Size="12"><RadzenText Text="@($"Observaciones anteriores: {solicitudSeleccionada.Observaciones}")" /></RadzenColumn>
+                @if (solicitudSeleccionada.Punteo.HasValue)
+                {
+                    <RadzenColumn Size="12"><RadzenText Text="@($"Punteo: {solicitudSeleccionada.Punteo:0.##}")" /></RadzenColumn>
+                }
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Motivo del rechazo (obligatorio para rechazar)" Style="width:100%">
+                        <RadzenTextArea @bind-Value="motivoRechazo" Rows="3" Style="width:100%" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+            @if (solicitudSeleccionada.Estado == "Pendiente" || solicitudSeleccionada.Estado == "En revisión")
+            {
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Style="margin-top:1rem">
+                    <RadzenButton Text="Rechazar" Icon="cancel" ButtonStyle="ButtonStyle.Danger"
+                                  Click="@(() => GuardarDecisionAsync("Rechazada"))" Disabled="@guardandoDecision" />
+                    <RadzenButton Text="Aprobar" Icon="check_circle" ButtonStyle="ButtonStyle.Success"
+                                  Click="@(() => GuardarDecisionAsync("Aprobada"))" Disabled="@guardandoDecision" />
+                </RadzenStack>
+            }
+        </RadzenCard>
+    }
+
 </RadzenStack>
 
 
@@ -492,6 +532,9 @@
     private string busqueda = string.Empty;
     private string? errorCarga;
     private bool cargando;
+    private bool guardandoDecision;
+    private string motivoRechazo = string.Empty;
+    private SolicitudGestionDto? solicitudSeleccionada;
     private IEnumerable<SolicitudGestionDto> SolicitudesFiltradas => solicitudes.Where(s =>
         (string.IsNullOrWhiteSpace(estadoSeleccionado) || s.Estado.Equals(estadoSeleccionado, StringComparison.OrdinalIgnoreCase)) &&
         (!convocatoriaSeleccionada.HasValue || s.IdConvocatoria == convocatoriaSeleccionada.Value) &&
@@ -511,6 +554,7 @@
         catch (Exception ex)
         {
             errorCarga = $"No se pudieron cargar las solicitudes: {ex.Message}";
+            Notifications.Notify(NotificationSeverity.Error, "Error al cargar solicitudes", ex.Message);
         }
         finally
         {
@@ -520,11 +564,44 @@
 
     private async Task VerSolicitud(SolicitudGestionDto solicitud)
     {
-        var resultado = await DialogService.OpenAsync<DetalleSolicitud>(
-            $"Solicitud #{solicitud.IdSolicitud}",
-            new Dictionary<string, object?> { { "Solicitud", solicitud } },
-            new DialogOptions { Width = "900px", Height = "800px", Resizable = true, Draggable = true });
-        if (resultado == true)
+        solicitudSeleccionada = solicitud;
+        motivoRechazo = string.Empty;
+    }
+
+    private void CerrarDetalle()
+    {
+        solicitudSeleccionada = null;
+        motivoRechazo = string.Empty;
+    }
+
+    private async Task GuardarDecisionAsync(string estado)
+    {
+        if (solicitudSeleccionada is null) return;
+        if (estado == "Rechazada" && string.IsNullOrWhiteSpace(motivoRechazo))
+        {
+            Notifications.Notify(NotificationSeverity.Warning, "Falta la justificación", "Escribe el motivo del rechazo.");
+            return;
+        }
+
+        guardandoDecision = true;
+        try
+        {
+            await Api.ActualizarEstadoSolicitudAsync(solicitudSeleccionada.IdSolicitud, new SolicitudEstadoDto
+            {
+                Estado = estado,
+                Observaciones = estado == "Rechazada" ? motivoRechazo.Trim() : solicitudSeleccionada.Observaciones
+            });
+            Notifications.Notify(NotificationSeverity.Success, $"Solicitud {estado.ToLowerInvariant()}", "La decisión se guardó correctamente.");
+            CerrarDetalle();
             await CargarSolicitudesAsync();
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo guardar la decisión", ex.Message);
+        }
+        finally
+        {
+            guardandoDecision = false;
+        }
     }
 }

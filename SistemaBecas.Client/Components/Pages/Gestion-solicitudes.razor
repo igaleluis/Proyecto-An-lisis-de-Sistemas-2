@@ -4,8 +4,6 @@
 @using Radzen.Blazor
 @using SistemaBecas.Client.Services
 @using SistemaBecas.Library.Dtos
-@using Components.Modals
-@inject DialogService DialogService
 @inject GestionApiClient Api
 @inject NotificationService Notifications
 
@@ -475,7 +473,7 @@
                                 <RadzenButton Icon="close"
                                               ButtonStyle="ButtonStyle.Danger"
                                               Size="ButtonSize.Small"
-                                              Click="@(() => CambiarEstadoAsync(solicitud, "Rechazada"))" />
+                                              Click="@(() => IniciarRechazo(solicitud))" />
                             }
 
                         </RadzenStack>
@@ -490,6 +488,49 @@
 
     </RadzenCard>
 
+    @if (solicitudDetalle is not null)
+    {
+        <RadzenCard>
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn Size="10">
+                    <RadzenText Text="@($"Detalle de solicitud #{solicitudDetalle.IdSolicitud}")" TextStyle="TextStyle.H6" />
+                </RadzenColumn>
+                <RadzenColumn Size="2" Style="text-align:right">
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Click="@(() => solicitudDetalle = null)" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Estudiante: {solicitudDetalle.Estudiante}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"DPI: {solicitudDetalle.Dpi}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Correo: {solicitudDetalle.Correo}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Teléfono: {solicitudDetalle.Telefono}")" /></RadzenColumn>
+                <RadzenColumn Size="12"><RadzenText Text="@($"Dirección: {solicitudDetalle.Direccion}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Convocatoria: {solicitudDetalle.Convocatoria}")" /></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6"><RadzenText Text="@($"Fecha: {solicitudDetalle.FechaSolicitud:dd/MM/yyyy} · Estado: {solicitudDetalle.Estado}")" /></RadzenColumn>
+                <RadzenColumn Size="12"><RadzenText Text="@($"Observaciones: {solicitudDetalle.Observaciones}")" /></RadzenColumn>
+                @if (solicitudDetalle.Punteo.HasValue)
+                {
+                    <RadzenColumn Size="12"><RadzenText Text="@($"Punteo: {solicitudDetalle.Punteo:0.##}")" /></RadzenColumn>
+                }
+            </RadzenRow>
+        </RadzenCard>
+    }
+
+    @if (solicitudParaRechazar is not null)
+    {
+        <RadzenCard>
+            <RadzenText Text="@($"Rechazar solicitud #{solicitudParaRechazar.IdSolicitud}")" TextStyle="TextStyle.H6" />
+            <RadzenText Text="Escribe el motivo del rechazo. Este campo es obligatorio." />
+            <RadzenTextArea @bind-Value="motivoRechazo" Rows="4" Style="width:100%; margin-top:0.75rem" />
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Style="margin-top:1rem">
+                <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="@CancelarRechazo" Disabled="@guardandoDecision" />
+                <RadzenButton Text="Confirmar rechazo" Icon="close" ButtonStyle="ButtonStyle.Danger"
+                              Click="@(() => CambiarEstadoAsync(solicitudParaRechazar, "Rechazada", motivoRechazo))"
+                              Disabled="@guardandoDecision" />
+            </RadzenStack>
+        </RadzenCard>
+    }
+
 </RadzenStack>
 
 
@@ -499,6 +540,10 @@
     private int? convocatoriaSeleccionada;
     private string busqueda = string.Empty;
     private string? errorCarga;
+    private SolicitudGestionDto? solicitudDetalle;
+    private SolicitudGestionDto? solicitudParaRechazar;
+    private string motivoRechazo = string.Empty;
+    private bool guardandoDecision;
 
 
     private List<string> estados = new()
@@ -543,29 +588,49 @@
 
     private async Task VerSolicitud(SolicitudGestionDto solicitud)
     {
-        var resultado = await DialogService.OpenAsync<DetalleSolicitud>(
-            $"Solicitud #{solicitud.IdSolicitud}",
-            new Dictionary<string, object?> { { "Solicitud", solicitud } },
-            new DialogOptions { Width = "900px", Height = "800px", Resizable = true, Draggable = true });
-        if (resultado == true)
-            await CargarSolicitudesAsync();
+        solicitudDetalle = solicitud;
     }
 
-    private async Task CambiarEstadoAsync(SolicitudGestionDto solicitud, string estado)
+    private void IniciarRechazo(SolicitudGestionDto solicitud)
     {
+        solicitudDetalle = null;
+        solicitudParaRechazar = solicitud;
+        motivoRechazo = string.Empty;
+    }
+
+    private void CancelarRechazo()
+    {
+        solicitudParaRechazar = null;
+        motivoRechazo = string.Empty;
+    }
+
+    private async Task CambiarEstadoAsync(SolicitudGestionDto solicitud, string estado, string? observacionesNuevas = null)
+    {
+        if (estado == "Rechazada" && string.IsNullOrWhiteSpace(observacionesNuevas))
+        {
+            Notifications.Notify(NotificationSeverity.Warning, "Falta el motivo", "Escribe el motivo del rechazo antes de continuar.");
+            return;
+        }
+
+        guardandoDecision = true;
         try
         {
             await Api.ActualizarEstadoSolicitudAsync(solicitud.IdSolicitud, new SolicitudEstadoDto
             {
                 Estado = estado,
-                Observaciones = solicitud.Observaciones
+                Observaciones = estado == "Rechazada" ? observacionesNuevas!.Trim() : solicitud.Observaciones
             });
             Notifications.Notify(NotificationSeverity.Success, "Solicitud actualizada", $"Estado: {estado}.");
+            if (estado == "Rechazada") CancelarRechazo();
             await CargarSolicitudesAsync();
         }
         catch (Exception ex)
         {
             Notifications.Notify(NotificationSeverity.Error, "No se pudo actualizar", ex.Message);
+        }
+        finally
+        {
+            guardandoDecision = false;
         }
     }
 

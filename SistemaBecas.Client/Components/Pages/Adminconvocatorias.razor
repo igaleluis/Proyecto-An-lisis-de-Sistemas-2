@@ -2,10 +2,8 @@
 
 @using Radzen
 @using Radzen.Blazor
-@using Modals
 @using SistemaBecas.Client.Services
 @using SistemaBecas.Library.Dtos
-@inject DialogService DialogService
 @inject GestionApiClient Api
 @inject NotificationService Notifications
 
@@ -57,6 +55,81 @@
         </RadzenRow>
 
     </RadzenCard>
+
+    @if (mostrarFormulario)
+    {
+        <RadzenCard>
+            <RadzenText Text="@(idConvocatoriaEditando.HasValue ? "Editar convocatoria" : "Nueva convocatoria")"
+                        TextStyle="TextStyle.H6" />
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Nombre" Style="width:100%">
+                        <RadzenTextBox @bind-Value="formConvocatoria.Nombre" Style="width:100%" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Estado" Style="width:100%">
+                        <RadzenDropDown @bind-Value="formConvocatoria.Estado"
+                                        Data="@(new[] { "Activa", "Próxima", "Cerrada" })"
+                                        Style="width:100%" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12">
+                    <RadzenFormField Text="Descripción" Style="width:100%">
+                        <RadzenTextArea @bind-Value="formConvocatoria.Descripcion" Rows="3" Style="width:100%" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenFormField Text="Fecha de inicio" Style="width:100%">
+                        <RadzenDatePicker @bind-Value="formConvocatoria.FechaInicio" DateFormat="dd/MM/yyyy" Style="width:100%" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenFormField Text="Fecha de fin" Style="width:100%">
+                        <RadzenDatePicker @bind-Value="formConvocatoria.FechaFin" DateFormat="dd/MM/yyyy" Style="width:100%" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenFormField Text="Cupos" Style="width:100%">
+                        <RadzenNumeric @bind-Value="formConvocatoria.Cupos" Min="0" Step="1" Style="width:100%" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Style="margin-top:1rem">
+                <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="@CancelarFormulario" />
+                <RadzenButton Text="@(idConvocatoriaEditando.HasValue ? "Guardar cambios" : "Crear convocatoria")"
+                              Icon="save" ButtonStyle="ButtonStyle.Primary" Click="@GuardarConvocatoriaAsync" Disabled="@guardando" />
+            </RadzenStack>
+        </RadzenCard>
+    }
+
+    @if (convocatoriaDetalle is not null)
+    {
+        <RadzenCard>
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn Size="10">
+                    <RadzenText Text="Detalle de convocatoria" TextStyle="TextStyle.H6" />
+                </RadzenColumn>
+                <RadzenColumn Size="2" Style="text-align:right">
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Click="@(() => convocatoriaDetalle = null)" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenText Text="@convocatoriaDetalle.Nombre" TextStyle="TextStyle.H5" />
+            <RadzenText Text="@convocatoriaDetalle.Descripcion" />
+            <RadzenText Text="@($"Fechas: {convocatoriaDetalle.FechaInicio:dd/MM/yyyy} a {convocatoriaDetalle.FechaFin:dd/MM/yyyy} · Cupos: {convocatoriaDetalle.Cupos} · Estado: {convocatoriaDetalle.Estado}")" />
+        </RadzenCard>
+    }
+
+    @if (idConvocatoriaPorEliminar.HasValue)
+    {
+        <RadzenAlert AlertStyle="AlertStyle.Warning"
+                     Text="Confirma la eliminación de la convocatoria seleccionada.">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Light" Click="@(() => idConvocatoriaPorEliminar = null)" />
+                <RadzenButton Text="Eliminar" Icon="delete" ButtonStyle="ButtonStyle.Danger" Click="@EliminarConvocatoriaAsync" Disabled="@guardando" />
+            </RadzenStack>
+        </RadzenAlert>
+    }
 
 
     <!-- ====================================================== -->
@@ -426,9 +499,17 @@
     private string busqueda = string.Empty;
     private string? errorCarga;
     private bool cargando;
+    private bool guardando;
+    private bool mostrarFormulario;
+    private int? idConvocatoriaEditando;
+    private int? idConvocatoriaPorEliminar;
+    private ConvocatoriaDto? convocatoriaDetalle;
+    private ConvocatoriaGuardarDto formConvocatoria = new() { Estado = "Próxima", FechaInicio = DateTime.Today, FechaFin = DateTime.Today.AddMonths(1) };
     private IEnumerable<ConvocatoriaDto> ConvocatoriasFiltradas => convocatorias.Where(c =>
         (string.IsNullOrWhiteSpace(estadoSeleccionado) || c.Estado.Equals(estadoSeleccionado, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrWhiteSpace(busqueda) || c.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase)));
+        (string.IsNullOrWhiteSpace(busqueda) ||
+         c.Nombre.Contains(busqueda.Trim(), StringComparison.OrdinalIgnoreCase) ||
+         c.IdConvocatoria.ToString().Contains(busqueda.Trim(), StringComparison.OrdinalIgnoreCase)));
 
     protected override Task OnInitializedAsync() => CargarConvocatoriasAsync();
 
@@ -443,6 +524,7 @@
         catch (Exception ex)
         {
             errorCarga = $"No se pudieron cargar las convocatorias: {ex.Message}";
+            Notifications.Notify(NotificationSeverity.Error, "Error al cargar convocatorias", ex.Message);
         }
         finally
         {
@@ -451,90 +533,124 @@
     }
 
 
-    async Task AbrirNuevaConvocatoria()
+    private void AbrirNuevaConvocatoria()
     {
-        var result = await DialogService.OpenAsync<NuevaConvocatoriaDialog>(
-            "Nueva Convocatoria",
-            null,
-            new DialogOptions
-            {
-                Width = "700px",
-                Resizable = true,
-                Draggable = true
-            });
+        idConvocatoriaEditando = null;
+        convocatoriaDetalle = null;
+        formConvocatoria = new ConvocatoriaGuardarDto { Estado = "Próxima", FechaInicio = DateTime.Today, FechaFin = DateTime.Today.AddMonths(1) };
+        mostrarFormulario = true;
+    }
 
-        if (result == true)
+
+    private async Task VerConvocatoria(int id)
+    {
+        try
         {
-            await CargarConvocatoriasAsync();
+            convocatoriaDetalle = await Api.ObtenerConvocatoriaAsync(id);
+            if (convocatoriaDetalle is null)
+                Notifications.Notify(NotificationSeverity.Warning, "Convocatoria no encontrada", "Actualiza la lista e inténtalo de nuevo.");
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo cargar el detalle", ex.Message);
         }
     }
 
 
-    async Task VerConvocatoria(int id)
+    private void ConfirmarEliminacion(int id)
     {
-        await DialogService.OpenAsync<DetalleConvocatoriaDialog>(
-            "Detalle de Convocatoria",
-            new Dictionary<string, object?>
-            {
-                { "Id", id }
-            },
-            new DialogOptions
-            {
-                Width = "600px",
-                Draggable = true
-            });
+        idConvocatoriaPorEliminar = id;
     }
 
 
-    async Task ConfirmarEliminacion(int id)
+    private async Task EditarConvocatoria(int id)
     {
-        var result = await DialogService.OpenAsync<ConfirmarEliminacionDialog>(
-            "Confirmar eliminación",
-            new Dictionary<string, object?>
-            {
-                { "Id", id },
-                { "NombreConvocatoria", convocatorias.FirstOrDefault(c => c.IdConvocatoria == id)?.Nombre ?? "esta convocatoria" }
-            },
-            new DialogOptions
-            {
-                Width = "450px",
-                Draggable = true
-            });
-
-        if (result == true)
+        try
         {
-            try
+            var convocatoria = await Api.ObtenerConvocatoriaAsync(id);
+            if (convocatoria is null)
             {
-                await Api.EliminarConvocatoriaAsync(id);
-                Notifications.Notify(NotificationSeverity.Success, "Convocatoria eliminada", "El cambio se guardó en la API.");
-                await CargarConvocatoriasAsync();
+                Notifications.Notify(NotificationSeverity.Warning, "Convocatoria no encontrada", "Actualiza la lista e inténtalo de nuevo.");
+                return;
             }
-            catch (Exception ex)
+            idConvocatoriaEditando = id;
+            convocatoriaDetalle = null;
+            formConvocatoria = new ConvocatoriaGuardarDto
             {
-                Notifications.Notify(NotificationSeverity.Error, "No se pudo eliminar", ex.Message);
-            }
+                Nombre = convocatoria.Nombre,
+                Descripcion = convocatoria.Descripcion,
+                FechaInicio = convocatoria.FechaInicio,
+                FechaFin = convocatoria.FechaFin,
+                Cupos = convocatoria.Cupos,
+                Estado = convocatoria.Estado
+            };
+            mostrarFormulario = true;
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo cargar la convocatoria", ex.Message);
         }
     }
 
-
-    async Task EditarConvocatoria(int id)
+    private void CancelarFormulario()
     {
-        var result = await DialogService.OpenAsync<EditarConvocatoriaDialog>(
-            "Editar Convocatoria",
-            new Dictionary<string, object?>
-            {
-                { "Id", id }
-            },
-            new DialogOptions
-            {
-                Width = "700px",
-                Resizable = true,
-                Draggable = true
-            });
+        mostrarFormulario = false;
+        idConvocatoriaEditando = null;
+    }
 
-        if (result == true)
+    private async Task GuardarConvocatoriaAsync()
+    {
+        if (string.IsNullOrWhiteSpace(formConvocatoria.Nombre) || formConvocatoria.FechaFin < formConvocatoria.FechaInicio || formConvocatoria.Cupos < 0)
         {
+            Notifications.Notify(NotificationSeverity.Warning, "Revisa los datos", "Completa el nombre y verifica las fechas y los cupos.");
+            return;
+        }
+
+        guardando = true;
+        try
+        {
+            if (idConvocatoriaEditando.HasValue)
+            {
+                await Api.ActualizarConvocatoriaAsync(idConvocatoriaEditando.Value, formConvocatoria);
+                Notifications.Notify(NotificationSeverity.Success, "Convocatoria actualizada", "Los cambios se guardaron correctamente.");
+            }
+            else
+            {
+                await Api.GuardarConvocatoriaAsync(formConvocatoria);
+                Notifications.Notify(NotificationSeverity.Success, "Convocatoria creada", "Se guardó correctamente.");
+            }
+            CancelarFormulario();
             await CargarConvocatoriasAsync();
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo guardar la convocatoria", ex.Message);
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+
+    private async Task EliminarConvocatoriaAsync()
+    {
+        if (!idConvocatoriaPorEliminar.HasValue) return;
+
+        guardando = true;
+        try
+        {
+            await Api.EliminarConvocatoriaAsync(idConvocatoriaPorEliminar.Value);
+            idConvocatoriaPorEliminar = null;
+            Notifications.Notify(NotificationSeverity.Success, "Convocatoria eliminada", "Se eliminó correctamente.");
+            await CargarConvocatoriasAsync();
+        }
+        catch (Exception ex)
+        {
+            Notifications.Notify(NotificationSeverity.Error, "No se pudo eliminar la convocatoria", ex.Message);
+        }
+        finally
+        {
+            guardando = false;
         }
     }
 
