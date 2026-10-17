@@ -1,0 +1,482 @@
+﻿@page "/administrar-evaluaciones"
+
+<PageTitle>Administrar Evaluaciones</PageTitle>
+
+<RadzenStack Gap="1.5rem">
+
+    <!-- Encabezado -->
+    <RadzenCard>
+        <RadzenRow AlignItems="AlignItems.Center">
+            <RadzenColumn Size="8">
+                <RadzenText Text="Administrar Evaluaciones"
+                            TextStyle="TextStyle.H4"
+                            Style="margin: 0;" />
+
+                <RadzenText Text="Registrar, consultar y modificar las evaluaciones de las solicitudes."
+                            TextStyle="TextStyle.Body1"
+                            Style="margin-top: 5px;" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="4" Style="text-align: right;">
+                <RadzenButton Text="Nueva evaluación"
+                              Icon="add"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@NuevaEvaluacion" />
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenCard>
+
+
+    <!-- Filtros -->
+    <RadzenCard>
+        <RadzenText Text="Filtros de búsqueda"
+                    TextStyle="TextStyle.H6"
+                    Style="margin-bottom: 15px;" />
+
+        <RadzenRow Gap="1rem">
+
+            <RadzenColumn Size="3">
+                <RadzenFormField Text="No. de solicitud" Style="width: 100%;">
+                    <RadzenNumeric @bind-Value="filtroSolicitud"
+                                   Style="width: 100%;"
+                                   Placeholder="Ej. 1" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="3">
+                <RadzenFormField Text="Evaluador" Style="width: 100%;">
+                    <RadzenDropDown @bind-Value="filtroEvaluador"
+                                    Data="@evaluadores"
+                                    TextProperty="Nombre"
+                                    ValueProperty="IdEvaluador"
+                                    AllowClear="true"
+                                    Placeholder="Todos"
+                                    Style="width: 100%;" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="3">
+                <RadzenFormField Text="Estado" Style="width: 100%;">
+                    <RadzenDropDown @bind-Value="filtroEstado"
+                                    Data="@estados"
+                                    AllowClear="true"
+                                    Placeholder="Todos"
+                                    Style="width: 100%;" />
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="3" Style="display: flex; align-items: end;">
+                <RadzenButton Text="Buscar"
+                              Icon="search"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@BuscarEvaluaciones"
+                              Style="margin-right: 10px;" />
+
+                <RadzenButton Text="Limpiar"
+                              Icon="clear"
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="@LimpiarFiltros" />
+            </RadzenColumn>
+
+        </RadzenRow>
+    </RadzenCard>
+
+
+    <!-- Tabla -->
+    <RadzenCard>
+
+        <RadzenText Text="Evaluaciones registradas"
+                    TextStyle="TextStyle.H6"
+                    Style="margin-bottom: 15px;" />
+
+        <RadzenDataGrid Data="@evaluaciones"
+                        TItem="EvaluacionMock"
+                        AllowPaging="true"
+                        PageSize="5"
+                        AllowSorting="true"
+                        AllowFiltering="false"
+                        EmptyText="No existen evaluaciones registradas.">
+
+            <Columns>
+
+                <RadzenDataGridColumn TItem="EvaluacionMock"
+                                      Property="IdEvaluacion"
+                                      Title="ID"
+                                      Width="70px" />
+
+                <RadzenDataGridColumn TItem="EvaluacionMock"
+                                      Property="IdSolicitud"
+                                      Title="Solicitud"
+                                      Width="100px" />
+
+                <RadzenDataGridColumn TItem="EvaluacionMock"
+                                      Property="Evaluador"
+                                      Title="Evaluador"
+                                      Width="180px" />
+
+                <RadzenDataGridColumn TItem="EvaluacionMock"
+                                      Property="FechaEvaluacion"
+                                      Title="Fecha"
+                                      Width="130px">
+                    <Template Context="evaluacion">
+                        @evaluacion.FechaEvaluacion.ToString("dd/MM/yyyy HH:mm")
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="EvaluacionMock"
+                                      Property="Punteo"
+                                      Title="Punteo"
+                                      Width="100px" />
+
+                <RadzenDataGridColumn TItem="EvaluacionMock"
+                                      Property="Estado"
+                                      Title="Estado"
+                                      Width="130px">
+                    <Template Context="evaluacion">
+
+                        @if (evaluacion.Estado == "Finalizada")
+                        {
+                            <RadzenBadge Text="@evaluacion.Estado"
+                                         BadgeStyle="BadgeStyle.Success" />
+                        }
+                        else if (evaluacion.Estado == "En proceso")
+                        {
+                            <RadzenBadge Text="@evaluacion.Estado"
+                                         BadgeStyle="BadgeStyle.Warning" />
+                        }
+                        else
+                        {
+                            <RadzenBadge Text="@evaluacion.Estado"
+                                         BadgeStyle="BadgeStyle.Light" />
+                        }
+
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="EvaluacionMock"
+                                      Title="Acciones"
+                                      Width="150px">
+
+                    <Template Context="evaluacion">
+
+                        <RadzenButton Icon="edit"
+                                      ButtonStyle="ButtonStyle.Warning"
+                                      Size="ButtonSize.Small"
+                                      Variant="Variant.Flat"
+                                      Click="@(() => EditarEvaluacion(evaluacion))"
+                                      Style="margin-right: 5px;"
+                                      title="Editar" />
+
+                        <RadzenButton Icon="visibility"
+                                      ButtonStyle="ButtonStyle.Info"
+                                      Size="ButtonSize.Small"
+                                      Variant="Variant.Flat"
+                                      Click="@(() => VerEvaluacion(evaluacion))"
+                                      title="Ver detalle" />
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+            </Columns>
+
+        </RadzenDataGrid>
+
+    </RadzenCard>
+
+
+    <!-- Formulario -->
+    @if (mostrarFormulario)
+    {
+        <RadzenCard>
+
+            <RadzenText Text="@tituloFormulario"
+                        TextStyle="TextStyle.H6"
+                        Style="margin-bottom: 20px;" />
+
+            <RadzenRow Gap="1rem">
+
+                <RadzenColumn Size="6">
+
+                    <RadzenFormField Text="No. de solicitud" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="evaluacionActual.IdSolicitud"
+                                       Style="width: 100%;" />
+                    </RadzenFormField>
+
+                </RadzenColumn>
+
+                <RadzenColumn Size="6">
+
+                    <RadzenFormField Text="Evaluador" Style="width: 100%;">
+                        <RadzenDropDown @bind-Value="evaluacionActual.IdEvaluador"
+                                        Data="@evaluadores"
+                                        TextProperty="Nombre"
+                                        ValueProperty="IdEvaluador"
+                                        Placeholder="Seleccione un evaluador"
+                                        Style="width: 100%;" />
+                    </RadzenFormField>
+
+                </RadzenColumn>
+
+                <RadzenColumn Size="6">
+
+                    <RadzenFormField Text="Fecha de evaluación" Style="width: 100%;">
+                        <RadzenDatePicker @bind-Value="evaluacionActual.FechaEvaluacion"
+                                          ShowTime="true"
+                                          DateFormat="dd/MM/yyyy HH:mm"
+                                          Style="width: 100%;" />
+                    </RadzenFormField>
+
+                </RadzenColumn>
+
+                <RadzenColumn Size="6">
+
+                    <RadzenFormField Text="Punteo" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="evaluacionActual.Punteo"
+                                       Min="0"
+                                       Max="100"
+                                       Step="0.01"
+                                       Style="width: 100%;" />
+                    </RadzenFormField>
+
+                </RadzenColumn>
+
+                <RadzenColumn Size="6">
+
+                    <RadzenFormField Text="Estado" Style="width: 100%;">
+                        <RadzenDropDown @bind-Value="evaluacionActual.Estado"
+                                        Data="@estados"
+                                        Style="width: 100%;" />
+                    </RadzenFormField>
+
+                </RadzenColumn>
+
+                <RadzenColumn Size="12">
+
+                    <RadzenFormField Text="Observaciones" Style="width: 100%;">
+                        <RadzenTextArea @bind-Value="evaluacionActual.Observaciones"
+                                        Rows="4"
+                                        Style="width: 100%;" />
+                    </RadzenFormField>
+
+                </RadzenColumn>
+
+            </RadzenRow>
+
+            <div style="margin-top: 20px;">
+
+                <RadzenButton Text="Guardar"
+                              Icon="save"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@GuardarEvaluacion"
+                              Style="margin-right: 10px;" />
+
+                <RadzenButton Text="Cancelar"
+                              Icon="close"
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="@CancelarFormulario" />
+
+            </div>
+
+        </RadzenCard>
+    }
+
+</RadzenStack>
+
+
+@code {
+
+    private int? filtroSolicitud;
+    private int? filtroEvaluador;
+    private string? filtroEstado;
+
+    private bool mostrarFormulario = false;
+    private string tituloFormulario = "Nueva evaluación";
+
+    private EvaluacionMock evaluacionActual = new();
+
+    private List<string> estados = new()
+    {
+        "Pendiente",
+        "En proceso",
+        "Finalizada"
+    };
+
+    private List<EvaluadorMock> evaluadores = new()
+    {
+        new EvaluadorMock
+        {
+            IdEvaluador = 1,
+            Nombre = "Evaluador de Prueba 1"
+        },
+        new EvaluadorMock
+        {
+            IdEvaluador = 2,
+            Nombre = "Evaluador de Prueba 2"
+        }
+    };
+
+    private List<EvaluacionMock> evaluaciones = new()
+    {
+        new EvaluacionMock
+        {
+            IdEvaluacion = 1,
+            IdSolicitud = 1,
+            IdEvaluador = 1,
+            Evaluador = "Evaluador de Prueba 1",
+            FechaEvaluacion = new DateTime(2026, 10, 1, 10, 30, 0),
+            Punteo = 85,
+            Observaciones = "La solicitud cumple con los criterios establecidos.",
+            Estado = "Finalizada"
+        },
+        new EvaluacionMock
+        {
+            IdEvaluacion = 2,
+            IdSolicitud = 2,
+            IdEvaluador = 2,
+            Evaluador = "Evaluador de Prueba 2",
+            FechaEvaluacion = new DateTime(2026, 10, 1, 11, 0, 0),
+            Punteo = 75,
+            Observaciones = "Evaluación en proceso.",
+            Estado = "En proceso"
+        }
+    };
+
+
+    private void NuevaEvaluacion()
+    {
+        tituloFormulario = "Nueva evaluación";
+
+        evaluacionActual = new EvaluacionMock
+        {
+            FechaEvaluacion = DateTime.Now,
+            Estado = "Pendiente"
+        };
+
+        mostrarFormulario = true;
+    }
+
+
+    private void EditarEvaluacion(EvaluacionMock evaluacion)
+    {
+        tituloFormulario = "Modificar evaluación";
+
+        evaluacionActual = new EvaluacionMock
+        {
+            IdEvaluacion = evaluacion.IdEvaluacion,
+            IdSolicitud = evaluacion.IdSolicitud,
+            IdEvaluador = evaluacion.IdEvaluador,
+            Evaluador = evaluacion.Evaluador,
+            FechaEvaluacion = evaluacion.FechaEvaluacion,
+            Punteo = evaluacion.Punteo,
+            Observaciones = evaluacion.Observaciones,
+            Estado = evaluacion.Estado
+        };
+
+        mostrarFormulario = true;
+    }
+
+
+    private void VerEvaluacion(EvaluacionMock evaluacion)
+    {
+        tituloFormulario = "Detalle de evaluación";
+
+        evaluacionActual = new EvaluacionMock
+        {
+            IdEvaluacion = evaluacion.IdEvaluacion,
+            IdSolicitud = evaluacion.IdSolicitud,
+            IdEvaluador = evaluacion.IdEvaluador,
+            Evaluador = evaluacion.Evaluador,
+            FechaEvaluacion = evaluacion.FechaEvaluacion,
+            Punteo = evaluacion.Punteo,
+            Observaciones = evaluacion.Observaciones,
+            Estado = evaluacion.Estado
+        };
+
+        mostrarFormulario = true;
+    }
+
+
+    private void GuardarEvaluacion()
+    {
+        if (evaluacionActual.IdEvaluacion == 0)
+        {
+            evaluacionActual.IdEvaluacion =
+                evaluaciones.Count == 0
+                    ? 1
+                    : evaluaciones.Max(x => x.IdEvaluacion) + 1;
+
+            var evaluador = evaluadores
+                .FirstOrDefault(x => x.IdEvaluador == evaluacionActual.IdEvaluador);
+
+            evaluacionActual.Evaluador =
+                evaluador?.Nombre ?? "Sin evaluador";
+
+            evaluaciones.Add(evaluacionActual);
+        }
+        else
+        {
+            var evaluacion = evaluaciones
+                .FirstOrDefault(x => x.IdEvaluacion == evaluacionActual.IdEvaluacion);
+
+            if (evaluacion != null)
+            {
+                evaluacion.IdSolicitud = evaluacionActual.IdSolicitud;
+                evaluacion.IdEvaluador = evaluacionActual.IdEvaluador;
+                evaluacion.FechaEvaluacion = evaluacionActual.FechaEvaluacion;
+                evaluacion.Punteo = evaluacionActual.Punteo;
+                evaluacion.Observaciones = evaluacionActual.Observaciones;
+                evaluacion.Estado = evaluacionActual.Estado;
+
+                var evaluador = evaluadores
+                    .FirstOrDefault(x => x.IdEvaluador == evaluacionActual.IdEvaluador);
+
+                evaluacion.Evaluador =
+                    evaluador?.Nombre ?? "Sin evaluador";
+            }
+        }
+
+        mostrarFormulario = false;
+    }
+
+
+    private void CancelarFormulario()
+    {
+        mostrarFormulario = false;
+    }
+
+
+    private void BuscarEvaluaciones()
+    {
+        // Por ahora solamente es la interfaz.
+        // La búsqueda real se conectará al backend después.
+    }
+
+
+    private void LimpiarFiltros()
+    {
+        filtroSolicitud = null;
+        filtroEvaluador = null;
+        filtroEstado = null;
+    }
+
+
+    public class EvaluacionMock
+    {
+        public int IdEvaluacion { get; set; }
+        public int IdSolicitud { get; set; }
+        public int IdEvaluador { get; set; }
+        public string Evaluador { get; set; } = "";
+        public DateTime FechaEvaluacion { get; set; }
+        public decimal? Punteo { get; set; }
+        public string Observaciones { get; set; } = "";
+        public string Estado { get; set; } = "";
+    }
+
+
+    public class EvaluadorMock
+    {
+        public int IdEvaluador { get; set; }
+        public string Nombre { get; set; } = "";
+    }
+}
