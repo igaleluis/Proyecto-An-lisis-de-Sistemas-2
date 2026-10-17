@@ -4,6 +4,7 @@ using SistemaBecas.Client.Services.Login;
 using Microsoft.AspNetCore.Components.Authorization;
 using SistemaBecas.Client.Services.Authentication;
 using SistemaBecas.Client.Services.RegistroService;
+using SistemaBecas.Client.Services.DocumentacionService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,7 @@ builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
+builder.Services.AddScoped<IDocumentacionService, DocumentacionService>();
 
 
 //Servicios API

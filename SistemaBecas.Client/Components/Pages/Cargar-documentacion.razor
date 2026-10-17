@@ -3,6 +3,8 @@
 @using Radzen
 @using Radzen.Blazor
 
+@inject NotificationService NotificationService
+
 <PageTitle>Sistema de Becas - Cargar documentación</PageTitle>
 
 <RadzenStack Gap="1.5rem"
@@ -424,7 +426,8 @@
 
                 <RadzenButton Text="Guardar documentación"
                               Icon="save"
-                              ButtonStyle="ButtonStyle.Primary" />
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@GuardarDocumentacion" />
 
             </RadzenStack>
 
@@ -496,4 +499,21 @@
         public string Descripcion { get; set; } = "";
     }
 
+    private void GuardarDocumentacion()
+    {
+        if (solicitudSeleccionada is null)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Solicitud requerida",
+                "Seleccione una solicitud antes de continuar.");
+
+            return;
+        }
+
+        NotificationService.Notify(
+    NotificationSeverity.Info,
+    "Funcionalidad pendiente",
+    "La carga de archivos estará disponible cuando se complete su implementación.");
+    }
 }

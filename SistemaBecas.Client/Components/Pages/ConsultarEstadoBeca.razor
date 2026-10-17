@@ -2,6 +2,7 @@
 
 @using Radzen
 @using Radzen.Blazor
+@inject NotificationService NotificationService
 
 <PageTitle>Consultar Estado de la Beca</PageTitle>
 
@@ -361,13 +362,54 @@
     };
 
 
+   
     private void ConsultarSolicitud()
     {
-        if (!string.IsNullOrWhiteSpace(numeroSolicitud))
+        if (string.IsNullOrWhiteSpace(numeroSolicitud))
         {
-            mostrarResultado = true;
+            mostrarResultado = false;
+
+            NotificationService.Notify(
+                NotificationSeverity.Warning,
+                "Campo requerido",
+                "Ingrese el número de solicitud que desea consultar.");
+
+            return;
         }
+
+        var numeroIngresado = numeroSolicitud.Trim().TrimStart('0');
+        var numeroRegistrado = solicitud.Numero.Trim().TrimStart('0');
+
+        if (string.IsNullOrEmpty(numeroIngresado))
+        {
+            numeroIngresado = "0";
+        }
+
+        if (string.IsNullOrEmpty(numeroRegistrado))
+        {
+            numeroRegistrado = "0";
+        }
+
+        if (numeroIngresado != numeroRegistrado)
+        {
+            mostrarResultado = false;
+
+            NotificationService.Notify(
+                NotificationSeverity.Error,
+                "Solicitud no encontrada",
+                "No se encontró una solicitud con el número ingresado.");
+
+            return;
+        }
+
+        mostrarResultado = true;
+
+        NotificationService.Notify(
+            NotificationSeverity.Success,
+            "Consulta realizada",
+            "Se encontró la solicitud y se muestra su información.");
     }
+
 
 
     public class Solicitud
